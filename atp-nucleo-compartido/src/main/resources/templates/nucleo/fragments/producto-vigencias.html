@@ -8,6 +8,12 @@
     atributo (D-20, R-PROD-24).
   - Cada fila `i` emite name="vigencias[i].<campo>" e id="vigencias_i_<campo>" (T-206, SA-P10).
   - El <template id="plantilla-vigencia"> es la fila vacía que clona el JS (T-207).
+  - Accesibilidad (R-PROD-17, H1 del informe QA del 2026-10-22): cada control de la grilla lleva
+    un nombre accesible propio (`aria-label`) con el rótulo verbatim de su columna y el número de
+    fila. El <th scope="col"> nombra la columna, pero no el control: sin este atributo axe-core
+    reportaba 140 violaciones `label` de impacto `critical` en el estado de edición.
+    El nombre accesible se indexa ("<rótulo> fila <n>", n desde 1) porque el JS renumera las filas
+    al quitar una: `static/js/vigencias.js` reindexa el `aria-label` junto con `name` e `id`.
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <body>
@@ -31,7 +37,7 @@
         <tr data-vigencia="true" th:each="v, it : ${producto.vigencias}">
           <td>
             <input class="atp-field__control" type="date"
-                   th:attr="name=|vigencias[${it.index}].prodFchVig|,id=|vigencias_${it.index}_prodFchVig|"
+                   th:attr="name=|vigencias[${it.index}].prodFchVig|,id=|vigencias_${it.index}_prodFchVig|,aria-label=|ProdFchVig fila ${it.count}|"
                    th:value="${v.prodFchVig}">
             <span class="atp-celda__fecha" th:text="${v.prodFchVigTexto}">01/01/2026</span>
             <p class="atp-field__error"
@@ -40,7 +46,7 @@
           </td>
           <td>
             <input class="atp-field__control" type="number" step="0.01"
-                   th:attr="name=|vigencias[${it.index}].prodImpu1|,id=|vigencias_${it.index}_prodImpu1|"
+                   th:attr="name=|vigencias[${it.index}].prodImpu1|,id=|vigencias_${it.index}_prodImpu1|,aria-label=|Importe Fijo Entrada fila ${it.count}|"
                    th:value="${v.prodImpu1}">
             <p class="atp-field__error"
                th:if="${#fields.hasErrors('vigencias[' + it.index + '].prodImpu1')}"
@@ -48,7 +54,7 @@
           </td>
           <td>
             <input class="atp-field__control" type="number" step="0.01"
-                   th:attr="name=|vigencias[${it.index}].prodImpu2|,id=|vigencias_${it.index}_prodImpu2|"
+                   th:attr="name=|vigencias[${it.index}].prodImpu2|,id=|vigencias_${it.index}_prodImpu2|,aria-label=|Imp.Cosech.Mec Entrada fila ${it.count}|"
                    th:value="${v.prodImpu2}">
             <p class="atp-field__error"
                th:if="${#fields.hasErrors('vigencias[' + it.index + '].prodImpu2')}"
@@ -56,7 +62,7 @@
           </td>
           <td>
             <input class="atp-field__control" type="number" step="0.01"
-                   th:attr="name=|vigencias[${it.index}].prodImpu3|,id=|vigencias_${it.index}_prodImpu3|"
+                   th:attr="name=|vigencias[${it.index}].prodImpu3|,id=|vigencias_${it.index}_prodImpu3|,aria-label=|Importe Fijo Salida fila ${it.count}|"
                    th:value="${v.prodImpu3}">
             <p class="atp-field__error"
                th:if="${#fields.hasErrors('vigencias[' + it.index + '].prodImpu3')}"
@@ -64,7 +70,7 @@
           </td>
           <td>
             <input class="atp-field__control" type="number" step="0.01"
-                   th:attr="name=|vigencias[${it.index}].prodImpu4|,id=|vigencias_${it.index}_prodImpu4|"
+                   th:attr="name=|vigencias[${it.index}].prodImpu4|,id=|vigencias_${it.index}_prodImpu4|,aria-label=|Imp.Cosech.Mec Salida fila ${it.count}|"
                    th:value="${v.prodImpu4}">
             <p class="atp-field__error"
                th:if="${#fields.hasErrors('vigencias[' + it.index + '].prodImpu4')}"
@@ -82,28 +88,29 @@
     <button class="atp-btn atp-btn--ghost" type="button" data-agregar-vigencia="true">+ Fila</button>
   </div>
 
-  <!-- Fila-plantilla: el JS clona este contenido y sustituye __INDEX__ por el indice nuevo. -->
+  <!-- Fila-plantilla: el JS clona este contenido y sustituye __INDEX__ por el indice nuevo
+       (0-based, para name/id) y __FILA__ por el numero de fila (1-based, para el aria-label). -->
   <template id="plantilla-vigencia">
     <tr data-vigencia="true">
       <td>
         <input class="atp-field__control" type="date" name="vigencias[__INDEX__].prodFchVig"
-               id="vigencias___INDEX___prodFchVig">
+               id="vigencias___INDEX___prodFchVig" aria-label="ProdFchVig fila __FILA__">
       </td>
       <td>
         <input class="atp-field__control" type="number" step="0.01" name="vigencias[__INDEX__].prodImpu1"
-               id="vigencias___INDEX___prodImpu1">
+               id="vigencias___INDEX___prodImpu1" aria-label="Importe Fijo Entrada fila __FILA__">
       </td>
       <td>
         <input class="atp-field__control" type="number" step="0.01" name="vigencias[__INDEX__].prodImpu2"
-               id="vigencias___INDEX___prodImpu2">
+               id="vigencias___INDEX___prodImpu2" aria-label="Imp.Cosech.Mec Entrada fila __FILA__">
       </td>
       <td>
         <input class="atp-field__control" type="number" step="0.01" name="vigencias[__INDEX__].prodImpu3"
-               id="vigencias___INDEX___prodImpu3">
+               id="vigencias___INDEX___prodImpu3" aria-label="Importe Fijo Salida fila __FILA__">
       </td>
       <td>
         <input class="atp-field__control" type="number" step="0.01" name="vigencias[__INDEX__].prodImpu4"
-               id="vigencias___INDEX___prodImpu4">
+               id="vigencias___INDEX___prodImpu4" aria-label="Imp.Cosech.Mec Salida fila __FILA__">
       </td>
       <td>
         <button class="atp-btn atp-btn--ghost js-quitar-vigencia" type="button">- Fila</button>

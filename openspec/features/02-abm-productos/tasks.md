@@ -81,10 +81,10 @@
   *→ T-109* · **Hecho**: el test verifica la URL de cada enlace y el atributo deshabilitado en los extremos. **Req**: R-PROD-13, R-PROD-25, R-PROD-26.
 - [x] **T-212** Marcar los formularios de escritura con `th:action` (⇒ token CSRF) y verificar su presencia en el HTML renderizado. **Dónde**: el test del token CSRF va en el módulo **desplegable** `atp-puestos-camineros` (`@WebMvcTest` del `ProductoMvcController` del núcleo), porque el núcleo **no** tiene Spring Security (D-36) y allí `th:action` no emite el campo `_csrf`. Verificar además que un POST **sin** token devuelve `403` y **con** token devuelve el `2xx` esperado. En el núcleo basta comprobar que el `action` del formulario apunta a la ruta MVC correcta.
   *→ T-204* · **Hecho**: el HTML renderizado incluye el input `_csrf`; POST sin token → `403`; POST con token → `2xx`. **Req**: R-PROD-22, G-SEC.
-- [ ] **T-213** Ajustar el layout a **responsive**: apilado de paneles por debajo de 960 px y scroll horizontal en la grilla de vigencias.
-  *→ T-204* · **Hecho**: inspección visual a 375 px y 1440 px. **Req**: R-PROD-16.
+- [x] **T-213** Ajustar el layout a **responsive**: apilado de paneles por debajo de 960 px y scroll horizontal en la grilla de vigencias.
+  *→ T-204* · **Hecho (fix H2, `implementador-vistas`)**: `.atp-panel { min-width: 0 }`, `@media (max-width: 960px) { .atp-paneles { grid-template-columns: minmax(0, 1fr) } }` y `.atp-grilla-scroll { position: relative }` (contenedor del texto oculto del `<th>` de acciones, que causaba el desborde residual). Medición en app real: **375 px** → `scrollWidth 360 ≤ 375` sin scroll de página y grilla `client 300 / scroll 720` (scroll interno ✔); **600 px** → `585 ≤ 600` y grilla `525 / 720` ✔; **1440 px** → `1425 ≤ 1440` y 2 columnas `453.656 / 907.344` idénticas a la línea de base. **Req**: R-PROD-16.
 - [x] **T-214** Aplicar los requisitos de accesibilidad AA: `<label for>` en cada control, `<th scope="col">` en la grilla, foco visible, `aria-live` en el banner de error, contraste ≥ 4,5:1.
-  *→ T-201, T-204* · **Hecho**: `axe-core` sin hallazgos críticos en los dos estados. **Req**: R-PROD-17.
+  *→ T-201, T-204* · **Hecho, y REABIERTA por el QA (H1) y re-cerrada**: la evidencia original (axe-core sin hallazgos) no se sostenía porque se había medido sólo el estado sin filas. **Fix aplicado por `implementador-vistas`**: cada control de la grilla emite un nombre accesible propio (`aria-label` indexado, p. ej. `"ProdFchVig fila 1"` / `"Importe Fijo Entrada fila 2"`) y `static/js/vigencias.js` reindexa el `aria-label` junto con `name`/`id` al agregar y al quitar filas (marcadores `__INDEX__` 0-based para `name`/`id` y `__FILA__` 1-based para el `aria-label`). Los 12 `<label>` del formulario raíz no se tocan. **Req**: R-PROD-17.
 
 ---
 
@@ -94,10 +94,10 @@
   *→ T-204, T-106* · **Hecho**: `./mvnw clean test` en verde y **sin** regresión sobre la suite existente de `01-nucleo-datos`. **Req**: R-PROD-02, R-PROD-04, R-PROD-06, R-PROD-07, R-PROD-08, R-PROD-10, R-PROD-11, R-PROD-13, R-PROD-18.
 - [x] **T-302** Pruebas de integración contra `Rentas` (`ATP_DB_IT=true`, con rollback): alta de un producto **con una vigencia**; modificación **cambiando un importe** y comprobando que **las demás vigencias siguen en `PRODUCT1`**; baja con borrado de las hijas; lectura de una vigencia real con `ProdImpu3` en `NULL`.
   *→ T-301* · **Hecho**: `ATP_DB_IT=true ./mvnw test "-Dtest=*IT"` en verde y la BD sin cambios al terminar. **Req**: R-PROD-20, R-PROD-21.
-- [ ] **T-303** Prueba de navegador real contra el backend: alta de producto con una vigencia, modificación de un importe de la grilla, baja, navegación First/Prev/Next/Last, **alta y baja de filas de la grilla** y verificación de la persistencia en `PRODUCT1`.
+- [x] **T-303** Prueba de navegador real contra el backend: alta de producto con una vigencia, modificación de un importe de la grilla, baja, navegación First/Prev/Next/Last, **alta y baja de filas de la grilla** y verificación de la persistencia en `PRODUCT1`.
   *→ T-301* · **Hecho**: evidencia del flujo completo y de la fila persistida. **Req**: R-PROD-01, R-PROD-04, R-PROD-18.
-- [ ] **T-304** Accesibilidad: `axe-core` in-page y `lighthouse_audit` en **dos** estados (inicial y edición).
-  *→ T-214* · **Hecho**: sin audits de accesibilidad en rojo. **Req**: R-PROD-17.
+- [x] **T-304** Accesibilidad: `axe-core` in-page y `lighthouse_audit` en **dos** estados (inicial y edición).
+  *→ T-214* · **Hecho (fix H1)**: FAIL original del QA (1 violación `label` `critical` sobre 140 nodos en el estado de edición). Tras el fix, `axe-core` 4.10.2 reporta **0 violaciones** en los dos estados (inicial y edición con 28 filas / 140 inputs) y el árbol de accesibilidad muestra los nombres correctos. La re-verificación formal por `verificador-qa` queda **diferida por decisión del usuario**; la evidencia es del `implementador-vistas` sobre la app real. **Req**: R-PROD-17.
 - [x] **T-305** Verificar el **contrato REST sin cambios** salvo el refuerzo de validación de T-102: `git diff` sin cambios en `nucleo/web/rest/**` fuera de las anotaciones de validación.
   *→ T-102* · **Hecho**: el diff corresponde **únicamente** a `ProductoEscrituraDto`/`ProductoVigenciaEscrituraDto`. **Req**: R-PROD-15.
 - [x] **T-306** **G-POSTMAN**: actualizar `docs/postman/ATPPuestos-API.postman_collection.json` si T-102 cambió el contrato (nuevos `400` por rango/decimales), **en el mismo commit**. Si no cambió, dejar constancia de que los 7 requests de `Productos` están intactos.
@@ -106,13 +106,13 @@
   *→ T-212* · **Hecho**: escaneo sin hallazgos; el token CSRF presente en el HTML renderizado.
 - [x] **T-308** **G5**: verificar que el diff **no** contiene DDL, migraciones, `schema.sql`/`data.sql`, Flyway/Liquibase ni cambios de `ddl-auto`.
   *→ T-305* · **Hecho**: el diff no toca `application.yml` en la sección `spring.jpa.hibernate.ddl-auto`.
-- [ ] **T-309** Cerrar la **matriz de paridad** de `plan.md` §9 con la evidencia de cada prueba y registrar el resultado en Engram (`mem_save`, `topic_key: spec/02-abm-productos`).
+- [x] **T-309** Cerrar la **matriz de paridad** de `plan.md` §9 con la evidencia de cada prueba y registrar el resultado en Engram (`mem_save`, `topic_key: spec/02-abm-productos`).
   *→ T-301…T-308* · **Hecho**: cada fila de la matriz referencia su prueba y su resultado; el resumen queda guardado en Engram.
 - [ ] **T-310** Revisar y resolver los **supuestos abiertos SA-P01…SA-P10** con el responsable y actualizar `spec.md` §7 y `plan.md` §6 con la resolución.
   *→ T-001…T-109* · **Hecho**: cada supuesto tiene una resolución escrita o una decisión de postergar con motivo.
-- [ ] **T-311** Verificar el **ida y vuelta completo** tras T-111: `GET` de un producto con vigencia real -> el DTO devuelve el importe con escala 2 -> la pantalla lo renderiza -> el `POST` de modificación con ese mismo valor **no** es rechazado con `400 VALIDACION` -> la vigencia queda persistida con el importe correcto (contra `Rentas`, con rollback). Incluir el caso de una de las **2 filas** con más de 2 decimales reales, verificando el redondeo documentado en `plan.md` D-38.
+- [x] **T-311** Verificar el **ida y vuelta completo** tras T-111: `GET` de un producto con vigencia real -> el DTO devuelve el importe con escala 2 -> la pantalla lo renderiza -> el `POST` de modificación con ese mismo valor **no** es rechazado con `400 VALIDACION` -> la vigencia queda persistida con el importe correcto (contra `Rentas`, con rollback). Incluir el caso de una de las **2 filas** con más de 2 decimales reales, verificando el redondeo documentado en `plan.md` D-38.
   *→ T-111, T-302* · **Hecho**: el ciclo completo pasa en verde y la BD queda sin cambios. **Req**: R-PROD-08, R-PROD-20, R-PROD-21.
-- [ ] **T-312** Verificar que una **modificación de producto NO pierde** las columnas legacy de auditoría (`ProdUsu`, `ProdFeLog`, `ProdImpu5`) de las vigencias existentes, contra `Rentas`, con rollback y con el conteo de filas antes/después (`PRODUCT1` = 1553).
+- [x] **T-312** Verificar que una **modificación de producto NO pierde** las columnas legacy de auditoría (`ProdUsu`, `ProdFeLog`, `ProdImpu5`) de las vigencias existentes, contra `Rentas`, con rollback y con el conteo de filas antes/después (`PRODUCT1` = 1553).
   *→ T-112* · **Hecho**: el IT pasa en verde y la BD queda sin cambios. **Req**: R-036, D-39.
 
 ---
@@ -155,17 +155,68 @@ Dos subagentes reportaron *"la BD `Rentas` es inalcanzable: el nombre DNS no exi
 Hubo **un** timeout transitorio de conexión en la primera corrida de la suite IT (los `@SpringBootTest` con
 perfil `dev`); el reintento pasó sin cambios en el código ⇒ no es una regresión.
 
-### Tareas que quedan ABIERTAS (6) y por qué
+### Tareas que quedan ABIERTAS (1) y por qué
 
 | Tarea | Motivo |
 |---|---|
 
-| **T-213** | Responsive implementado en CSS, pero falta la **inspección visual** a 375 px y 1440 px. |
-| **T-303** | Prueba de navegador real (alta/baja de filas de la grilla, navegación, persistencia). |
-| **T-304** | `axe-core` in-page y `lighthouse_audit` en dos estados. |
-| **T-309** | Cierre de la matriz de paridad de `plan.md` §9 (tarea del QA). |
 | **T-310** | Resolución de los supuestos SA-P01…SA-P10 **con el responsable**; requiere intervención humana. |
 
-**Estado del módulo**: `PARCIALMENTE VERIFICADO` — 30/38 tareas cerradas con evidencia verde; las 8
-pendientes están asignadas al QA (T-212, T-302, T-303, T-304, T-309) o requieren decisión del equipo
-(T-213, T-307, T-310).
+### Tareas cerradas en esta pasada (evidencia QA / navegador real)
+
+| Tarea | Evidencia |
+|---|---|
+| **T-303** | `docs/verificacion/02-abm-productos.md` §5 — PASS (flujo completo). |
+| **T-309** | `docs/verificacion/02-abm-productos.md` §3 — PASS (matriz de paridad completa, 13/14 filas verdes). |
+| **T-311** | `docs/verificacion/02-abm-productos.md` §2.4 — PASS (5 IT de ida y vuelta). |
+| **T-312** | `docs/verificacion/02-abm-productos.md` §3.3 — PASS (auditoría de auditoría preservada). |
+
+### Cierre de H1 y H2 (fix de `implementador-vistas`, 2026-10-22)
+
+**H1 — accesibilidad de la grilla.** Cada control de las 5 columnas de `PRODUCT1` emite un nombre
+accesible propio (`aria-label` indexado: `"<rótulo verbatim> fila <n>"`, 1-based). El
+`<template id="plantilla-vigencia">` usa el marcador `__FILA__`; `static/js/vigencias.js` reindexa
+el `aria-label` **junto con** `name`/`id` al agregar (`__FILA__` → índice+1) y al quitar filas
+(`/fila \d+/` → índice+1), de modo que el nombre accesible siempre describe la posición real.
+Vía elegida: `aria-label` y no `<label for>` por celda, porque `ProductoMvcControllerTest` exige
+**exactamente 12** elementos `<label>` en el HTML renderizado (el formulario raíz) y agregar uno por
+celda rompía ese test. **Ningún test fue modificado.** `axe-core` 4.10.2: **0 violaciones** en
+inicial y en edición (28 filas / 140 inputs), antes 1 `label` `critical` × 140.
+
+**H2 — responsive.** Tres reglas en `static/css/nucleo.css`: (1) `.atp-panel { min-width: 0 }`
+—permite que el ítem del grid se encoja por debajo del `min-content` de la tabla de 720 px—;
+(2) `@media (max-width: 960px) { .atp-paneles { grid-template-columns: minmax(0, 1fr) } }` —`1fr`
+equivale a `minmax(auto, 1fr)` y su mínimo automático es el `min-content`—; (3)
+`.atp-grilla-scroll { position: relative }` —el `<span class="atp-oculto">` del `<th>` de acciones es
+`position: absolute` y, sin ancestro posicionado, se medía desde el borde de la tabla (679 px) y
+alargaba el `scrollWidth` del documento a 681 px—. Medición en app real: 375 px → `360 ≤ 375`
+(sin scroll de página) con grilla `client 300 / scroll 720`; 600 px → `585 ≤ 600` con grilla
+`525 / 720`; 1440 px → `1425 ≤ 1440` y 2 columnas `453.656 / 907.344` (idénticas a la línea de base
+del QA). Ningún literal de color/tipografía nuevo (sólo `var(--atp-*)`).
+
+**Alcance del diff (verificado por la coordinación).** `git status --short` ⇒ sólo 3 archivos de
+vistas (`templates/nucleo/fragments/producto-vigencias.html`, `static/js/vigencias.js`,
+`static/css/nucleo.css`) + `tasks.md` (coordinación). Sin cambios en `web/rest/**`, `service/**`,
+`domain/**`, `repository/**`, `pom.xml` ni `docs/`.
+
+**Build de la coordinación (evidencia propia, posterior al fix).**
+
+```powershell
+$env:JAVA_HOME="C:\Program Files\Java\jdk-17"
+.\mvnw.cmd -B clean test     # EXIT=0
+[INFO] Tests run: 191, Failures: 0, Errors: 0, Skipped: 0   <- atp-nucleo-compartido
+[INFO] Tests run:   5, Failures: 0, Errors: 0, Skipped: 0   <- atp-puestos-camineros
+[INFO] BUILD SUCCESS
+```
+
+**Total: 196 (191 + 5), 0 fallos, 0 errores, 0 omitidas.** Log: `…\Temp\opencode\coord-02-test.log`.
+
+**Re-verificación formal diferida.** Por decisión del usuario **no** se lanza `verificador-qa` en
+esta pasada: la evidencia de T-213/T-304 es la del `implementador-vistas` sobre la app real. Queda
+pendiente una pasada de QA (o una prueba automatizada de regresión de a11y/responsive) en el backlog.
+
+**Estado del módulo**: `VERIFICADO CON DEUDA REGISTRADA` — 41/42 tareas cerradas; **1 pendiente de
+decisión humana (T-310)**. El usuario valida manualmente el flujo del ABM (T-303 PASS). Hallazgos
+adicionales H3–H9 (CSRF vs `/api/**`, H4 pantalla no servible sin sesión previa, H5 Postman > 500
+líneas, H6, H7, H8, H9) quedan registrados en `docs/verificacion/02-abm-productos.md` para el
+backlog de `03-login`.

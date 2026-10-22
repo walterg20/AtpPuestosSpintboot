@@ -95,6 +95,11 @@ body.atp-body {
 }
 
 .atp-panel {
+  /* Permite que el panel (ítem del grid) se encoja por debajo de su min-content: sin esto, el
+     `min-width: 720px` de la tabla de vigencias se propaga al track del grid y la página desborda
+     en vez de aparecer el scroll interno de `.atp-grilla-scroll` (H2 del informe QA del
+     2026-10-22, R-PROD-16). */
+  min-width: 0;
   background: var(--atp-surface);
   border: 1px solid var(--atp-border);
   border-radius: var(--atp-radius);
@@ -265,6 +270,12 @@ body.atp-body {
 }
 
 .atp-grilla-scroll {
+  /* `position: relative` para que los descendientes absolutamente posicionados (por ejemplo el
+     texto oculto de una cabecera) tengan a esta caja como bloque contenedor: si escaparan al
+     bloque contenedor inicial se medirían desde el borde de la tabla (720px) y volverían a
+     desbordar el documento en lugar de quedar dentro del scroll interno (H2 del informe QA del
+     2026-10-22). */
+  position: relative;
   overflow-x: auto;
   border: 1px solid var(--atp-border);
   border-radius: var(--atp-radius);
@@ -379,7 +390,10 @@ body.atp-body {
 /* ---------------------------------------------------------------------- Responsive */
 @media (max-width: 960px) {
   .atp-paneles {
-    grid-template-columns: 1fr;
+    /* `1fr` equivale a `minmax(auto, 1fr)`: el mínimo automático del track es el min-content del
+       panel, que con la tabla de vigencias (720px) mantiene el desborde de la página. Con
+       `minmax(0, 1fr)` el track puede encogerse y el scroll queda dentro de la grilla. */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .atp-grid-2col {

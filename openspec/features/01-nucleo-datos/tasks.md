@@ -1,12 +1,12 @@
 # Tasks — 01 Núcleo de Datos (piloto)
 
-> **PORTADO (2026-10-22)** desde el repositorio tppuestos2 (commit 974c3d6). Las 80 tareas
-> marcadas [x] están **ejecutadas**: su código vive hoy en tp-nucleo-compartido/ y está
-> cubierto por la suite verde (105 tests). Las 5 pendientes [ ] siguen pendientes.
-> Las mini-specs de UI **Angular** (ui-abm-maestras.md, ui-abm-localidades.md,
-> ui-abm-feriados.md) **no** se portaron: su detalle de implementación es específico de Angular
+> **PORTADO (2026-10-22)** desde el repositorio `atppuestos2` (commit `974c3d6`). Las 80 tareas
+> marcadas `[x]` están **ejecutadas**: su código vive hoy en `atp-nucleo-compartido/` y está
+> cubierto por la suite verde (105 tests). Las 5 pendientes `[ ]` siguen pendientes.
+> Las mini-specs de UI **Angular** (`ui-abm-maestras.md`, `ui-abm-localidades.md`,
+> `ui-abm-feriados.md`) **no** se portaron: su detalle de implementación es específico de Angular
 > y queda obsoleto. Su contenido de comportamiento (rótulos, validaciones, flujos) sigue siendo
-> válido como fuente y se consulta en el repositorio tppuestos2 cuando se especifique la capa
+> válido como fuente y se consulta en el repositorio `atppuestos2` cuando se especifique la capa
 > Thymeleaf de los catálogos.
 
 > Checklist verificable del módulo `01-nucleo-datos`. Cada tarea es atómica y trazable a un

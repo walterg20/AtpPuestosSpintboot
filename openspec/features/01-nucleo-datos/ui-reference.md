@@ -1,8 +1,8 @@
 # UI Reference — Maestras geográficas y catálogo (T-502)
 
-> **PORTADO (2026-10-22)** desde el repositorio tppuestos2 (commit 974c3d6). Inventario visual
+> **PORTADO (2026-10-22)** desde el repositorio `atppuestos2` (commit `974c3d6`). Inventario visual
 > del legacy: sigue siendo la referencia de **comportamiento** de las 8 maestras y de
-> ListadoLocalidades, con independencia del framework de presentación.
+> `ListadoLocalidades`, con independencia del framework de presentación.
 
 > **Alcance**: Inventory visual de las 8 transacciones maestras y `ListadoLocalidades` (único WebPanel de esta familia).  
 > **Restricción**: Solo lectura sobre KB GeneXus 18. Solo escritura dentro de `openspec/features/**`.  

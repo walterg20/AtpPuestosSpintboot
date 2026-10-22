@@ -1,8 +1,8 @@
 # Plan — 01 Núcleo de Datos (piloto)
 
-> **PORTADO (2026-10-22)** desde el repositorio tppuestos2 (commit 974c3d6). Acompaña a
-> spec.md (mismo gate **G-SPEC**). Las rutas de código se actualizaron al monorepo:
-> ackend/src/main/java/... -> tp-nucleo-compartido/src/main/java/....
+> **PORTADO (2026-10-22)** desde el repositorio `atppuestos2` (commit `974c3d6`). Acompaña a
+> `spec.md` (mismo gate **G-SPEC**). Las rutas de código se actualizaron al monorepo:
+> `backend/src/main/java/...` -> `atp-nucleo-compartido/src/main/java/...`.
 
 > Descomposición técnica del módulo `01-nucleo-datos`: mapeo JPA exacto, contratos REST y
 > desglose de implementación. Acompaña a `spec.md` (mismo gate **G-SPEC**).

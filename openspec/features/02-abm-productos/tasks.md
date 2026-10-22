@@ -48,6 +48,8 @@
   *→ T-106* · **Hecho**: test que con una colección desordenada verifica el orden ascendente y que `indiceAnterior`/`indiceSiguiente`/`primerCodigo`/`ultimoCodigo` son `null` en los extremos. **Req**: R-PROD-13, R-PROD-25.
 - [x] **T-110** Verificar que el servicio no persiste `uMedNombre` ni `ProdIMax1..4` y que los defaults `0` de `ProdTipCal`/`TPPriID`/`ProdAnula` siguen vigente.
   *→ T-002* · **Hecho**: IT de alta que comprueba los valores persistidos en `PRODUCTO` y la ausencia de columnas correspondientes. **Req**: R-PROD-29, plan §2.4.
+- [ ] **T-111** Normalizar la **escala de los importes leídos** al tipo lógico `NUMERIC(12,2)` en el borde de lectura (entidad → DTO): `setScale(2, RoundingMode.HALF_UP)` sobre `ProdImpu1..4` (`plan.md` D-38). Sin esto, la columna física `money` (escala 4) entrega `12.0000` y el `@Digits(integer=10, fraction=2)` del DTO de escritura **rechaza** el valor ⇒ el ida y vuelta leer → editar → guardar se rompe en la API y en la pantalla. **No** relajar el `@Digits` ni cambiar la forma del JSON (sólo la escala textual del número).
+  *→ T-102, T-302* · **Hecho**: test que toma una vigencia real con `ProdImpu1 = 12.0000` (escala 4 en BD), verifica que el DTO de lectura devuelve `12.00` y que ese mismo valor **pasa** la validación del DTO de escritura. **Req**: R-PROD-08, R-PROD-20. **Nota**: las **2 filas** con más de 2 decimales reales se redondean al centavo en el ida y vuelta (mismo efecto que el legacy al asignar a `NUMERIC(12,2)`) — desviación documentada en `plan.md` D-38.
 
 ---
 
@@ -75,7 +77,7 @@
   *→ T-108* · **Hecho**: el test de errores encuentra el mensaje junto al control y `Guardar` con `disabled`. **Req**: R-PROD-10, R-PROD-11.
 - [x] **T-211** Implementar los enlaces de navegación (`First`/`Prev`/`Next`/`Last`/`Select`) contra `GET /productos?prodCod=…`, deshabilitados en los extremos, y el filtro de anulados como 3 enlaces que preservan `prodCod`.
   *→ T-109* · **Hecho**: el test verifica la URL de cada enlace y el atributo deshabilitado en los extremos. **Req**: R-PROD-13, R-PROD-25, R-PROD-26.
-- [ ] **T-212** Marcar los formularios de escritura con `th:action` (⇒ token CSRF) y verificar su presencia en el HTML renderizado. **Dónde**: el test del token CSRF va en el módulo **desplegable** `atp-puestos-camineros` (`@WebMvcTest` del `ProductoMvcController` del núcleo), porque el núcleo **no** tiene Spring Security (D-36) y allí `th:action` no emite el campo `_csrf`. Verificar además que un POST **sin** token devuelve `403` y **con** token devuelve el `2xx` esperado. En el núcleo basta comprobar que el `action` del formulario apunta a la ruta MVC correcta.
+- [x] **T-212** Marcar los formularios de escritura con `th:action` (⇒ token CSRF) y verificar su presencia en el HTML renderizado. **Dónde**: el test del token CSRF va en el módulo **desplegable** `atp-puestos-camineros` (`@WebMvcTest` del `ProductoMvcController` del núcleo), porque el núcleo **no** tiene Spring Security (D-36) y allí `th:action` no emite el campo `_csrf`. Verificar además que un POST **sin** token devuelve `403` y **con** token devuelve el `2xx` esperado. En el núcleo basta comprobar que el `action` del formulario apunta a la ruta MVC correcta.
   *→ T-204* · **Hecho**: el HTML renderizado incluye el input `_csrf`; POST sin token → `403`; POST con token → `2xx`. **Req**: R-PROD-22, G-SEC.
 - [ ] **T-213** Ajustar el layout a **responsive**: apilado de paneles por debajo de 960 px y scroll horizontal en la grilla de vigencias.
   *→ T-204* · **Hecho**: inspección visual a 375 px y 1440 px. **Req**: R-PROD-16.
@@ -88,7 +90,7 @@
 
 - [x] **T-301** Suite de vistas (`@WebMvcTest` + `MockMvc`): render de la vista, **12 rótulos verbatim** en orden, 5 cabeceras de la grilla, navegación, validaciones (rango de PK, decimales, unicidad de fecha), errores del backend y conservación del formulario. **≥ 25 pruebas nuevas**.
   *→ T-204, T-106* · **Hecho**: `./mvnw clean test` en verde y **sin** regresión sobre la suite existente de `01-nucleo-datos`. **Req**: R-PROD-02, R-PROD-04, R-PROD-06, R-PROD-07, R-PROD-08, R-PROD-10, R-PROD-11, R-PROD-13, R-PROD-18.
-- [ ] **T-302** Pruebas de integración contra `Rentas` (`ATP_DB_IT=true`, con rollback): alta de un producto **con una vigencia**; modificación **cambiando un importe** y comprobando que **las demás vigencias siguen en `PRODUCT1`**; baja con borrado de las hijas; lectura de una vigencia real con `ProdImpu3` en `NULL`.
+- [x] **T-302** Pruebas de integración contra `Rentas` (`ATP_DB_IT=true`, con rollback): alta de un producto **con una vigencia**; modificación **cambiando un importe** y comprobando que **las demás vigencias siguen en `PRODUCT1`**; baja con borrado de las hijas; lectura de una vigencia real con `ProdImpu3` en `NULL`.
   *→ T-301* · **Hecho**: `ATP_DB_IT=true ./mvnw test "-Dtest=*IT"` en verde y la BD sin cambios al terminar. **Req**: R-PROD-20, R-PROD-21.
 - [ ] **T-303** Prueba de navegador real contra el backend: alta de producto con una vigencia, modificación de un importe de la grilla, baja, navegación First/Prev/Next/Last, **alta y baja de filas de la grilla** y verificación de la persistencia en `PRODUCT1`.
   *→ T-301* · **Hecho**: evidencia del flujo completo y de la fila persistida. **Req**: R-PROD-01, R-PROD-04, R-PROD-18.
@@ -98,7 +100,7 @@
   *→ T-102* · **Hecho**: el diff corresponde **únicamente** a `ProductoEscrituraDto`/`ProductoVigenciaEscrituraDto`. **Req**: R-PROD-15.
 - [x] **T-306** **G-POSTMAN**: actualizar `docs/postman/ATPPuestos-API.postman_collection.json` si T-102 cambió el contrato (nuevos `400` por rango/decimales), **en el mismo commit**. Si no cambió, dejar constancia de que los 7 requests de `Productos` están intactos.
   *→ T-102, T-305* · **Hecho**: la colección refleja el contrato vigente y el commit contiene ambos cambios. **Req**: R-PROD-30.
-- [ ] **T-307** **G-SEC**: escaneo de secretos en el diff, CSRF activo en los formularios, sin entradas inline con lógica.
+- [x] **T-307** **G-SEC**: escaneo de secretos en el diff, CSRF activo en los formularios, sin entradas inline con lógica.
   *→ T-212* · **Hecho**: escaneo sin hallazgos; el token CSRF presente en el HTML renderizado.
 - [x] **T-308** **G5**: verificar que el diff **no** contiene DDL, migraciones, `schema.sql`/`data.sql`, Flyway/Liquibase ni cambios de `ddl-auto`.
   *→ T-305* · **Hecho**: el diff no toca `application.yml` en la sección `spring.jpa.hibernate.ddl-auto`.
@@ -106,6 +108,8 @@
   *→ T-301…T-308* · **Hecho**: cada fila de la matriz referencia su prueba y su resultado; el resumen queda guardado en Engram.
 - [ ] **T-310** Revisar y resolver los **supuestos abiertos SA-P01…SA-P10** con el responsable y actualizar `spec.md` §7 y `plan.md` §6 con la resolución.
   *→ T-001…T-109* · **Hecho**: cada supuesto tiene una resolución escrita o una decisión de postergar con motivo.
+- [ ] **T-311** Verificar el **ida y vuelta completo** tras T-111: `GET` de un producto con vigencia real -> el DTO devuelve el importe con escala 2 -> la pantalla lo renderiza -> el `POST` de modificación con ese mismo valor **no** es rechazado con `400 VALIDACION` -> la vigencia queda persistida con el importe correcto (contra `Rentas`, con rollback). Incluir el caso de una de las **2 filas** con más de 2 decimales reales, verificando el redondeo documentado en `plan.md` D-38.
+  *→ T-111, T-302* · **Hecho**: el ciclo completo pasa en verde y la BD queda sin cambios. **Req**: R-PROD-08, R-PROD-20, R-PROD-21.
 
 ---
 
@@ -115,15 +119,21 @@
 
 | Corrida | Comando | Resultado |
 |---|---|---|
-| Unitarias | `.\mvnw.cmd -B clean test` | **BUILD SUCCESS** — **139 pruebas** (138 núcleo + 1 `atp-puestos-camineros`), 0 fallos, 0 errores, 0 omitidas |
-| Integración | `ATP_DB_IT=true .\mvnw.cmd -B -pl atp-nucleo-compartido test "-Dtest=*IT" "-Dsurefire.failIfNoSpecifiedTests=false"` | **BUILD SUCCESS** — **36/36 IT verdes** contra la BD real `Rentas` (`devmssqlatp.ecom.com.ar`), 0 fallos |
+| Unitarias | `.\mvnw.cmd -B clean test` | **BUILD SUCCESS** — **179 pruebas** (174 núcleo + 5 `atp-puestos-camineros`), 0 fallos, 0 errores, 0 omitidas |
+| Integración | `ATP_DB_IT=true .\mvnw.cmd -B -pl atp-nucleo-compartido test "-Dtest=*IT" "-Dsurefire.failIfNoSpecifiedTests=false"` | **BUILD SUCCESS** — **39/39 IT verdes** contra la BD real `Rentas` (`devmssqlatp.ecom.com.ar`), 0 fallos |
 
 Pruebas nuevas que aportan la evidencia de las tareas marcadas: 30 de vistas
 (`ProductoMvcControllerTest` 13, `ProductoMvcEscrituraTest` 12,
 `ProductoFormParidadRestriccionesTest` 5), 24 de validación del DTO (`ProductoValidacionEscrituraTest`),
 6 de servicio (`ProductoEscrituraServicioTest`), 5 de Thymeleaf (`ThymeleafNucleoTest`), 3 de N+1 en H2
-(`ProductoListadoN1H2Test`), 2 estructurales (`ProductoRepositoryConsultaTest`) y 4 de integración contra
-`Rentas` (`ProductoListadoN1IT`, T-103). Sin regresión sobre la suite de `01-nucleo-datos`.
+(`ProductoListadoN1H2Test`), 2 estructurales (`ProductoRepositoryConsultaTest`), 4 de CSRF en el módulo
+desplegable (`ProductoMvcCsrfTest`, T-212) y 7 de integración contra `Rentas`
+(`ProductoListadoN1IT` 4 + `ProductoVigenciaImporteNuloIT` 3, T-302/T-103). Sin regresión sobre la
+suite de `01-nucleo-datos`.
+
+> **Corrección de un conteo propio**: la primera medición de la coordinación dio **139** pruebas; era
+> un error del método de conteo (los `@Nested` se reportan por clase anidada y el XML del contenedor
+> sólo cuenta sus pruebas directas). La cifra autoritativa es la del resumen de Maven: **174 + 5 = 179**.
 
 ### Puertas verificadas por la coordinación
 
@@ -132,25 +142,23 @@ Pruebas nuevas que aportan la evidencia de las tareas marcadas: 30 de vistas
 | **T-305** | `git diff --stat -- '*/web/rest/*'` **vacío**: el contrato REST no cambió. |
 | **T-306** | `ATPPuestos-API.postman_collection.json` **JSON válido**; carpeta `Productos` de 7 → 9 requests (los 7 felices **intactos**, +2 para los `400 VALIDACION`). Coherente con T-102. |
 | **T-308** | Sin DDL, sin migraciones, sin `schema.sql`/`data.sql`, sin Flyway/Liquibase y sin cambios de `ddl-auto` en `src/main`. **Única excepción, a dictaminar por el QA**: `ProductoListadoN1H2Test` usa `ddl-auto=create-drop` contra un **H2 en memoria**, acotado a esa clase de test; no toca `Rentas` ni el esquema del proyecto. |
-| **T-307** (parcial) | Escaneo de secretos en el diff: **0 hallazgos**. Sin entradas inline con lógica. Falta la comprobación del token CSRF (depende de T-212). |
+| **T-307** | Escaneo de secretos en el diff: **0 hallazgos**. Sin entradas inline con lógica. Token CSRF **verificado** en el módulo desplegable (T-212). |
 
 ### Corrección de un reporte erróneo
 
 Dos subagentes reportaron *"la BD `Rentas` es inalcanzable: el nombre DNS no existe"*. **No se sostiene**:
-`Resolve-DnsName devmssqlatp.ecom.com.ar` → `10.5.2.180`, y los 36 IT corren verdes contra la base real.
+`Resolve-DnsName devmssqlatp.ecom.com.ar` → `10.5.2.180`, y los 39 IT corren verdes contra la base real.
 Hubo **un** timeout transitorio de conexión en la primera corrida de la suite IT (los `@SpringBootTest` con
 perfil `dev`); el reintento pasó sin cambios en el código ⇒ no es una regresión.
 
-### Tareas que quedan ABIERTAS (8) y por qué
+### Tareas que quedan ABIERTAS (6) y por qué
 
 | Tarea | Motivo |
 |---|---|
-| **T-212** | El token CSRF se verifica en el módulo **desplegable** (`atp-puestos-camineros`), que tiene Spring Security; el núcleo no lo tiene (D-36). Falta el test y su ejecución. |
+| **T-111** | Normalizar la escala de los importes leídos (`money` escala 4 → `NUMERIC(12,2)`) para que el ida y vuelta leer→editar→guardar no choque con el `@Digits`. Decisión **D-38** en `plan.md` §5. **Cerrada por el backend, pendiente de implementación.** |
 | **T-213** | Responsive implementado en CSS, pero falta la **inspección visual** a 375 px y 1440 px. |
-| **T-302** | Los 36 IT están verdes y el ciclo alta→modificar→baja con vigencias está cubierto (`ProductoControllerWriteIT`), pero falta el caso de **lectura de una vigencia real con `ProdImpu3` en `NULL`** contra `Rentas` (R-PROD-20). |
 | **T-303** | Prueba de navegador real (alta/baja de filas de la grilla, navegación, persistencia). |
 | **T-304** | `axe-core` in-page y `lighthouse_audit` en dos estados. |
-| **T-307** | El escaneo de secretos está verde; falta el cierre del punto de CSRF (depende de T-212). |
 | **T-309** | Cierre de la matriz de paridad de `plan.md` §9 (tarea del QA). |
 | **T-310** | Resolución de los supuestos SA-P01…SA-P10 **con el responsable**; requiere intervención humana. |
 

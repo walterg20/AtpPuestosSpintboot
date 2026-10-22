@@ -62,14 +62,14 @@ import org.springframework.transaction.annotation.Transactional;
  *       esos campos: la pantalla no devuelve {@code 400} por el importe ausente.</li>
  * </ol>
  *
- * <p><strong>Hallazgo colateral (caracterizado, no corregido)</strong>: las columnas fisicas
- * {@code ProdImpu1..5} de {@code PRODUCT1} son de tipo {@code money} (escala 4), mientras que el
- * tipo logico declarado por la KB es {@code NUMERIC(12,2)}. Al releerlas, el driver entrega
- * {@code BigDecimal} con escala 4 ({@code 12.0000}), que el DTO de escritura rechaza por
- * {@code @Digits(integer = 10, fraction = 2)}. Eso afecta a los importes <strong>no nulos</strong>
- * y es <strong>independiente</strong> del importe nulo que verifica T-302: queda documentado en
- * {@link #losImportesNoNulosConEscala4SonRechazadosPorElDtoDeEscritura()} y no se corrige aqui
- * (no es alcance de T-302 ni corresponde tocar codigo de produccion).
+ * <p><strong>Hallazgo colateral (caracterizado y corregido por T-111 / D-38)</strong>:
+ * las columnas fisicas {@code ProdImpu1..5} de {@code PRODUCT1} son de tipo {@code money} (escala 4),
+ * mientras que el tipo logico declarado por la KB es {@code NUMERIC(12,2)}. Al releerlas, el driver
+ * entregaba {@code BigDecimal} con escala 4 ({@code 12.0000}), que el DTO de escritura rechazaba por
+ * {@code @Digits(integer = 10, fraction = 2)}: el ida y vuelta leer -&gt; editar -&gt; guardar se
+ * rompia. <strong>T-111</strong> normaliza la escala en el borde de lectura, de modo que la
+ * caracterizacion de este test paso a ser la del <strong>comportamiento corregido</strong> (ver
+ * {@link #losImportesNoNulosSeLeenConEscala2YElDtoDeEscrituraLosAcepta()}).
  *
  * <p>Solo lectura contra la base real ({@code SELECT}); se ejecuta con {@code ATP_DB_IT=true} y
  * revierte todo al terminar ({@link Transactional}).
@@ -247,8 +247,8 @@ class ProductoVigenciaImporteNuloIT {
 
         // El importe ausente, ya normalizado a 0, NO genera violacion (@NotNull/@Digits): la
         // pantalla no responde 400 por ese campo. Se acota la asercion a los campos normalizados:
-        // los importes NO nulos de la misma vigencia tienen otro problema (escala 4), que se
-        // documenta en el test siguiente y es ajeno a T-302.
+        // los importes NO nulos de la misma vigencia llegan ya con escala 2 (T-111), de modo que
+        // tampoco pueden violar @Digits.
         Validator validator = validatorFactory.getValidator();
         Set<String> rutasConViolacion = validator.validate(vigenciaEscritura).stream()
                 .map(ConstraintViolation::getPropertyPath)
@@ -286,18 +286,19 @@ class ProductoVigenciaImporteNuloIT {
     }
 
     /**
-     * <strong>Caracterizacion de un hallazgo colateral</strong> (no es de T-302): las columnas
-     * fisicas {@code ProdImpu1..5} de {@code PRODUCT1} son {@code money} (escala 4), pero el tipo
-     * logico de la KB es {@code NUMERIC(12,2)}. La lectura devuelve {@code BigDecimal} con escala 4
-     * ({@code 12.0000}) y el DTO de escritura, que declara {@code @Digits(integer = 10,
-     * fraction = 2)}, lo rechaza. Afecta a los importes <strong>no nulos</strong>; es
-     * independiente del importe nulo (que si se normaliza a {@code 0} y no viola nada).
+     * <strong>T-111 / D-38</strong>: las columnas fisicas {@code ProdImpu1..5} de
+     * {@code PRODUCT1} son {@code money} (escala 4), pero el tipo logico de la KB es
+     * {@code NUMERIC(12,2)}. La lectura normaliza la escala en el borde de lectura, de modo que el
+     * importe llega al DTO de escritura con escala 2 y <strong>no</strong> viola
+     * {@code @Digits(integer = 10, fraction = 2)}.
      *
-     * <p>Se documenta el comportamiento real; no se modifica codigo de produccion.
+     * <p><strong>Antes de T-111</strong> este test caracterizaba el bug (el importe con escala 4
+     * <em>si</em> era rechazado). Con la correccion, la caracterizacion es la del comportamiento
+     * vigente: la ida y vuelta leer -&gt; editar -&gt; guardar ya no se rompe.
      */
     @Test
-    @DisplayName("T-302 (hallazgo): los importes NO nulos llegan con escala 4 y el DTO de escritura los rechaza")
-    void losImportesNoNulosConEscala4SonRechazadosPorElDtoDeEscritura() {
+    @DisplayName("T-111: los importes NO nulos llegan con escala 2 y el DTO de escritura los acepta")
+    void losImportesNoNulosSeLeenConEscala2YElDtoDeEscrituraLosAcepta() {
         @SuppressWarnings("unchecked")
         List<Object[]> candidatas = entityManager.createNativeQuery(SQL_BUSQUEDA).getResultList();
         Object[] fila = candidatas.get(0);
@@ -310,14 +311,17 @@ class ProductoVigenciaImporteNuloIT {
                 .findFirst()
                 .orElseThrow();
 
-        // La entidad conserva la escala fisica de la columna `money` (4 decimales).
+        // La lectura normaliza la escala del `money` (4 decimales) al tipo logico (2 decimales).
         BigDecimal impu1 = vigenciaDto.prodImpu1();
         assertThat(impu1)
                 .as("ProdImpu1 de la vigencia real %s / %s", prodCod, fecha)
                 .isNotNull();
         assertThat(impu1.scale())
-                .as("el driver devuelve el `money` (escala 4) sin recortar los ceros")
-                .isGreaterThan(2);
+                .as("el DTO de lectura entrega el importe con escala 2 (NUMERIC(12,2))")
+                .isEqualTo(2);
+        assertThat(impu1)
+                .as("el valor numerico no cambia: solo la escala")
+                .isEqualByComparingTo((BigDecimal) fila[2]);
 
         ProductoForm form = ProductoMapper.aForm(dto, productoService.importesVigentes(prodCod));
         ProductoEscrituraDto escritura = ProductoMapper.aEscritura(form);
@@ -332,10 +336,10 @@ class ProductoVigenciaImporteNuloIT {
         System.out.println("[T-302] violaciones del DTO de escritura de la vigencia "
                 + prodCod + " / " + fecha + ": " + rutas);
         assertThat(rutas)
-                .as("los importes no nulos con escala 4 violan @Digits(fraction = 2)")
-                .contains("prodImpu1");
+                .as("el importe leido con escala 2 no puede violar @Digits(fraction = 2)")
+                .doesNotContain("prodImpu1");
         if (vigenciaDto.prodImpu2() != null) {
-            assertThat(rutas).contains("prodImpu2");
+            assertThat(rutas).doesNotContain("prodImpu2");
         }
     }
 

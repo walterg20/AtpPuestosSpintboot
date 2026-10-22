@@ -98,13 +98,22 @@ final class NucleoMapper {
                 f.getFerUsuario());
     }
 
+    /**
+     * Conversion de una vigencia al DTO de lectura.
+     *
+     * <p><strong>T-111 / D-38</strong>: los 4 importes se normalizan al tipo logico
+     * {@code NUMERIC(12,2)} (escala 2) porque la columna fisica es {@code money} (escala 4) y el
+     * driver entrega {@code 12.0000}, que el {@code @Digits(integer = 10, fraction = 2)} del DTO de
+     * escritura rechaza. Un importe ausente ({@code NULL}) <strong>sigue ausente</strong>: la
+     * normalizacion a {@code 0} es de la vista (R-PROD-20).
+     */
     static ProductoVigenciaDto toDto(ProductoVigencia v) {
         return new ProductoVigenciaDto(
                 v.getProdFchVig(),
-                v.getProdImpu1(),
-                v.getProdImpu2(),
-                v.getProdImpu3(),
-                v.getProdImpu4());
+                ImporteNormalizador.aEscalaLogica(v.getProdImpu1()),
+                ImporteNormalizador.aEscalaLogica(v.getProdImpu2()),
+                ImporteNormalizador.aEscalaLogica(v.getProdImpu3()),
+                ImporteNormalizador.aEscalaLogica(v.getProdImpu4()));
     }
 
     static ProductoDto toDto(Producto p) {

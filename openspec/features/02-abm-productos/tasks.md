@@ -48,7 +48,7 @@
   *→ T-106* · **Hecho**: test que con una colección desordenada verifica el orden ascendente y que `indiceAnterior`/`indiceSiguiente`/`primerCodigo`/`ultimoCodigo` son `null` en los extremos. **Req**: R-PROD-13, R-PROD-25.
 - [x] **T-110** Verificar que el servicio no persiste `uMedNombre` ni `ProdIMax1..4` y que los defaults `0` de `ProdTipCal`/`TPPriID`/`ProdAnula` siguen vigente.
   *→ T-002* · **Hecho**: IT de alta que comprueba los valores persistidos en `PRODUCTO` y la ausencia de columnas correspondientes. **Req**: R-PROD-29, plan §2.4.
-- [ ] **T-111** Normalizar la **escala de los importes leídos** al tipo lógico `NUMERIC(12,2)` en el borde de lectura (entidad → DTO): `setScale(2, RoundingMode.HALF_UP)` sobre `ProdImpu1..4` (`plan.md` D-38). Sin esto, la columna física `money` (escala 4) entrega `12.0000` y el `@Digits(integer=10, fraction=2)` del DTO de escritura **rechaza** el valor ⇒ el ida y vuelta leer → editar → guardar se rompe en la API y en la pantalla. **No** relajar el `@Digits` ni cambiar la forma del JSON (sólo la escala textual del número).
+- [x] **T-111** Normalizar la **escala de los importes leídos** al tipo lógico `NUMERIC(12,2)` en el borde de lectura (entidad → DTO): `setScale(2, RoundingMode.HALF_UP)` sobre `ProdImpu1..4` (`plan.md` D-38). Sin esto, la columna física `money` (escala 4) entrega `12.0000` y el `@Digits(integer=10, fraction=2)` del DTO de escritura **rechaza** el valor ⇒ el ida y vuelta leer → editar → guardar se rompe en la API y en la pantalla. **No** relajar el `@Digits` ni cambiar la forma del JSON (sólo la escala textual del número).
   *→ T-102, T-302* · **Hecho**: test que toma una vigencia real con `ProdImpu1 = 12.0000` (escala 4 en BD), verifica que el DTO de lectura devuelve `12.00` y que ese mismo valor **pasa** la validación del DTO de escritura. **Req**: R-PROD-08, R-PROD-20. **Nota**: las **2 filas** con más de 2 decimales reales se redondean al centavo en el ida y vuelta (mismo efecto que el legacy al asignar a `NUMERIC(12,2)`) — desviación documentada en `plan.md` D-38.
 
 ---
@@ -155,7 +155,7 @@ perfil `dev`); el reintento pasó sin cambios en el código ⇒ no es una regres
 
 | Tarea | Motivo |
 |---|---|
-| **T-111** | Normalizar la escala de los importes leídos (`money` escala 4 → `NUMERIC(12,2)`) para que el ida y vuelta leer→editar→guardar no choque con el `@Digits`. Decisión **D-38** en `plan.md` §5. **Cerrada por el backend, pendiente de implementación.** |
+
 | **T-213** | Responsive implementado en CSS, pero falta la **inspección visual** a 375 px y 1440 px. |
 | **T-303** | Prueba de navegador real (alta/baja de filas de la grilla, navegación, persistencia). |
 | **T-304** | `axe-core` in-page y `lighthouse_audit` en dos estados. |

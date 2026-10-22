@@ -171,6 +171,11 @@ public class ProductoService {
             case 4 -> v.getProdImpu4();
             default -> null;
         };
-        return valor != null ? valor : BigDecimal.ZERO;
+        // T-111 / D-38: la columna fisica es `money` (escala 4) y el tipo logico es
+        // NUMERIC(12,2): el derivado se expone ya con escala 2.
+        BigDecimal normalizado = ImporteNormalizador.aEscalaLogica(valor);
+        // R-005: el derivado vale 0 cuando no hay importe aplicable (tampoco hay vigencia
+        // vigente). El `null` de la columna se traduce a 0, como ya hacia el legacy.
+        return normalizado != null ? normalizado : BigDecimal.ZERO;
     }
 }

@@ -50,6 +50,8 @@
   *→ T-002* · **Hecho**: IT de alta que comprueba los valores persistidos en `PRODUCTO` y la ausencia de columnas correspondientes. **Req**: R-PROD-29, plan §2.4.
 - [x] **T-111** Normalizar la **escala de los importes leídos** al tipo lógico `NUMERIC(12,2)` en el borde de lectura (entidad → DTO): `setScale(2, RoundingMode.HALF_UP)` sobre `ProdImpu1..4` (`plan.md` D-38). Sin esto, la columna física `money` (escala 4) entrega `12.0000` y el `@Digits(integer=10, fraction=2)` del DTO de escritura **rechaza** el valor ⇒ el ida y vuelta leer → editar → guardar se rompe en la API y en la pantalla. **No** relajar el `@Digits` ni cambiar la forma del JSON (sólo la escala textual del número).
   *→ T-102, T-302* · **Hecho**: test que toma una vigencia real con `ProdImpu1 = 12.0000` (escala 4 en BD), verifica que el DTO de lectura devuelve `12.00` y que ese mismo valor **pasa** la validación del DTO de escritura. **Req**: R-PROD-08, R-PROD-20. **Nota**: las **2 filas** con más de 2 decimales reales se redondean al centavo en el ida y vuelta (mismo efecto que el legacy al asignar a `NUMERIC(12,2)`) — desviación documentada en `plan.md` D-38.
+- [x] **T-112** Implementar la **actualización diferencial** de las vigencias en `ProductoService.reemplazarVigencias` (`plan.md` D-39): las vigencias existentes con la misma `ProdFchVig` se **actualizan in situ** (conservando `ProdImpu5`, `ProdFeLog` y `ProdUsu`); las que no llegan en el body se **eliminan**; las nuevas se **insertan**. El conjunto final debe ser exactamente el enviado (R-PROD-21/SA-P08) y **no** puede perder las columnas legacy de auditoría.
+  *→ T-111* · **Hecho**: IT que modifica un producto con vigencias reales y comprueba que (a) las filas existentes conservan `ProdUsu`/`ProdFeLog`/`ProdImpu5`, (b) una vigencia quitada se elimina, (c) una vigencia nueva se inserta, (d) el conjunto final es el enviado. **Req**: R-PROD-21, R-036, D-39.
 
 ---
 
@@ -110,6 +112,8 @@
   *→ T-001…T-109* · **Hecho**: cada supuesto tiene una resolución escrita o una decisión de postergar con motivo.
 - [ ] **T-311** Verificar el **ida y vuelta completo** tras T-111: `GET` de un producto con vigencia real -> el DTO devuelve el importe con escala 2 -> la pantalla lo renderiza -> el `POST` de modificación con ese mismo valor **no** es rechazado con `400 VALIDACION` -> la vigencia queda persistida con el importe correcto (contra `Rentas`, con rollback). Incluir el caso de una de las **2 filas** con más de 2 decimales reales, verificando el redondeo documentado en `plan.md` D-38.
   *→ T-111, T-302* · **Hecho**: el ciclo completo pasa en verde y la BD queda sin cambios. **Req**: R-PROD-08, R-PROD-20, R-PROD-21.
+- [ ] **T-312** Verificar que una **modificación de producto NO pierde** las columnas legacy de auditoría (`ProdUsu`, `ProdFeLog`, `ProdImpu5`) de las vigencias existentes, contra `Rentas`, con rollback y con el conteo de filas antes/después (`PRODUCT1` = 1553).
+  *→ T-112* · **Hecho**: el IT pasa en verde y la BD queda sin cambios. **Req**: R-036, D-39.
 
 ---
 

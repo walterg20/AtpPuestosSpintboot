@@ -12,9 +12,13 @@ import ar.com.atp.puestos.shared.error.ConflictException;
 import ar.com.atp.puestos.shared.error.NotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,16 +136,91 @@ public class ProductoService {
         producto.setProdAnula(dto.prodAnula() != null ? dto.prodAnula() : 0);
     }
 
-    /** Reemplaza el conjunto de vigencias manteniendo ambos lados de la asociación (R-004, R-034). */
+    /**
+     * <strong>Actualización diferencial</strong> del conjunto de vigencias (D-39).
+     *
+     * <p>El contrato observable no cambia: al terminar, el conjunto de vigencias del producto es
+     * <strong>exactamente</strong> el enviado (R-PROD-21 / SA-P08). Lo que cambia es <strong>cómo</strong>
+     * se llega a ese conjunto:
+     *
+     * <ul>
+     *   <li>La vigencia <strong>existente</strong> con la misma {@code ProdFchVig} se <strong>actualiza
+     *       in situ</strong>: se le escriben los 4 importes nuevos y <strong>se conservan</strong> las
+     *       columnas legacy {@code ProdImpu5}, {@code ProdFeLog} y {@code ProdUsu} (R-036). Antes
+     *       (D-39) la modificación hacía {@code clear()} + reinserción: <strong>borraba y recreaba</strong>
+     *       las filas hijas, con lo que esas tres columnas quedaban en {@code NULL} y se perdían
+     *       datos de auditoría que sí existen en {@code Rentas} (1116 filas con {@code ProdUsu},
+     *       1116 con {@code ProdFeLog}, 764 con {@code ProdImpu5}).</li>
+     *   <li>La vigencia existente cuya {@code ProdFchVig} <strong>no</strong> llega en el body se
+     *       <strong>elimina</strong> (el {@code orphanRemoval} de la asociación la borra).</li>
+     *   <li>La vigencia <strong>nueva</strong> se <strong>inserta</strong> con las columnas legacy en
+     *       {@code NULL}: la escritura de auditoría de las filas nuevas pertenece al módulo
+     *       {@code 03-login} (<strong>SA-P11</strong>).</li>
+     * </ul>
+     *
+     * <p>Además, la actualización in situ se <strong>acerca al legacy</strong>: GeneXus actualiza la
+     * fila hija cuyos valores cambian, en vez de borrarla y recrearla.
+     *
+     * <p>La colección administrada se reordena al <strong>orden enviado</strong> para que la
+     * respuesta conserve la forma observable del contrato (el orden con que vuelve la lista de
+     * vigencias del {@code PUT}).
+     */
     private void reemplazarVigencias(Producto producto, List<ProductoVigenciaEscrituraDto> vigencias) {
-        producto.getVigencias().clear(); // orphanRemoval elimina las ausentes
+        // 1) indice de las vigencias existentes por ProdFchVig (la PK de PRODUCT1 es la fecha).
+        Map<LocalDateTime, ProductoVigencia> existentes = new HashMap<>();
+        for (ProductoVigencia vigente : producto.getVigencias()) {
+            existentes.put(vigente.getProdFchVig(), vigente);
+        }
+
+        // 2) actualizar in situ las que coinciden e insertar las nuevas, en el orden enviado.
+        List<ProductoVigencia> ordenEnviado = new ArrayList<>(vigencias.size());
+        Set<LocalDateTime> fechasEnviadas = new HashSet<>();
         for (ProductoVigenciaEscrituraDto v : vigencias) {
-            ProductoVigencia entidad = new ProductoVigencia(v.prodFchVig());
+            fechasEnviadas.add(v.prodFchVig());
+            ProductoVigencia entidad = existentes.get(v.prodFchVig());
+            if (entidad == null) {
+                // Vigencia nueva: la referencia al padre completa el id derivado (@MapsId prodCod).
+                entidad = new ProductoVigencia(v.prodFchVig());
+                producto.addVigencia(entidad);
+            }
             entidad.setProdImpu1(nvl(v.prodImpu1()));
             entidad.setProdImpu2(nvl(v.prodImpu2()));
             entidad.setProdImpu3(nvl(v.prodImpu3()));
             entidad.setProdImpu4(nvl(v.prodImpu4()));
-            producto.addVigencia(entidad);
+            // ProdImpu5 / ProdFeLog / ProdUsu NO se tocan: se conservan (D-39, R-036).
+            ordenEnviado.add(entidad);
+        }
+
+        // 3) eliminar las que no vinieron (orphanRemoval de la asociacion).
+        for (ProductoVigencia vigente : new ArrayList<>(producto.getVigencias())) {
+            if (!fechasEnviadas.contains(vigente.getProdFchVig())) {
+                producto.getVigencias().remove(vigente);
+            }
+        }
+
+        // 4) dejar la coleccion en el orden enviado (misma forma observable del contrato).
+        reordenar(producto.getVigencias(), ordenEnviado);
+    }
+
+    /**
+     * Reordena la coleccion administrada para que quede en el orden enviado. Solo mueve instancias
+     * ya presentes: no agrega ni quita elementos, de modo que el calculo de filas orphans de
+     * Hibernate no cambia.
+     */
+    private void reordenar(List<ProductoVigencia> coleccion, List<ProductoVigencia> orden) {
+        if (coleccion.size() != orden.size()) {
+            return;
+        }
+        for (int i = 0; i < orden.size(); i++) {
+            if (coleccion.get(i) == orden.get(i)) {
+                continue;
+            }
+            int j = coleccion.indexOf(orden.get(i));
+            if (j < 0) {
+                continue;
+            }
+            ProductoVigencia elemento = coleccion.remove(j);
+            coleccion.add(i, elemento);
         }
     }
 

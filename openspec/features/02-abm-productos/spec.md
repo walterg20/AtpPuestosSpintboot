@@ -175,7 +175,7 @@ muestra en `dd/MM/yyyy`. Confirmado en los datos reales: las 1553 filas de `PROD
 | Productos **sin** vigencias | 16 | `importes-vigentes` ⇒ los 4 derivados en `0`. |
 | `ProdImpu3`/`ProdImpu4` en `NULL` | **293 de 1553 filas (18,9 %)** | La ausencia de la clave en el JSON **debe** normalizarse a `0` antes de enviar (R-PROD-20). |
 | `PRODUCTO.ProdReppa` (columna legacy) | `'N'` en las filas muestreadas | Mapeada pero **no expuesta** ni editable. |
-| `PRODUCT1.ProdImpu5/ProdFeLog/ProdUsu` (legacy) | `NULL` en las filas muestreadas | Mapeadas, **no expuestas**. |
+| `PRODUCT1.ProdImpu5/ProdFeLog/ProdUsu` (legacy) | **NO** están en `NULL`: de 1553 filas, **1116** tienen `ProdUsu`, **1116** `ProdFeLog` y **764** `ProdImpu5` (verificado por G-DATA en vivo el 2026-10-22) | Mapeadas, **no expuestas**. **Consecuencia**: la modificación **no** puede borrar y reinsertar las filas (perdería esas columnas) ⇒ actualización diferencial, ver `plan.md` **D-39**. La afirmación anterior de esta tabla ("`NULL` en las filas muestreadas") era **incorrecta**. |
 | FK física `PRODUCT1 → PRODUCTO` | **no existe** | La baja del producto borra las vigencias por cascada JPA, no por FK. |
 | `IDENTITY` / `COLUMN_DEFAULT` | ninguno | La PK viaja en el body del `POST` (R-PROD-09). |
 

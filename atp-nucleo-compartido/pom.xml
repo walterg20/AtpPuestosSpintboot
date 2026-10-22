@@ -34,6 +34,18 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
+    <!--
+      T-101 / D-36: el nucleo aloja las vistas Thymeleaf del catalogo (D-26), por lo que sus
+      `templates/` deben renderizarse desde el jar desplegable => la dependencia va en scope
+      `compile` (el de por defecto). Sin `thymeleaf-layout-dialect` (SA-P09 / D-07 de 00-alcance):
+      los fragmentos `th:replace` alcanzan sin el dialecto.
+      Prohibido Spring Security en el nucleo (ni `compile` ni `test`): su autoconfiguracion se
+      activaria en los `@WebMvcTest` del nucleo y romperia la suite verde de 01-nucleo-datos.
+    -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>

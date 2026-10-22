@@ -36,9 +36,16 @@ public class ProductoService {
         this.vigenciaRepository = vigenciaRepository;
     }
 
+    /**
+     * Listado de productos con sus vigencias anidadas.
+     *
+     * <p><strong>T-103</strong>: ambas rutas cargan las vigencias con un {@code left join fetch}
+     * (una sola consulta). Antes, la asociación {@code LAZY} se inicializaba con una consulta por
+     * producto (244 productos ⇒ ~245 consultas). El contenido y el orden del resultado no cambian.
+     */
     public List<ProductoDto> listarProductos(Boolean anulados) {
         List<Producto> productos = (anulados == null)
-                ? productoRepository.findAll()
+                ? productoRepository.findAllConVigencias()
                 : productoRepository.findByProdAnulaOrderByProdDescAsc(anulados ? 1 : 0);
         return productos.stream().map(NucleoMapper::toDto).toList();
     }
@@ -101,6 +108,22 @@ public class ProductoService {
                         "Producto " + prodCod + " no encontrado."));
     }
 
+    /**
+     * Aplica los campos de la escritura sobre la entidad raíz.
+     *
+     * <p><strong>T-110 (verificado, sin cambio de comportamiento)</strong>:
+     * <ul>
+     *   <li>{@code uMedNombre} <strong>no</strong> se persiste: {@code PRODUCTO} no tiene la
+     *       columna (G-DATA) ⇒ en la entidad es {@code @Transient} y queda {@code null}
+     *       (R-PROD-19, SA-P01).</li>
+     *   <li>{@code ProdIMax1..4} <strong>no</strong> se persisten: son fórmulas de la KB
+     *       ({@code @Transient}); se calculan al vuelo en
+     *       {@link #importesVigentes(Integer)} (R-005, R-PROD-03).</li>
+     *   <li>Los defaults {@code 0} de las columnas {@code NOT NULL} sin contraparte en el DTO
+     *       ({@code ProdTipCal}, {@code TPPriID}, {@code ProdAnula}) se siguen aplicando cuando
+     *       el cliente omite el campo (R-PROD-29, plan §2.4).</li>
+     * </ul>
+     */
     private void aplicarCampos(Producto producto, ProductoEscrituraDto dto) {
         producto.setProdTipCal(dto.prodTipCal() != null ? dto.prodTipCal() : 0);
         producto.setTpPriID(dto.tpPriID() != null ? dto.tpPriID() : 0);

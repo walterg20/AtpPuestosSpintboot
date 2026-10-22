@@ -49,9 +49,9 @@ paquete no las cubriría. Esta colección documenta **sólo el canal `/api/**`**
 3. Ajustar `baseUrl` si el backend corre en otro host/puerto (`application.yml`,
    `server.port`, por defecto `8080`).
 
-## Cobertura actual (módulo `01-nucleo-datos`)
+## Cobertura actual (módulos `01-nucleo-datos` y `02-abm-productos`)
 
-9 carpetas / 44 requests:
+9 carpetas / 46 requests:
 
 - **Health** — `GET /api/v1/health`
 - **Provincias** — listar, obtener, crear, actualizar, eliminar
@@ -62,6 +62,16 @@ paquete no las cubriría. Esta colección documenta **sólo el canal `/api/**`**
 - **Jurisdicciones** — listar, ABM
 - **Feriados** — listar (rango `desde`/`hasta` obligatorio), ABM
 - **Productos** — listar (filtro `anulados`), obtener, `importes-vigentes` (`ProdIMax1..4`), ABM
+  y los dos casos de validación del DTO de escritura (`400 VALIDACION`)
+
+> **Validación del DTO de escritura de Productos (T-102 / D-32).** `prodCod` está acotado al rango
+> `0…32767` de la columna física `PRODUCTO.ProdCod` (`smallint`) y los 4 importes de cada vigencia
+> al tipo lógico `NUMERIC(12,2)` (hasta 2 decimales, `±9999999999.99`). Antes de T-102, un
+> `prodCod` fuera de rango o un importe con 3 decimales llegaban a SQL Server y la API respondía
+> `500 ERROR_INTERNO`; ahora responden `400 VALIDACION` (hallazgo N-4). Los requests
+> *"Crear producto - prodCod fuera de rango (400 VALIDACION)"* y
+> *"Crear producto - importe con 3 decimales (400 VALIDACION)"* cubren ambos casos.
+> Los 7 requests felices de `Productos` quedan **intactos**.
 
 > **Tolerancia a FK huérfana (R-024/R-025/R-207).** `GET /api/v1/localidades` sin `provCod`
 > devuelve las 3989 localidades de `Localida`, incluidas las 30 con `ProvCod = 0`
@@ -77,6 +87,7 @@ paquete no las cubriría. Esta colección documenta **sólo el canal `/api/**`**
 |---|---|---|
 | 2026-10-21 | `LocalidadDto.provCod` expone el **valor físico** de la FK `Localida.ProvCod`: las 30 filas huérfanas devuelven `provCod = 0` (antes la clave se **omitía** del JSON y el cliente recibía `undefined`) y `provNombre` sigue ausente. Se actualizaron los scripts de test de los 3 endpoints de lectura y se agregaron ejemplos guardados con el cuerpo real. | T-410 (R-207) |
 | 2026-10-22 | Estructura del proyecto reorganizada en monorepo Maven: los controladores pasaron de `nucleo/web/controller/` a `nucleo/web/rest/`. **La colección no cambia**: ni rutas, ni cuerpos, ni estados. | T-003 |
+| 2026-10-22 | **T-102 / D-32**: refuerzo de la validación del DTO de escritura de `Productos` (`prodCod` en `0…32767`; los 4 importes con `@Digits(integer=10, fraction=2)`). **Cambio de contrato REST**: un `prodCod` fuera de rango o un importe con 3 decimales pasan de `500 ERROR_INTERNO` a `400 VALIDACION`. Se agregaron 2 requests de prueba a la carpeta `Productos`; los 7 requests previos quedan intactos. | T-102 / T-306 |
 
 ## Fuente de verdad
 

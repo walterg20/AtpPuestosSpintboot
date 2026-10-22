@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!--
+  Pantalla del ABM de Productos (nivel 0 + nivel 1) — T-204.
+
+  - Título `Productos` verbatim del legacy (textblock Title).
+  - Panel de colección con las columnas `Código`, `Producto` y `Prod Anulado` (verbatim).
+  - Panel de registro con los 12 campos del nivel 0 y sus rótulos verbatim, en el orden de
+    spec.md §3.1 (incluye el typo `Importre C. Mec. Salida`, la `P` mayúscula de
+    `Tipo de Producción` y los dos campos rotulados `Código`).
+  - Sección de vigencias (nivel 1) en el fragmento nucleo/fragments/producto-vigencias.
+  - Botonera Guardar / Cancelar / Eliminar (SA-P03) y filtro de anulados.
+  - Estados: empty (colección vacía), error (mensaje inline) y sin selección (modo ALTA).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Productos')}">
+  <title>Productos</title>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+
+  <main id="contenido" class="atp-pagina">
+    <h1 class="atp-pagina__titulo">Productos</h1>
+
+    <!-- Banner de error: mensaje del backend o error de carga (R-PROD-11). -->
+    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive" th:if="${mensajeError}">
+      <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
+    </div>
+
+    <div class="atp-paneles">
+
+      <!-- ================================================= Panel de colección -->
+      <section class="atp-panel atp-panel--coleccion" aria-labelledby="titulo-coleccion">
+        <h2 class="atp-panel__titulo" id="titulo-coleccion">Colección</h2>
+
+        <nav class="atp-nav" aria-label="Navegación de registros">
+          <a class="atp-btn atp-btn--ghost" th:if="${primerCodigo != null}"
+             th:href="@{/productos(prodCod=${primerCodigo},anulados=${filtroAnulados.parametro()})}">First</a>
+          <button class="atp-btn atp-btn--ghost" type="button" th:if="${primerCodigo == null}" disabled>First</button>
+
+          <a class="atp-btn atp-btn--ghost" th:if="${indiceAnterior != null}"
+             th:href="@{/productos(prodCod=${indiceAnterior},anulados=${filtroAnulados.parametro()})}">Prev</a>
+          <button class="atp-btn atp-btn--ghost" type="button" th:if="${indiceAnterior == null}" disabled>Prev</button>
+
+          <a class="atp-btn atp-btn--ghost" th:if="${indiceSiguiente != null}"
+             th:href="@{/productos(prodCod=${indiceSiguiente},anulados=${filtroAnulados.parametro()})}">Next</a>
+          <button class="atp-btn atp-btn--ghost" type="button" th:if="${indiceSiguiente == null}" disabled>Next</button>
+
+          <a class="atp-btn atp-btn--ghost" th:if="${ultimoCodigo != null}"
+             th:href="@{/productos(prodCod=${ultimoCodigo},anulados=${filtroAnulados.parametro()})}">Last</a>
+          <button class="atp-btn atp-btn--ghost" type="button" th:if="${ultimoCodigo == null}" disabled>Last</button>
+        </nav>
+
+        <nav class="atp-filtro" aria-label="Filtro de anulados">
+          <a class="atp-btn atp-btn--ghost"
+             th:classappend="${filtroAnulados.name() == 'TODOS'} ? 'atp-btn--activo' : ''"
+             th:href="@{/productos(prodCod=${productoId})}">Todos</a>
+          <a class="atp-btn atp-btn--ghost"
+             th:classappend="${filtroAnulados.name() == 'NO'} ? 'atp-btn--activo' : ''"
+             th:href="@{/productos(prodCod=${productoId},anulados=false)}">No</a>
+          <a class="atp-btn atp-btn--ghost"
+             th:classappend="${filtroAnulados.name() == 'SI'} ? 'atp-btn--activo' : ''"
+             th:href="@{/productos(prodCod=${productoId},anulados=true)}">Sí</a>
+        </nav>
+
+        <table class="atp-table" th:if="${not #lists.isEmpty(coleccion)}">
+          <caption class="atp-table__caption">Productos cargados</caption>
+          <thead>
+            <tr>
+              <th scope="col">Código</th>
+              <th scope="col">Producto</th>
+              <th scope="col">Prod Anulado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="fila : ${coleccion}"
+                th:classappend="${fila.prodCod == productoId} ? 'atp-table__fila--seleccionada' : ''">
+              <td>
+                <a class="atp-enlace" th:href="@{/productos(prodCod=${fila.prodCod})}"
+                   th:text="${fila.prodCod}">0</a>
+              </td>
+              <td th:text="${fila.prodDesc}">Producto</td>
+              <td th:text="${fila.prodAnula}">0</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="atp-vacio" th:if="${#lists.isEmpty(coleccion) and (mensajeError == null)}">
+          Sin registros.
+          <a class="atp-enlace" th:href="@{/productos}">Recargar</a>
+        </p>
+        <p class="atp-vacio" th:if="${#lists.isEmpty(coleccion) and (mensajeError != null)}">
+          No se pudieron mostrar los registros.
+        </p>
+      </section>
+
+      <!-- ================================================== Panel de registro -->
+      <section class="atp-panel atp-panel--registro" aria-labelledby="titulo-registro">
+        <h2 class="atp-panel__titulo" id="titulo-registro">Registro</h2>
+        <p class="atp-panel__estado" th:if="${modo.name() == 'ALTA'}">Sin selección</p>
+
+        <form class="atp-form" th:object="${producto}" th:action="${accionFormulario}" method="post">
+          <!-- El filtro de anulados viaja con la escritura para volver con el mismo filtro
+               (R-PROD-26). En modo TODOS el valor es vacío y el backend lo toma como "sin filtro". -->
+          <input type="hidden" name="anulados" th:value="${filtroAnulados.parametro()}">
+
+          <div class="atp-grid-2col">
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodCod">Código</label>
+              <input class="atp-field__control" id="prodCod" type="number" min="0" max="32767" step="1"
+                     th:field="*{prodCod}" th:readonly="${modo.name() == 'EDICION'}">
+              <p class="atp-field__error" th:if="${#fields.hasErrors('prodCod')}"
+                 th:errors="*{prodCod}">Error</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodDesc">Producto</label>
+              <input class="atp-field__control" id="prodDesc" type="text" maxlength="25"
+                     th:field="*{prodDesc}">
+              <p class="atp-field__error" th:if="${#fields.hasErrors('prodDesc')}"
+                 th:errors="*{prodDesc}">Error</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodTipCal">Tipo de cálculo</label>
+              <input class="atp-field__control" id="prodTipCal" type="number" step="1"
+                     th:field="*{prodTipCal}">
+              <p class="atp-field__error" th:if="${#fields.hasErrors('prodTipCal')}"
+                 th:errors="*{prodTipCal}">Error</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="tpPriID">Tipo de Producción</label>
+              <input class="atp-field__control" id="tpPriID" type="number" step="1"
+                     th:field="*{tpPriID}">
+              <p class="atp-field__error" th:if="${#fields.hasErrors('tpPriID')}"
+                 th:errors="*{tpPriID}">Error</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodIMax1">Importe de Entrada</label>
+              <input class="atp-field__control" id="prodIMax1" type="number" step="0.01"
+                     th:field="*{prodIMax1}" readonly>
+              <p class="atp-field__ayuda">Valor vigente calculado por el servidor; no se edita ni se envía.</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodIMax2">Importe C. Mec. Entrada</label>
+              <input class="atp-field__control" id="prodIMax2" type="number" step="0.01"
+                     th:field="*{prodIMax2}" readonly>
+              <p class="atp-field__ayuda">Valor vigente calculado por el servidor; no se edita ni se envía.</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodIMax3">Importe Salida</label>
+              <input class="atp-field__control" id="prodIMax3" type="number" step="0.01"
+                     th:field="*{prodIMax3}" readonly>
+              <p class="atp-field__ayuda">Valor vigente calculado por el servidor; no se edita ni se envía.</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodIMax4">Importre C. Mec. Salida</label>
+              <input class="atp-field__control" id="prodIMax4" type="number" step="0.01"
+                     th:field="*{prodIMax4}" readonly>
+              <p class="atp-field__ayuda">Valor vigente calculado por el servidor; no se edita ni se envía.</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="uMedNroId">Código</label>
+              <input class="atp-field__control" id="uMedNroId" type="text" maxlength="3"
+                     th:field="*{uMedNroId}">
+              <p class="atp-field__error" th:if="${#fields.hasErrors('uMedNroId')}"
+                 th:errors="*{uMedNroId}">Error</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="uMedNombre">Unidad de Medida</label>
+              <input class="atp-field__control" id="uMedNombre" type="text" maxlength="40"
+                     th:field="*{uMedNombre}" readonly>
+              <p class="atp-field__ayuda">
+                <span class="atp-field__derivado">derivado</span>
+                PRODUCTO no tiene la columna UMedNombre y no existe la transacción UMed en la KB:
+                el valor no tiene origen y no se persiste.
+              </p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodAcop">Acopiador?</label>
+              <input class="atp-field__control" id="prodAcop" type="text" maxlength="1"
+                     th:field="*{prodAcop}">
+              <p class="atp-field__error" th:if="${#fields.hasErrors('prodAcop')}"
+                 th:errors="*{prodAcop}">Error</p>
+            </div>
+
+            <div class="atp-field">
+              <label class="atp-field__etiqueta" for="prodAnula">Prod Anulado</label>
+              <input class="atp-field__control" id="prodAnula" type="number" step="1"
+                     th:field="*{prodAnula}">
+              <p class="atp-field__error" th:if="${#fields.hasErrors('prodAnula')}"
+                 th:errors="*{prodAnula}">Error</p>
+            </div>
+
+          </div>
+
+          <div th:replace="~{nucleo/fragments/producto-vigencias :: vigencias}"></div>
+
+          <div class="atp-botonera">
+            <button class="atp-btn atp-btn--primary" type="submit" th:disabled="${tieneErrores}">Guardar</button>
+            <a class="atp-btn atp-btn--ghost" th:href="@{/productos}">Cancelar</a>
+          </div>
+        </form>
+
+        <form class="atp-form atp-form--baja" th:if="${accionEliminar != null}"
+              th:action="${accionEliminar}" method="post">
+          <input type="hidden" name="anulados" th:value="${filtroAnulados.parametro()}">
+          <button class="atp-btn atp-btn--peligro" type="submit"
+                  data-confirmar="¿Confirma la baja del producto?">Eliminar</button>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+
+  <script th:src="@{/js/vigencias.js}" defer></script>
+</body>
+</html>

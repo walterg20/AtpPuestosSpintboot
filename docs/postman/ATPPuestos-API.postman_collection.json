@@ -1884,6 +1884,100 @@
                                                 ]
                                   },
                                   {
+                                      "name":  "Crear producto - prodCod fuera de rango (400 VALIDACION)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/v1/productos",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "productos"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"prodCod\": 99999,\n  \"prodDesc\": \"Producto demo\",\n  \"prodTipCal\": 1,\n  \"tpPriID\": 1,\n  \"uMedNroId\": \"UN\",\n  \"prodAcop\": \"N\",\n  \"prodAnula\": 0,\n  \"vigencias\": [\n    {\n      \"prodFchVig\": \"2026-01-01T00:00:00\",\n      \"prodImpu1\": 100.00,\n      \"prodImpu2\": 110.00,\n      \"prodImpu3\": 120.00,\n      \"prodImpu4\": 130.00\n    }\n  ]\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"400 Bad Request\", () =\u003e pm.response.to.have.status(400));",
+                                                                                    "pm.test(\"code = VALIDACION\", () =\u003e pm.response.json().code === \"VALIDACION\");"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
+                                      "name":  "Crear producto - importe con 3 decimales (400 VALIDACION)",
+                                      "request":  {
+                                                      "method":  "POST",
+                                                      "header":  [
+                                                                     {
+                                                                         "key":  "Content-Type",
+                                                                         "value":  "application/json"
+                                                                     }
+                                                                 ],
+                                                      "url":  {
+                                                                  "raw":  "{{baseUrl}}/api/v1/productos",
+                                                                  "host":  [
+                                                                               "{{baseUrl}}"
+                                                                           ],
+                                                                  "path":  [
+                                                                               "api",
+                                                                               "v1",
+                                                                               "productos"
+                                                                           ]
+                                                              },
+                                                      "body":  {
+                                                                   "mode":  "raw",
+                                                                   "raw":  "{\n  \"prodCod\": 900,\n  \"prodDesc\": \"Producto demo\",\n  \"prodTipCal\": 1,\n  \"tpPriID\": 1,\n  \"uMedNroId\": \"UN\",\n  \"prodAcop\": \"N\",\n  \"prodAnula\": 0,\n  \"vigencias\": [\n    {\n      \"prodFchVig\": \"2026-01-01T00:00:00\",\n      \"prodImpu1\": 100.001,\n      \"prodImpu2\": 110.00,\n      \"prodImpu3\": 120.00,\n      \"prodImpu4\": 130.00\n    }\n  ]\n}",
+                                                                   "options":  {
+                                                                                   "raw":  {
+                                                                                               "language":  "json"
+                                                                                           }
+                                                                               }
+                                                               }
+                                                  },
+                                      "response":  [
+
+                                                   ],
+                                      "event":  [
+                                                    {
+                                                        "listen":  "test",
+                                                        "script":  {
+                                                                       "type":  "text/javascript",
+                                                                       "exec":  [
+                                                                                    "pm.test(\"400 Bad Request\", () =\u003e pm.response.to.have.status(400));",
+                                                                                    "pm.test(\"code = VALIDACION\", () =\u003e pm.response.json().code === \"VALIDACION\");"
+                                                                                ]
+                                                                   }
+                                                    }
+                                                ]
+                                  },
+                                  {
                                       "name":  "Actualizar producto",
                                       "request":  {
                                                       "method":  "PUT",

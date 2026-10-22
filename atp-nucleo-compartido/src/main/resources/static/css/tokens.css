@@ -1,0 +1,62 @@
+/*
+ * Tokens del sistema de diseño — Derivado de la UI legacy (ATPEvo2), ver docs/design.md.
+ *
+ * ÚNICO archivo donde se escriben literales de color y de tipografía. El resto de las hojas y las
+ * plantillas sólo usan var(--atp-*).
+ *
+ * Reglas:
+ *  - Marca: #C60B44 (carmesí institucional del legacy).
+ *  - Texto secundario: #555555 en lugar del #747474 del legacy (3,61:1 < 4,5:1 exigido por AA).
+ *  - Error: #C0392B en lugar del #FF0000 del legacy (contraste AA sobre blanco).
+ *  - Superficies suaves: añadidas para las variantes de alerta, de modo que el texto conserve
+ *    contraste AA sin relying en tintes calculados en la hoja de componentes.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- Marca */
+  --atp-primary: #C60B44;
+  --atp-primary-dark: #9D1F1F;
+  --atp-primary-contrast: #FFFFFF;
+
+  /* ------------------------------------------------ Neutrales (superficie / texto) */
+  --atp-surface: #FFFFFF;
+  --atp-surface-alt: #F0F0F0;
+  --atp-border: #D3D4D3;
+  --atp-text: #333333;
+  --atp-text-muted: #555555;
+  --atp-disabled: #A9A9A9;
+
+  /* ------------------------------------------------------------ Semánticos */
+  --atp-info: #1D6893;
+  --atp-warn: #FF8000;
+  --atp-warn-strong: #8A4B00;
+  --atp-error: #C0392B;
+  --atp-success: #2E7D32;
+
+  /* --------------------------------------------- Superficies de las alertas */
+  --atp-info-surface: #E8F1F7;
+  --atp-warn-surface: #FFF3E0;
+  --atp-error-surface: #FBEAE8;
+  --atp-success-surface: #E8F3E9;
+
+  /* ----------------------------------------------------------- Tipografía */
+  --atp-font: "Segoe UI", "Trebuchet MS", Verdana, Arial, sans-serif;
+  --atp-font-mono: "Cascadia Mono", Consolas, "Courier New", monospace;
+
+  --atp-text-display: 24px;
+  --atp-text-title: 18px;
+  --atp-text-body: 14px;
+  --atp-text-caption: 12px;
+
+  /* ------------------------------------------------ Espaciado y forma (4px) */
+  --atp-space-1: 4px;
+  --atp-space-2: 8px;
+  --atp-space-3: 12px;
+  --atp-space-4: 16px;
+  --atp-space-5: 24px;
+  --atp-space-6: 32px;
+
+  --atp-radius: 4px;
+  --atp-shadow-1: 0 1px 2px rgba(51, 51, 51, 0.16);
+  --atp-shadow-2: 0 2px 6px rgba(51, 51, 51, 0.20);
+}

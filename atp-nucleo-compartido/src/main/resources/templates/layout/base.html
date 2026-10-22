@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!--
+  Layout base de las pantallas del nucleo (plan.md §4.1, T-203).
+
+  No usa thymeleaf-layout-dialect (SA-P09): el layout se compone con th:replace sobre los
+  fragmentos `head`, `cabecera` y `pie`. Cada pagina incluye:
+
+    <head th:replace="~{layout/base :: head('Titulo')}">
+    <header th:replace="~{layout/base :: cabecera}">
+    <footer th:replace="~{layout/base :: pie}">
+
+  Los estilos salen de los tokens (static/css/tokens.css) y de los componentes
+  (static/css/nucleo.css). El unico JS del layout es el de confirmaciones.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${titulo}">ATP</title>
+  <link rel="stylesheet" th:href="@{/css/tokens.css}">
+  <link rel="stylesheet" th:href="@{/css/nucleo.css}">
+  <script th:src="@{/js/confirmaciones.js}" defer></script>
+</head>
+<body>
+  <header class="atp-cabecera" th:fragment="cabecera">
+    <p class="atp-cabecera__marca">ATP · Puestos Camineros</p>
+  </header>
+
+  <footer class="atp-pie" th:fragment="pie">
+    <p>Administración de Rentas · módulo de productos</p>
+  </footer>
+</body>
+</html>

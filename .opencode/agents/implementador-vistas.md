@@ -5,32 +5,23 @@ mode: subagent
 color: "#f59e0b"
 permissions:
   - action: edit
-    resource: "*/src/main/java/**/domain/**"
+    resource: "*"
     effect: deny
   - action: edit
-    resource: "*/src/main/java/**/repository/**"
-    effect: deny
+    resource: "*/src/main/java/**/web/mvc/**"
+    effect: allow
   - action: edit
-    resource: "*/src/main/java/**/service/**"
-    effect: deny
+    resource: "*/src/main/resources/templates/**"
+    effect: allow
   - action: edit
-    resource: "*/src/main/java/**/dto/**"
-    effect: deny
+    resource: "*/src/main/resources/static/**"
+    effect: allow
   - action: edit
-    resource: "*/src/main/java/**/shared/**"
-    effect: deny
+    resource: "*/src/test/java/**/web/mvc/**"
+    effect: allow
   - action: edit
-    resource: "*/src/main/java/**/web/rest/**"
-    effect: deny
-  - action: edit
-    resource: "*/pom.xml"
-    effect: deny
-  - action: edit
-    resource: "*/src/main/resources/application*.yml"
-    effect: deny
-  - action: edit
-    resource: "openspec/**"
-    effect: deny
+    resource: "*/src/test/resources/**"
+    effect: allow
 ---
 
 # Implementador de Vistas — Spring MVC + Thymeleaf

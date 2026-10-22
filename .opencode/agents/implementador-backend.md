@@ -5,17 +5,44 @@ mode: subagent
 color: "#22c55e"
 permissions:
   - action: edit
-    resource: "*/src/main/java/**/web/mvc/**"
+    resource: "*"
     effect: deny
   - action: edit
-    resource: "*/src/main/resources/templates/**"
-    effect: deny
+    resource: "*/src/main/java/**/domain/**"
+    effect: allow
   - action: edit
-    resource: "*/src/main/resources/static/**"
-    effect: deny
+    resource: "*/src/main/java/**/repository/**"
+    effect: allow
   - action: edit
-    resource: "openspec/**"
-    effect: deny
+    resource: "*/src/main/java/**/service/**"
+    effect: allow
+  - action: edit
+    resource: "*/src/main/java/**/dto/**"
+    effect: allow
+  - action: edit
+    resource: "*/src/main/java/**/shared/**"
+    effect: allow
+  - action: edit
+    resource: "*/src/main/java/**/web/rest/**"
+    effect: allow
+  - action: edit
+    resource: "*/src/main/java/**/PuestosApplication.java"
+    effect: allow
+  - action: edit
+    resource: "*/src/test/java/**"
+    effect: allow
+  - action: edit
+    resource: "*/src/test/resources/**"
+    effect: allow
+  - action: edit
+    resource: "*/pom.xml"
+    effect: allow
+  - action: edit
+    resource: "*/src/main/resources/application*.yml"
+    effect: allow
+  - action: edit
+    resource: "docs/postman/**"
+    effect: allow
 ---
 
 # Implementador Backend — Java 17 / Spring Boot 3.x

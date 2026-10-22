@@ -1,0 +1,50 @@
+schema: spec-driven
+
+context: |
+  Replatforming del sistema legacy GeneXus 18 (KB `ATPPuestos`) hacia un MONOLITO MODULAR en
+  Java 17 + Spring Boot 3.x, con capa de presentación Spring MVC + Thymeleaf y JavaScript puntual.
+
+  Alcance y guardarraíles (ver openspec/constitution/):
+  - La KB GeneXus legacy es SOLO LECTURA (prohibido compilar/modificar/eliminar objetos).
+  - Spec-Driven Development: no hay código de aplicación sin spec aprobada en openspec/features/<modulo>/.
+  - Paridad de BD: reutilizar el esquema SQL Server existente preservando nombres físicos exactos
+    de tabla y columna con @Table(name=...) y @Column(name=...). SIN DDL, SIN migraciones, SIN
+    rediseño de esquema. Las columnas que existen en la BD y no en la KB (huérfanas) se mapean.
+  - Monolito modular: 1 artefacto desplegable, regla de dependencia web -> service -> repository
+    -> domain. Prohibido el atajo web -> repository.
+  - JavaScript puntual: vanilla, sin framework, sin bundler, sin npm en el build, sin CDN.
+  - Sin secretos en el repo; credenciales solo por variables de entorno.
+  - Documentos y specs en español; sintaxis de requisitos EARS; norma ISO/IEC 25030.
+  - Archivos de configuración por debajo de 500 líneas.
+
+  Estructura de specs de ESTE proyecto (además de la nativa de OpenSpec):
+    openspec/constitution/   -> reglas del stack, convenciones y flujo SDD
+    openspec/features/<NN>-<modulo>/{spec.md, plan.md, tasks.md}
+
+  Estructura del monorepo:
+    pom.xml                        -> parent POM + Maven Wrapper
+    atp-nucleo-compartido/         -> catalogos, personas, base de seguridad, API REST /api/v1
+    atp-puestos-camineros/         -> modulo Puestos Camineros (login + dominio) + vistas Thymeleaf
+
+  Contexto de la KB (F0): ver docs/analisis-ATPPuestos.md
+  - Ambiente único: `Gen18`, generador "Default (Java)".
+  - BD de metadatos KB: GX_KB_ATPPuestos.
+  - BD de la aplicación: `Rentas` @ devmssqlatp.ecom.com.ar (SQL Server), credenciales en .env.
+  - Nombres físicos de tabla legacy (8 chars) != nombres lógicos de transacción.
+
+  Regla de canal: la API REST vive bajo /api/ y responde JSON uniforme {code, message}; el
+  resto de las rutas son páginas Thymeleaf y responden HTML. El GlobalExceptionHandler negocia
+  según el prefijo de ruta.
+
+rules:
+  tasks:
+    - Toda tarea debe ser verificable y referenciar el requisito EARS que implementa.
+    - Tareas de máximo medio día; usar casillas `- [ ]`.
+
+operations:
+  apply:
+    guidance:
+      - Respetar el orden de tasks.md y actualizar el progreso al cerrar cada tarea.
+  archive:
+    guidance:
+      - Resumir el resultado del módulo (cobertura, paridad, pruebas) antes de archivar.

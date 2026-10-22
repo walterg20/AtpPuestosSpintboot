@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!--
+  Vista de error por defecto de la aplicacion.
+
+  La sirve el GlobalExceptionHandler (ar.com.atp.puestos.shared.error) para las peticiones que NO
+  son del canal REST: las de error llegan con el modelo `codigo`, `mensaje`, `ruta` y `status`.
+
+  La misma plantilla es la que Spring Boot usa como pagina de error por defecto (BasicErrorController
+  -> DefaultErrorViewResolver -> "error"), y en ese caso el modelo trae `status`, `error`,
+  `message` y `path`. Por eso cada dato se resuelve con el operador elvis `?:`: la plantilla
+  sirve para los dos origenes sin duplicarse.
+
+  El diseno visual (tokens, tipografia, color) vive en el sistema de diseño derivado de
+  `docs/design.md`; esta version es funcional y deliberadamente sobria.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${codigo} ?: 'Error'">Error</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="atp-error">
+  <main class="atp-error__panel">
+    <p class="atp-error__status" th:text="${status} ?: '—'">—</p>
+    <h1 class="atp-error__code" th:text="${codigo} ?: (${error} ?: 'Error')">Error</h1>
+    <p class="atp-error__message" th:text="${mensaje} ?: (${message} ?: 'Ocurrió un error inesperado.')">
+      Ocurrió un error inesperado.
+    </p>
+    <p class="atp-error__path" th:if="${ruta} ?: ${path}" th:text="${ruta} ?: ${path}">/ruta</p>
+    <a class="atp-error__back" th:href="@{/}">Volver al inicio</a>
+  </main>
+</body>
+</html>

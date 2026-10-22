@@ -1,0 +1,55 @@
+# ATPPuestos — configuracion de la aplicacion.
+#
+# Ubicacion y ownership: este archivo vive en el MODULO NUCLEO (atp-nucleo-compartido) y no en
+# el modulo desplegable. Motivo: Spring Boot resuelve `classpath:/application.yml` tomando el
+# PRIMER recurso de ese nombre en el classpath (no fusiona varios `application.yml`). Si el modulo
+# desplegable trajera el suyo, uno de los dos seria ignorado en silencio y la configuracion
+# efectiva dependeria del orden de classpath.
+#
+# Con esta ubicacion hay UNA sola fuente de verdad:
+#   - en runtime la consume el modulo desplegable, que lo hereda del jar del nucleo;
+#   - en los tests del nucleo la consume el propio modulo, con el mismo contenido.
+# Asi la configuracion de los tests y la de produccion no pueden divergir.
+#
+# Lo especifico del modulo Puestos Camineros va en archivos `application-<perfil>.yml` propios
+# de ese modulo (p. ej. `application-puestos-camineros.yml`), que se cargan ADEMAS de este.
+#
+# Sin secretos en el repositorio: todo se toma de variables de entorno (G3, R-204).
+spring:
+  application:
+    name: atp-puestos
+  datasource:
+    # Preferir la URL completa (SPRING_DATASOURCE_URL); si no, se compone desde DB_*.
+    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:Rentas};encrypt=true;trustServerCertificate=true}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
+    driver-class-name: ${DB_DRIVER:com.microsoft.sqlserver.jdbc.SQLServerDriver}
+    hikari:
+      pool-name: atp-puestos-pool
+      maximum-pool-size: 10
+      connection-timeout: 10000
+  jpa:
+    # Paridad de BD: Hibernate NUNCA genera DDL sobre el esquema existente (R-204, R-205).
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: false
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+
+# Auditoria de escritura (R-033): usuario por defecto en fase 1 (sin autenticacion aun).
+# Con el modulo de login (spec 02-login) pasara a derivarse del usuario de la sesion.
+app:
+  auditoria:
+    usuario: ${APP_AUDITORIA_USUARIO:SISTEMA}

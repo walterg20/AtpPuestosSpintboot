@@ -1,0 +1,17 @@
+# Normalización de fin de línea.
+# El repo guarda LF; en Windows el checkout no debe convertir a CRLF (ruido en los diffs
+# de archivos Java, YAML y Markdown, que son la mayor parte del árbol).
+* text=auto eol=lf
+
+# Los scripts de Windows necesitan CRLF para ejecutarse correctamente.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binarios: nunca tocar.
+*.jar binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary

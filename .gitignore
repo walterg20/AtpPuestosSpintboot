@@ -1,0 +1,43 @@
+# === Secretos y entorno ===
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# === Maven / Java (monorepo) ===
+target/
+*/target/
+.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+
+# === IDE / Editor ===
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.user
+
+# === OS ===
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# === GeneXus (nunca versionar artefactos de la KB en este repo) ===
+# Patrones de carpeta anclados a la raiz (con "/") para NO ignorar
+# paquetes Java legitimamente llamados "web" dentro de atp-*/src/.
+*.gxw
+*.xpz
+*.gxSource
+*.gxForm
+/Data*/
+/web/
+
+# === Temporales ===
+*.tmp
+*.bak
+~$*

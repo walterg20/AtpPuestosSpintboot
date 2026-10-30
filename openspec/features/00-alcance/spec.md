@@ -45,7 +45,7 @@ Bases en `devmssqlatp.ecom.com.ar`: `RENTAS`, `RentasTDA`, `RENTASTestigo`, `REN
   - 8 catálogos: Provincia, Localidad, Calle, Camino, Área, Jurisdicción, Feriado, Producto.
   - Producto con su nivel 1 de vigencias (`PRODUCT1`).
   - Personas (`PERSONAS`) y su vínculo con el usuario.
-- **Login completo de Puestos Camineros** (spec `03-login`).
+- **Login completo de Puestos Camineros** (spec `03-login`).\n- **Control de Cargas** de Puestos Camineros (spec `08-control-cargas`): validación de puesto, búsqueda por barcode, marcado de formulario, ver detalle, ver tabla, pagos. El **reporte en PDF** queda **fuera de alcance** (OUT) y se integra más adelante.
 - **API REST `/api/v1`** sobre el núcleo de datos (contrato ya existente y verificado).
 - **Capa de presentación Thymeleaf** para lo anterior.
 
@@ -58,7 +58,7 @@ Bases en `devmssqlatp.ecom.com.ar`: `RENTAS`, `RentasTDA`, `RENTASTestigo`, `REN
 | **Planes de Pago** | **Decisión del equipo (2026-10-22): descartado de este alcance** | Base `ATPDomiciliarioWeb`, propia; otro repo |
 | Portal Contribuyente | Otra aplicación, con base propia | `ATPPadronWeb`; requiere un login de actor externo, que **no** es el de Puestos |
 | Módulos internos de Gestión ATP | Otra KB | `Gx18\ATPGestion` |
-| EOs/SDTs/ThemeClass del Design System Unanimo | Patrón de plataforma, no dominio | Reutilizar el design system, no reimplementar |
+| EOs/SDTs/ThemeClass del Design System Unanimo | Patrón de plataforma, no dominio | Reutilizar el design system, no reimplementar |\n| Reporte en PDF de Control de Cargas | Fuera de alcance de `08-control-cargas` (se integra más adelante) | Backlog (módulo futuro) |
 | Plantillas mobile (`SD*`), `Deprecated`, `iOS`, `Social`, `Store`, `Purchases`, `Media` | Fuera del negocio | — |
 | **Gx15** (`Gx15\ATPPuestos`, `ATPGestion`, `ATPWeb`, `ATPWebIA`, `ATPWebModulos`, `ATPDomiciliarios`) | Sin análisis posible | El MCP actual soporta `major` 16/17/18 ⇒ **Gx15 no es accesible** con la herramienta vigente. Requiere otro canal de lectura. |
 
@@ -90,4 +90,4 @@ Bases en `devmssqlatp.ecom.com.ar`: `RENTAS`, `RentasTDA`, `RENTASTestigo`, `REN
 
 - Inventario y diagnóstico: `docs/analisis-ATPPuestos.md` (F0, §13 G-DATA, §14 portfolio).
 - Reglas del stack: `openspec/constitution/stack.md`.
-- Módulos derivados: `01-nucleo-datos` (ya implementado), `02-abm-productos`, `03-login`.
+- Módulos derivados: `01-nucleo-datos` (ya implementado), `02-abm-productos`, `03-login`, `08-control-cargas`.

@@ -78,7 +78,7 @@ Base: `Rentas` @ `devmssqlatp.ecom.com.ar` (SQL Server). Verificado con
 | Productos (1) | `PRODUCT1` | (`ProdCod`,`ProdFchVig`) | `datetime`, no `date` |
 | Personas | `PERSONAS` | `PerId` | `PerCodUsu` ← usuario (cifrado) |
 
-**Módulos de seguridad** (relevados para `03-login`):
+**Módulos de cargas** (relevados para `08-control-cargas`):\n\n| Legacy | Tabla | PK | Columnas relevantes |\n|---|---|---|---|\n| Contribuyentes | `CONTRIBU` | `ConCuit` | `ConRazSoc`, columnas huérfanas mapeadas |\n| DetProdPri (cabecera) | `DETPRODP` | (`ConCuit`,`DPPSucu`,`CalPerFisc`,`DPPSecu`,`DPPNroForm`) | `DPPMarcAnu`, `DPPClasif`, `DPPTipoGui`, `DPPUltPSuN`, `DPPUltPSuT`, `DPPUltPaOp`, columnas huérfanas mapeadas |\n| DetProdPri (pases) | `DETPROD2` | (`ConCuit`,`DPPSucu`,`CalPerFisc`,`DPPSecu`,`DPPNroForm`,`DPPPaseId`) | `DPPPaseFec`, `DPPPaseOpe`, `DPPPaseHor`, `DPPPaseEst`, `SucTipo`, `SucNroId`, `DPPPaseCo` |\n\n**Módulos de seguridad** (relevados para `03-login`):
 
 | Legacy | Tabla | PK | Columnas relevantes |
 |---|---|---|---|
@@ -91,7 +91,7 @@ Base: `Rentas` @ `devmssqlatp.ecom.com.ar` (SQL Server). Verificado con
 **Columnas huérfanas** (en la BD, no en la KB) — se mapean, no se rediseñan: `Areas.AreaBaja`,
 `Areas.AreaEmails`, `Areas.AreaAdjun`, `Areas.AreaRespons`, `CALLES.CallAlt1..3`,
 `Localida.LocCodAfip`, `PROVINCI.ProvCodAfip`, `PRODUCTO.ProdReppa`,
-`PRODUCT1.ProdImpu5/ProdFeLog/ProdUsu`, y las 5 de `SCRTY` listadas arriba.
+`PRODUCT1.ProdImpu5/ProdFeLog/ProdUsu`, las 5 de `SCRTY` listadas arriba, y las de `CONTRIBU`/`DETPRODP` listadas en `08-control-cargas/plan.md` §2.1/§2.2.
 
 **Sin `IDENTITY` y sin `COLUMN_DEFAULT`** en ninguna tabla ⇒ la PK viaja en el body del `POST` y
 el duplicado responde `409`.

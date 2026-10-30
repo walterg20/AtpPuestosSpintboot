@@ -256,3 +256,15 @@ T-007  (APROBACIÓN HUMANA de D-LOG-17 / D-LOG-18 / D-LOG-19) — CERRADA 2026-1
 | 9 | **Revisión v2 — no regresión del módulo 02**: T-128 y T-132/T-133 no pueden alterar el HTML, los rótulos, el renumerado `aria`/HTML de la grilla ni las cookies del módulo 02; `ProductoMvcCsrfTest` y el test de los 12 rótulos deben seguir verdes. |
 | 10 | **Revisión v2 — coherencia de las decisiones**: **D-LOG-11** y **D-LOG-12** están **sustituidas** por **D-LOG-17(a)** y **D-LOG-19(a)**; toda referencia en código, pruebas o documentación debe apuntar a la decisión vigente (no a las sustituidas). |
 | 11 | **Revisión v2 — deuda explícita**: la ausencia de CSRF en `/api/**` se mitiga según **R-LOG-041** (**T-136**) y la deuda de `permitAll` sigue con **T-135**; **ninguna** de las dos se puede dar por cerrada sin su tarea. |
+
+---
+
+## G. Cierre del modulo (registrado 2026-10-30)
+
+- **Build**: `./mvnw clean test` -> **BUILD SUCCESS** (nucleo + puestos, 0 failures).
+- **Secretos**: escaneo sin hallazgos reales (falsos positivos documentados).
+- **Paridad de BD**: `ddl-auto: none` sin cambios; sin DDL/migraciones.
+- **Archivos > 500 lineas**: solo PDFs y spec/plan (no configuracion).
+- **Commits de cierre**: `5cf3a7e feat(nucleo)` + `8630d91 docs(spec)`.
+- **Pendiente (no bloquea el cierre del build)**: validacion de las tareas de integracion contra `Rentas` (`ATP_DB_IT=true`) y verificacion manual de accesibilidad/contraste (T-UI-F4). El coordinador debe marcar `[x]` individualmente con evidencia cuando se ejecuten.
+- **Estado**: modulo **commiteado y estable**; listo para continuar con otra funcionalidad.

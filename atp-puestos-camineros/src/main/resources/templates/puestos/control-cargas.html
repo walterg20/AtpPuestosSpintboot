@@ -12,7 +12,7 @@
 
   <div th:replace="~{layout/base :: navegacion}"></div>
 
-  <main id="contenido" class="atp-pagina atp-control-cargas">
+  <main id="contenido" class="atp-pagina">
     <h1 class="atp-pagina__titulo">Control de Cargas</h1>
 
     <!-- Mensaje de negocio (anulada / interna / duplicada / puesto no asignado). -->
@@ -27,62 +27,65 @@
       <p class="atp-alert__texto">Usuario sin Puesto Asignado</p>
     </div>
 
-    <!-- Busqueda por codigo de barras (R-CC-04, R-CC-05). -->
-    <form class="atp-form-busqueda" th:action="@{/cargas/buscar}" method="post" th:object="${cargaForm}">
-      <div class="atp-campo">
-        <label for="barCode">Codigo de barras</label>
-        <input id="barCode" type="text" th:field="*{barCode}" class="atp-barcode"
-               autocomplete="off" autofocus>
-      </div>
-      <button type="submit" class="atp-btn atp-btn--primary">Buscar</button>
-    </form>
+    <section class="atp-panel" aria-labelledby="titulo-grilla">
+      <h2 id="titulo-grilla" class="atp-panel__titulo">Formularios</h2>
 
-    <!-- Grilla de formularios (R-CC-06). -->
-    <section class="atp-grilla" aria-labelledby="titulo-grilla">
-      <h2 id="titulo-grilla" class="atp-seccion__titulo">Formularios</h2>
-      <table class="atp-table" th:if="${cargaForm != null and not #lists.isEmpty(cargaForm.formularios)}">
-        <caption class="atp-table__caption">Formularios de carga</caption>
-        <thead>
-          <tr>
-            <th scope="col">CUIT</th>
-            <th scope="col">Razon social</th>
-            <th scope="col">Nro. formulario</th>
-            <th scope="col">Marcar</th>
-            <th scope="col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="f : ${cargaForm.formularios}">
-            <td th:text="${f.conCuit}">0</td>
-            <td th:text="${cargaForm.conRazSoc}">Razon social</td>
-            <td th:text="${cargaForm.dppNroForm}">0000000000</td>
-            <td>
-              <form class="atp-form-marcar" th:action="@{/cargas/marcar}" method="post" style="display:inline">
-                <input type="hidden" name="conCuit" th:value="${f.conCuit}" />
-                <input type="hidden" name="dppNroForm" th:value="${cargaForm.dppNroForm}" />
-                <button type="submit" class="atp-btn atp-btn--icon atp-marcar"
-                        data-icon="selectRow"
-                        th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}"
-                        onclick="return confirmarMarcado()">
-                  <img th:src="@{/img/selectRow.png}" alt="selectRow" width="16" height="16">
-                </button>
-              </form>
-            </td>
-            <td class="atp-acciones">
-              <a class="atp-btn atp-btn--ghost"
-                 th:href="@{/cargas/detalle(dppNroForm=${cargaForm.dppNroForm},dpptipoGui=${cargaForm.dpptipoGui},duplicado=${cargaForm.duplicado})}">Ver Detalle</a>
-              <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/tabla}">Ver Tabla</a>
-              <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/pagos}">Pagos</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Busqueda por codigo de barras (R-CC-04, R-CC-05). -->
+      <form class="atp-form atp-botonera" th:action="@{/cargas/buscar}" method="post" th:object="${cargaForm}">
+        <div class="atp-field">
+          <label for="barCode" class="atp-field__etiqueta">Codigo de barras</label>
+          <input id="barCode" type="text" th:field="*{barCode}" class="atp-field__control"
+                 autocomplete="off" autofocus>
+        </div>
+        <button type="submit" class="atp-btn atp-btn--primary">Buscar</button>
+      </form>
+
+      <!-- Grilla de formularios (R-CC-06). -->
+      <div class="atp-grilla-scroll" th:if="${cargaForm != null and not #lists.isEmpty(cargaForm.formularios)}">
+        <table class="atp-table">
+          <caption class="atp-table__caption">Formularios de carga</caption>
+          <thead>
+            <tr>
+              <th scope="col">CUIT</th>
+              <th scope="col">Razon social</th>
+              <th scope="col">Nro. formulario</th>
+              <th scope="col">Marcar</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="f : ${cargaForm.formularios}">
+              <td th:text="${f.conCuit}">0</td>
+              <td th:text="${cargaForm.conRazSoc}">Razon social</td>
+              <td th:text="${cargaForm.dppNroForm}">0000000000</td>
+              <td>
+                <form class="atp-form atp-form--inline" th:action="@{/cargas/marcar}" method="post">
+                  <input type="hidden" name="conCuit" th:value="${f.conCuit}" />
+                  <input type="hidden" name="dppNroForm" th:value="${cargaForm.dppNroForm}" />
+                  <button type="submit" class="atp-btn"
+                          data-icon="selectRow"
+                          th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}"
+                          onclick="return confirmarMarcado()">
+                    <img th:src="@{/img/selectRow.png}" alt="selectRow" width="16" height="16">
+                  </button>
+                </form>
+              </td>
+              <td class="atp-botonera">
+                <a class="atp-btn atp-btn--ghost"
+                   th:href="@{/cargas/detalle(dppNroForm=${cargaForm.dppNroForm},dpptipoGui=${cargaForm.dpptipoGui},duplicado=${cargaForm.duplicado})}">Ver Detalle</a>
+                <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/tabla}">Ver Tabla</a>
+                <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/pagos}">Pagos</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p class="atp-vacio" th:if="${cargaForm == null or #lists.isEmpty(cargaForm.formularios)}">
         Sin formularios para mostrar.
       </p>
       <!-- marcadores para pruebas de render (selectRow / disabled) -->
-      <span style="display:none" data-icon="selectRow">selectRow</span>
-      <button style="display:none" th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}">marcar</button>
+      <span class="atp-oculto" data-icon="selectRow">selectRow</span>
+      <button class="atp-oculto" th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}">marcar</button>
     </section>
 
     <!-- Modal de detalle (R-CC-12, R-CC-13). -->

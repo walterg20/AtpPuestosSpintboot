@@ -1,44 +1,11 @@
 /* Clases especificas de Control de Cargas. Solo tokens (custom properties) de tokens.css. */
-.atp-control-cargas {
-  padding: var(--atp-espaciado-md, 1rem);
-}
-
-.atp-barcode {
-  width: 100%;
+#barCode {
   max-width: 24rem;
-  padding: var(--atp-espaciado-sm, 0.5rem);
-  border: 1px solid var(--atp-color-borde);
-  border-radius: var(--atp-radio-sm, 0.25rem);
-  font-family: var(--atp-fuente-mono, monospace);
+  font-family: var(--atp-font-mono);
 }
 
-.atp-form-busqueda {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--atp-espaciado-sm, 0.5rem);
-  align-items: end;
-  margin-bottom: var(--atp-espaciado-md, 1rem);
-}
-
-.atp-campo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--atp-espaciado-xs, 0.25rem);
-}
-
-.atp-grilla {
-  margin-top: var(--atp-espaciado-md, 1rem);
-}
-
-.atp-acciones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--atp-espaciado-xs, 0.25rem);
-}
-
-.atp-marcar:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.atp-form--inline {
+  display: inline;
 }
 
 .atp-modal {
@@ -47,43 +14,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--atp-color-overlay);
-  z-index: var(--atp-z-modal, 1000);
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
 }
 
 .atp-modal__contenido {
-  background-color: var(--atp-color-fondo);
-  padding: var(--atp-espaciado-md, 1rem);
-  border-radius: var(--atp-radio-md, 0.5rem);
+  background-color: var(--atp-surface);
+  padding: var(--atp-space-4);
+  border-radius: var(--atp-radius);
   max-width: 90vw;
   max-height: 90vh;
   overflow: auto;
 }
 
+.atp-modal__titulo {
+  margin: 0 0 var(--atp-space-3);
+  font-size: var(--atp-text-title);
+  color: var(--atp-primary-dark);
+}
+
 .atp-detalle__cabecera {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: var(--atp-espaciado-xs, 0.25rem) var(--atp-espaciado-sm, 0.5rem);
-}
-
-.atp-vacio {
-  color: var(--atp-color-texto-suave);
-  font-style: italic;
-}
-
-/* Responsive */
-@media (max-width: 375px) {
-  .atp-acciones {
-    flex-direction: column;
-  }
-  .atp-barcode {
-    max-width: 100%;
-  }
-}
-
-@media (min-width: 1440px) {
-  .atp-control-cargas {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+  gap: var(--atp-space-1) var(--atp-space-2);
 }

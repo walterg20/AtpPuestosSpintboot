@@ -20,6 +20,9 @@ permissions:
     resource: verificador-qa
     effect: allow
   - action: subagent
+    resource: desplegador-local
+    effect: allow
+  - action: subagent
     resource: explore
     effect: allow
   - action: edit
@@ -40,8 +43,8 @@ delegar, validar entregables y mantener el estado del arnés.
   GeneXus.
 - **Podés escribir** en `openspec/features/**` (sobre todo `tasks.md`) y en la memoria Engram.
 - Sólo podés lanzar como subagentes: `analista-gx`, `implementador-backend`,
-  `implementador-vistas`, `verificador-qa` y `explore`. No lances a ningún otro agente ni a
-  vos mismo.
+  `implementador-vistas`, `verificador-qa`, `desplegador-local` y `explore`. No lances a ningún otro
+  agente ni a vos mismo.
 
 > **Ojo con el nombre del subagente de vistas**: `implementador-frontend` **ya no existe**; se
 > llama `implementador-vistas` y trabaja sobre Thymeleaf. Si en este archivo la lista de permisos

@@ -11,6 +11,7 @@ import ar.com.atp.puestos.nucleo.web.mvc.producto.ProductoForm;
 import ar.com.atp.puestos.nucleo.web.mvc.producto.ProductoMapper;
 import ar.com.atp.puestos.shared.error.ConflictException;
 import ar.com.atp.puestos.shared.error.NotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,9 +56,12 @@ public class ProductoMvcController {
     private static final Logger log = LoggerFactory.getLogger(ProductoMvcController.class);
 
     private final ProductoService productoService;
+    private final ProveedorNavegacion proveedorNavegacion;
 
-    public ProductoMvcController(ProductoService productoService) {
+    public ProductoMvcController(ProductoService productoService,
+            ProveedorNavegacion proveedorNavegacion) {
         this.productoService = productoService;
+        this.proveedorNavegacion = proveedorNavegacion;
     }
 
     /**
@@ -66,7 +70,9 @@ public class ProductoMvcController {
     @GetMapping
     public String listar(@RequestParam(name = "prodCod", required = false) Integer prodCod,
             @RequestParam(name = "anulados", required = false) Boolean anulados,
+            HttpServletRequest request,
             Model model) {
+        proveedorNavegacion.poblar(model, request);
         FiltroAnulados filtro = FiltroAnulados.deParametro(anulados);
         List<ProductoDto> productos;
         try {
@@ -109,7 +115,9 @@ public class ProductoMvcController {
     public String crear(@RequestParam(name = "anulados", required = false) Boolean anulados,
             @Valid @ModelAttribute("producto") ProductoForm form,
             BindingResult bindingResult,
+            HttpServletRequest request,
             Model model) {
+        proveedorNavegacion.poblar(model, request);
         List<ProductoDto> ordenados = ordenar(cargar(FiltroAnulados.deParametro(anulados)));
         if (bindingResult.hasErrors()) {
             poblar(model, ordenados, form, ModoProducto.ALTA, null,
@@ -136,7 +144,9 @@ public class ProductoMvcController {
             @RequestParam(name = "anulados", required = false) Boolean anulados,
             @Valid @ModelAttribute("producto") ProductoForm form,
             BindingResult bindingResult,
+            HttpServletRequest request,
             Model model) {
+        proveedorNavegacion.poblar(model, request);
         List<ProductoDto> ordenados = ordenar(cargar(FiltroAnulados.deParametro(anulados)));
         if (bindingResult.hasErrors()) {
             poblar(model, ordenados, form, ModoProducto.EDICION, prodCod,
@@ -160,7 +170,9 @@ public class ProductoMvcController {
     @PostMapping("/{prodCod}/eliminar")
     public String eliminar(@PathVariable("prodCod") Integer prodCod,
             @RequestParam(name = "anulados", required = false) Boolean anulados,
+            HttpServletRequest request,
             Model model) {
+        proveedorNavegacion.poblar(model, request);
         try {
             productoService.eliminarProducto(prodCod);
         } catch (ConflictException | NotFoundException ex) {

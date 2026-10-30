@@ -1,0 +1,478 @@
+/*
+ * Layout — estructura de página: cabecera, sesión, navegación, menú, pie, página.
+ * Regla: solo tokens var(--atp-*), sin literales de color ni tipografía.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+body.atp-body {
+  margin: 0;
+  background: var(--atp-surface-alt);
+  color: var(--atp-text);
+  font-family: var(--atp-font);
+  font-size: var(--atp-text-body);
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ------------------------------------------------------------------- Cabecera institucional (Figma) */
+.atp-cabecera {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 210px;
+  background: var(--atp-primary);
+  color: var(--atp-primary-contrast);
+  overflow: hidden;
+  width: 100%;
+}
+
+.atp-cabecera__foto {
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 250px;
+  height: 209px;
+  overflow: hidden;
+}
+
+.atp-cabecera__foto img {
+  position: absolute;
+  left: -2px;
+  top: -3px;
+  width: 1434px;
+  height: 905px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.atp-cabecera__curva {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 84px;
+  height: 96px;
+  pointer-events: none;
+}
+
+.atp-cabecera__curva img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.atp-cabecera__titulo {
+  position: relative;
+  margin: 0;
+  padding: 85px 0 0 449px;
+  font-family: var(--atp-font);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--atp-primary-contrast);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.atp-cabecera__logo-personal {
+  position: absolute;
+  right: 125px;
+  top: 111px;
+  width: 73px;
+  height: 73px;
+  overflow: hidden;
+}
+
+.atp-cabecera__logo-personal img {
+  position: absolute;
+  left: -1307px;
+  top: -113px;
+  width: 1434px;
+  height: 905px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------- Barra de sesión (sección separada, entre cabecera y menú) */
+.atp-sesion {
+  display: flex;
+  align-items: center;
+  gap: var(--atp-space-6);
+  padding: 0 6px 0 133px;
+  min-height: 22px;
+  background: var(--atp-surface);
+  font-family: var(--atp-font);
+  font-size: 17px;
+  color: var(--atp-session-label);
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.atp-sesion__dato {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  height: 22px;
+  overflow: hidden;
+}
+
+.atp-sesion__dato-rotulo {
+  text-decoration: underline;
+  text-underline-position: from-font;
+  white-space: nowrap;
+}
+
+.atp-sesion__dato-valor {
+  width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atp-sesion__salir-form {
+  margin-left: auto;
+}
+
+.atp-sesion__salir {
+  font-family: var(--atp-font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--atp-text);
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* ------------------------------------------------------------------- Navegación (sticky) */
+.atp-nav-principal {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  border-top: 1px solid var(--atp-border);
+  border-bottom: 1px solid var(--atp-border);
+  background: var(--atp-surface);
+  width: 100%;
+}
+
+/* ------------------------------------------------------------------- Menú principal (Figma: fondo #1D5B7D, serif 22px) */
+.atp-menu {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--atp-info);
+  width: 100%;
+}
+
+.atp-menu__lista {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.atp-menu__item {
+  margin: 0;
+  border-right: 1px solid #78909D;
+  flex: 1 1 auto;
+}
+
+.atp-menu__enlace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--atp-space-2) var(--atp-space-3);
+  min-height: 47px;
+  background: var(--atp-info);
+  color: var(--atp-primary-contrast);
+  font-family: var(--atp-font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.atp-menu__enlace:hover {
+  background: var(--atp-info-dark);
+  color: var(--atp-primary-contrast);
+}
+
+.atp-menu__nombre {
+  font-size: 22px;
+  color: var(--atp-primary-contrast);
+}
+
+.atp-menu__item--activo .atp-menu__enlace {
+  background: var(--atp-surface);
+  color: var(--atp-info);
+  border: 1px solid var(--atp-border);
+}
+
+.atp-menu__item--activo .atp-menu__nombre {
+  color: var(--atp-info);
+}
+
+/* Submenú */
+.atp-menu__sublista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--atp-space-1);
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--atp-space-3);
+  border-left: 2px solid var(--atp-border);
+}
+
+.atp-menu__sublista .atp-menu__enlace {
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--atp-space-1);
+  padding: var(--atp-space-1) var(--atp-space-2);
+  font-size: var(--atp-text-caption);
+}
+
+.atp-menu__descripcion {
+  font-size: var(--atp-text-caption);
+  font-weight: 400;
+  font-variant: normal;
+  color: var(--atp-primary-contrast);
+}
+
+/* ------------------------------------------------------------------- Página (contenido) */
+.atp-pagina {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: var(--atp-space-5);
+  flex: 1 0 auto;
+}
+
+.atp-pagina__titulo {
+  margin: 0 0 var(--atp-space-4);
+  font-size: var(--atp-text-display);
+  color: var(--atp-primary-dark);
+}
+
+/* ------------------------------------------------------------------- Pie institucional (Figma: barra de colores + logos) */
+.atp-pie {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--atp-border);
+  flex-shrink: 0;
+}
+
+.atp-pie__barra {
+  display: flex;
+  height: 5px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.atp-pie__segmento {
+  height: 5px;
+  flex-shrink: 0;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.atp-pie__segmento--1 { background: var(--atp-footer-seg-1); }
+.atp-pie__segmento--2 { background: var(--atp-footer-seg-2); }
+.atp-pie__segmento--3 { background: var(--atp-footer-seg-3); }
+.atp-pie__segmento--4 { background: var(--atp-footer-seg-4); }
+.atp-pie__segmento--5 { background: var(--atp-footer-seg-5); }
+.atp-pie__segmento--6 { background: var(--atp-footer-seg-6); }
+.atp-pie__segmento--7 { background: var(--atp-footer-seg-1); }
+.atp-pie__segmento--8 { background: var(--atp-footer-seg-2); }
+
+.atp-pie__logos {
+  display: flex;
+  align-items: center;
+  gap: var(--atp-space-5);
+  padding: var(--atp-space-3) var(--atp-space-5);
+  background: var(--atp-footer-bg);
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.atp-pie__logo-wrap {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.atp-pie__logo-wrap--atp {
+  width: 172px;
+  height: 49px;
+}
+
+.atp-pie__logo-wrap--chaco {
+  width: 104px;
+  height: 59px;
+}
+
+.atp-pie__logo-wrap--ecom {
+  width: 127px;
+  height: 46px;
+  margin-left: auto;
+}
+
+.atp-pie__logo-wrap img {
+  position: absolute;
+  width: 1434px;
+  height: 905px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.atp-pie__logo-wrap--atp img {
+  left: -41px;
+  top: -834px;
+}
+
+.atp-pie__logo-wrap--chaco img {
+  left: -284px;
+  top: -829px;
+}
+
+.atp-pie__logo-wrap--ecom img {
+  left: -1283px;
+  top: -836px;
+}
+
+/* .atp-pie__version eliminado — el texto de versión ya no se muestra en el footer. */
+
+/* ------------------------------------------------------------------- Responsive */
+@media (max-width: 960px) {
+  .atp-cabecera {
+    min-height: 160px;
+  }
+
+  .atp-cabecera__titulo {
+    font-size: 28px;
+    padding: 60px 0 0 20px;
+    white-space: normal;
+  }
+
+  .atp-cabecera__foto {
+    width: 180px;
+    height: 150px;
+  }
+
+  .atp-cabecera__logo-personal {
+    width: 50px;
+    height: 50px;
+    right: 20px;
+    top: 80px;
+  }
+
+  .atp-sesion {
+    flex-wrap: wrap;
+    gap: var(--atp-space-3);
+    padding: 0 var(--atp-space-3);
+  }
+
+  .atp-sesion__dato-valor {
+    width: auto;
+    max-width: 150px;
+  }
+
+  .atp-menu__enlace {
+    font-size: 16px;
+    min-height: 40px;
+  }
+
+  .atp-menu__nombre {
+    font-size: 16px;
+  }
+
+  .atp-pie__logos {
+    gap: var(--atp-space-3);
+    padding: var(--atp-space-2) var(--atp-space-3);
+  }
+
+  .atp-paneles {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .atp-grid-2col {
+    grid-template-columns: 1fr;
+  }
+
+  .atp-pagina {
+    padding: var(--atp-space-3);
+  }
+
+  .atp-contexto {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .atp-cabecera {
+    min-height: 120px;
+  }
+
+  .atp-cabecera__titulo {
+    font-size: 20px;
+    padding: 40px 0 0 10px;
+    white-space: normal;
+  }
+
+  .atp-cabecera__foto {
+    display: none;
+  }
+
+  .atp-cabecera__curva {
+    display: none;
+  }
+
+  .atp-cabecera__logo-personal {
+    width: 40px;
+    height: 40px;
+    right: 10px;
+    top: 60px;
+  }
+
+  .atp-sesion {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--atp-space-2);
+  }
+
+  .atp-sesion__salir-form {
+    margin-left: 0;
+  }
+
+  .atp-menu {
+    flex-direction: column;
+  }
+
+  .atp-menu__item {
+    border-right: none;
+    border-bottom: 1px solid #78909D;
+  }
+
+  .atp-pie__logos {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--atp-space-3);
+  }
+
+  .atp-pie__logo-wrap--ecom {
+    margin-left: 0;
+  }
+
+  .atp-login__clave {
+    flex-direction: column;
+  }
+}

@@ -20,9 +20,9 @@ import org.springframework.util.ClassUtils;
  *       del catalogo viven en el nucleo, D-26).</li>
  *   <li><strong>Sin</strong> {@code thymeleaf-layout-dialect} (SA-P09 / D-07 de
  *       {@code 00-alcance}): los fragmentos {@code th:replace} alcanzan sin el dialecto.</li>
- *   <li><strong>Sin</strong> Spring Security en el nucleo (D-36): su autoconfiguracion se
- *       activaria en los {@code @WebMvcTest} del nucleo y romperia la suite verde de
- *       {@code 01-nucleo-datos}.</li>
+ *   <li><strong>Con</strong> Spring Security en el nucleo (modulo {@code 03-login}, T-101): el
+ *       nucleo aloja la {@code SecurityFilterChain} del sistema; la prohibicion anterior (D-36)
+ *       queda superada por la spec aprobada de {@code 03-login}.</li>
  * </ul>
  */
 class ThymeleafNucleoTest {
@@ -65,12 +65,15 @@ class ThymeleafNucleoTest {
     }
 
     @Test
-    @DisplayName("D-36: Spring Security no esta en el classpath del nucleo (ni compile ni test)")
-    void noHaySpringSecurity() {
+    @DisplayName("T-101 (03-login): Spring Security esta en el classpath del nucleo")
+    void haySpringSecurity() {
+        // D-36 (que prohibia Spring Security en el nucleo) queda SUPERADO por la spec aprobada
+        // de 03-login: el nucleo aloja la `SecurityFilterChain` del sistema (politica CSRF por
+        // familia de rutas y `permitAll` en `/api/v1/**`).
         assertThat(ClassUtils.isPresent("org.springframework.security.core.context.SecurityContextHolder",
-                getClass().getClassLoader()))
-                .as("D-36: Spring Security no debe estar en el nucleo; rompe los @WebMvcTest del nucleo")
-                .isFalse();
+                getClass().getClassLoader())).isTrue();
+        assertThat(ClassUtils.isPresent("org.springframework.security.config.annotation.web.configuration.EnableWebSecurity",
+                getClass().getClassLoader())).isTrue();
     }
 
     private static String leerRecurso(String ruta) throws IOException {

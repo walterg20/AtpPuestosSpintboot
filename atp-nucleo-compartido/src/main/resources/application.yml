@@ -1,4 +1,4 @@
-# ATPPuestos — configuracion de la aplicacion.
+# ATPPuestos ???????? configuracion de la aplicacion.
 #
 # Ubicacion y ownership: este archivo vive en el MODULO NUCLEO (atp-nucleo-compartido) y no en
 # el modulo desplegable. Motivo: Spring Boot resuelve `classpath:/application.yml` tomando el
@@ -16,6 +16,21 @@
 #
 # Sin secretos en el repositorio: todo se toma de variables de entorno (G3, R-204).
 spring:
+  # 03-login / D-LOG-16: el login legacy NO usa `UserDetailsService` ni `AuthenticationProvider`
+  # (la decision de acceso vive en `ServicioAcceso` y el registro en la sesion, en
+  # `RegistradorAutenticacion`). Se excluye la autoconfiguracion que crea un
+  # `InMemoryUserDetailsManager` con el usuario "user" y una contrasena aleatoria: esa credencial
+  # NO es utilizable (la cadena de seguridad no habilita `formLogin` ni `httpBasic`) y su
+  # impresion en el log de arranque es ruido de seguridad.
+  #
+  # Por que esta via y no `exclude` en `@SpringBootApplication`: en los slices `@WebMvcTest`
+  # Spring Boot desactiva el `@EnableAutoConfiguration` de la clase de aplicacion y lista sus
+  # auto-configuraciones por otro mecanismo, que NO aplica las exclusiones de la anotacion
+  # (verificado: el aviso seguia apareciendo en los 9 slices). La propiedad
+  # `spring.autoconfigure.exclude` si se aplica en TODOS los contextos: el arranque real, los
+  # `@SpringBootTest` y cada slice `@WebMvcTest` / `@DataJpaTest`.
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
   application:
     name: atp-puestos
   datasource:
@@ -29,6 +44,26 @@ spring:
       maximum-pool-size: 10
       connection-timeout: 10000
   jpa:
+    # T-129 / R-LOG-046 / D-LOG-21: dialecto explicito, en su version minima soportada (11.0).
+    #
+    # Hallazgo verificado contra `Rentas` (2026-10-22, G-DATA + arranque real): el driver
+    # `mssql-jdbc 12.10.2` informa correctamente la version del servidor
+    # (`getDatabaseMajorVersion()` = 15, `@@VERSION` = Microsoft SQL Server 2019 15.0.2170.1), pero
+    # Hibernate 6.6 resuelve el dialecto BASE `SQLServerDialect` con la version 10.0 (la version por
+    # defecto de esa clase) => aviso HHH000511 en cada arranque. Fijar `SQLServerDialect` NO lo
+    # elimina (mismo resultado). Si lo elimina: `SQLServer2012Dialect` (v11 = version minima
+    # soportada, la que fija D-LOG-21) => 0 apariciones de HHH000511, verificado en el arranque
+    # real y en la suite de IT completa.
+    #
+    # No altera el comportamiento observable contra `Rentas`: el proyecto no usa paginacion, ni
+    # window functions, ni listas `IN` vacias, ni el reloj de la base (la auditoria usa
+    # `LocalDateTime.now()` en Java) y la suite de IT completa queda verde con los mismos
+    # resultados (R-LOG-046). NO se toca `ddl-auto` (sigue en `none`).
+    #
+    # Nota: Hibernate 6.6 depreca las variantes por version (aviso informativo HHH90000026) y
+    # recomienda la base, pero volver a la base reintroduce HHH000511: es una contradiccion interna
+    # de Hibernate. Se prioriza el requisito de la spec (cero HHH000511).
+    database-platform: org.hibernate.dialect.SQLServer2012Dialect
     # Paridad de BD: Hibernate NUNCA genera DDL sobre el esquema existente (R-204, R-205).
     hibernate:
       ddl-auto: none
@@ -47,9 +82,20 @@ server:
   port: ${SERVER_PORT:8080}
   error:
     include-message: always
+  servlet:
+    session:
+      cookie:
+        # T-136 / R-LOG-041: la cookie de sesion viaja con SameSite=Lax, de modo que el navegador
+        # no la envie en un POST intersitio. Es la mitigacion acordada para la ausencia de CSRF en
+        # `/api/**`.
+        same-site: lax
+        http-only: true
 
-# Auditoria de escritura (R-033): usuario por defecto en fase 1 (sin autenticacion aun).
-# Con el modulo de login (spec 02-login) pasara a derivarse del usuario de la sesion.
+# Auditoria de escritura (R-033): usuario por defecto cuando NO hay sesion autenticada.
+# T-130 / R-LOG-032: con el modulo de login (spec 03-login) el usuario auditor de una escritura
+# se deriva del `Context.Usuario` de la sesion (ver `nucleo.service.ResolvedorUsuarioAuditor`);
+# este valor queda como respaldo para las escrituras sin sesion (p. ej. el canal REST).
 app:
   auditoria:
     usuario: ${APP_AUDITORIA_USUARIO:SISTEMA}
+

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -36,8 +38,13 @@ import org.springframework.test.web.servlet.MockMvc;
  *
  * <p>El servicio se sustituye por un mock: la pantalla no habla por HTTP con la propia API
  * (R-PROD-01, D-29).
+ *
+ * <p><strong>03-login</strong>: desde que el núcleo trae Spring Security, las rutas MVC exigen
+ * sesión y las de escritura exigen token CSRF ⇒ la prueba se ejecuta con un usuario autenticado
+ * y cada POST lleva su token (igual que la prueba equivalente del módulo desplegable).
  */
 @WebMvcTest(controllers = ProductoMvcController.class)
+@WithMockUser(username = "tester", roles = "USER")
 class ProductoMvcEscrituraTest {
 
     @Autowired
@@ -45,6 +52,10 @@ class ProductoMvcEscrituraTest {
 
     @MockitoBean
     private ProductoService productoService;
+
+    /** La barra de navegación (contexto + menú) la provee el componente de presentación. */
+    @MockitoBean
+    private ProveedorNavegacion proveedorNavegacion;
 
     @BeforeEach
     void coleccionVaciaPorDefecto() {
@@ -54,7 +65,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("Alta válida: redirige a GET /productos?prodCod= y escribe por el servicio")
     void altaValidaRedirigeYEscribePorElServicio() throws Exception {
-        mockMvc.perform(post("/productos")
+        mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "  Algodón  ")
                         .param("prodTipCal", "1")
@@ -77,7 +88,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("T-107: prodIMax1..4 y uMedNombre quedan fuera del cuerpo de escritura")
     void losDerivadosYLaUnidadDeMedidaQuedanFueraDelCuerpo() throws Exception {
-        mockMvc.perform(post("/productos")
+        mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON")
                         .param("prodIMax1", "10")
@@ -98,7 +109,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("R-PROD-29: los enteros opcionales vacíos se envían ausentes")
     void losEnterosOpcionalesVaciosSeEnvianAusentes() throws Exception {
-        mockMvc.perform(post("/productos")
+        mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON"))
                 .andExpect(status().is3xxRedirection());
@@ -115,7 +126,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("R-PROD-05 y R-PROD-23: la vigencia viaja anidada y con la fecha a medianoche")
     void laVigenciaViajaAnidadaYAMedianoche() throws Exception {
-        mockMvc.perform(post("/productos")
+        mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON")
                         .param("vigencias[0].prodFchVig", "2026-01-01")
@@ -137,7 +148,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("R-PROD-07: una prodCod fuera de rango no ejecuta la escritura")
     void unaProdCodFueraDeRangoNoEscribe() throws Exception {
-        mockMvc.perform(post("/productos")
+        mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "99999")
                         .param("prodDesc", "ALGODON"))
                 .andExpect(status().isOk())
@@ -150,7 +161,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("R-PROD-10 y T-210: el error de binding se muestra junto al campo y Guardar queda off")
     void elErrorDeBindingSeMuestraJuntoAlCampo() throws Exception {
-        String html = mockMvc.perform(post("/productos")
+        String html = mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "99999")
                         .param("prodDesc", "ALGODON"))
                 .andExpect(status().isOk())
@@ -164,7 +175,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("R-PROD-10: el error de una fila de la grilla se muestra junto a la celda")
     void elErrorDeUnaFilaSeMuestraJuntoALaCelda() throws Exception {
-        String html = mockMvc.perform(post("/productos")
+        String html = mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON")
                         .param("vigencias[0].prodImpu1", "10.00")
@@ -182,7 +193,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("R-PROD-08: un importe con 3 decimales se marca y no se escribe")
     void unImporteConTresDecimalesNoSeEscribe() throws Exception {
-        mockMvc.perform(post("/productos")
+        mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON")
                         .param("vigencias[0].prodFchVig", "2026-01-01")
@@ -210,7 +221,7 @@ class ProductoMvcEscrituraTest {
         assertThat(html).contains("href=\"/productos?prodCod=20&amp;anulados=false\"");
 
         // La escritura vuelve con el mismo filtro.
-        mockMvc.perform(post("/productos")
+        mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON")
                         .param("anulados", "false"))
@@ -224,7 +235,7 @@ class ProductoMvcEscrituraTest {
         when(productoService.crearProducto(any()))
                 .thenThrow(new ConflictException("PK_DUPLICADA", "Ya existe un producto con ProdCod 42."));
 
-        String html = mockMvc.perform(post("/productos")
+        String html = mockMvc.perform(post("/productos").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON"))
                 .andExpect(status().isOk())
@@ -239,7 +250,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("Modificación: redirige a GET /productos?prodCod={prodCod}")
     void laModificacionRedirigeAlProducto() throws Exception {
-        mockMvc.perform(post("/productos/42")
+        mockMvc.perform(post("/productos/42").with(csrf())
                         .param("prodCod", "42")
                         .param("prodDesc", "ALGODON"))
                 .andExpect(status().is3xxRedirection())
@@ -251,7 +262,7 @@ class ProductoMvcEscrituraTest {
     @Test
     @DisplayName("Baja: redirige a GET /productos")
     void laBajaRedirigeALaColeccion() throws Exception {
-        mockMvc.perform(post("/productos/42/eliminar"))
+        mockMvc.perform(post("/productos/42/eliminar").with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/productos"));
 

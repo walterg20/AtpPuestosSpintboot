@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Fragmento de bloque de usuario (UserInfo/UserInfoNuevo del legacy).
+     Muestra nombre, puesto/receptoria, turno y comision solo cuando hay sesion activa.
+     Boton "Salir": POST a /logout (CSRF via th:action). -->
+<div class="atp-user-info" th:fragment="user-info" th:if="${contexto != null}">
+  <span class="atp-user-info__rotulo">Usuario</span>
+  <span class="atp-user-info__valor" th:text="${contexto.usuarioNombre()}">Nombre</span>
+
+  <span class="atp-user-info__rotulo" th:if="${contexto.tipo() == 'PUE'}">Puesto</span>
+  <span class="atp-user-info__rotulo" th:unless="${contexto.tipo() == 'PUE'}">Receptoria</span>
+  <span class="atp-user-info__valor" th:text="${contexto.sucursalNombre()}">Sucursal</span>
+
+  <span class="atp-user-info__rotulo">Turno</span>
+  <span class="atp-user-info__valor" th:text="${contexto.turno()}">0</span>
+
+  <span class="atp-user-info__rotulo" th:if="${contexto.comision() != null and contexto.comision() != 0}">Comision</span>
+  <span class="atp-user-info__valor" th:if="${contexto.comision() != null and contexto.comision() != 0}"
+        th:text="${contexto.comision()}">0</span>
+
+  <form class="atp-user-info__salir" th:action="@{/logout}" method="post">
+    <button class="atp-btn atp-btn--ghost" type="submit">Salir</button>
+  </form>
+</div>
+</body>
+</html>

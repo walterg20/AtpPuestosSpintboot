@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <!-- Barra de programas (tabs horizontales). El fragmento `menuItem` recibe la ruta actual
+     como parámetro explícito (`actual`) para poder marcar la tab activa sin depender de que
+     el modelo la traiga: si `rutaActual` no está en el modelo, `actual` llega en null y
+     ningún ítem se marca (comparación segura, el render nunca falla). -->
+  <nav class="atp-menu" th:fragment="menu" th:if="${programas != null}">
+    <ul class="atp-menu__lista">
+      <th:block th:each="it : ${programas}">
+        <li th:replace="~{fragments/menu :: menuItem(mitem=${it}, actual=${rutaActual})}"></li>
+      </th:block>
+    </ul>
+    <p class="atp-vacio" th:if="${#lists.isEmpty(programas)}">Sin programas disponibles</p>
+  </nav>
+
+  <th:block th:fragment="menuItem(mitem, actual)">
+    <li class="atp-menu__item" th:with="activo=${actual != null and mitem.link() != null and mitem.link() == actual}"
+      th:classappend="${activo} ? 'atp-menu__item--activo' : ''">
+      <a class="atp-menu__enlace" th:href="${mitem.link() != null ? mitem.link() : '#'}"
+        th:target="${mitem.linkTarget()}" th:attr="aria-current=(${activo} ? 'page' : null)">
+        <span class="atp-menu__nombre" th:text="${mitem.title()}">Programa</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      <ul class="atp-menu__sublista" th:if="${not #lists.isEmpty(mitem.items())}">
+        <th:block th:each="hijo : ${mitem.items()}">
+          <li th:replace="~{fragments/menu :: menuItem(mitem=${hijo}, actual=${actual})}"></li>
+        </th:block>
+      </ul>
+    </li>
+  </th:block>
+</body>
+
+</html>

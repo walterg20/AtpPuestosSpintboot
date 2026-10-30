@@ -32,7 +32,6 @@ import ar.com.atp.puestos.shared.error.ConflictException;
 import ar.com.atp.puestos.shared.error.NotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,8 +56,14 @@ public class NucleoEscrituraService {
     private final JurisdiccionRepository jurisdiccionRepository;
     private final FeriadoRepository feriadoRepository;
 
-    /** Usuario de auditoría de {@code Feriado} en fase 1 (R-033). */
-    private final String usuarioAuditoria;
+    /**
+     * Usuario de auditoría de {@code Feriado} (R-033).
+     *
+     * <p><strong>T-130 / R-LOG-032</strong>: con sesión autenticada es el {@code Context.Usuario}
+     * de la sesión; sin sesión, el valor por defecto de {@code app.auditoria.usuario}
+     * ({@code SISTEMA}).
+     */
+    private final ResolvedorUsuarioAuditor resolvedorUsuarioAuditor;
 
     public NucleoEscrituraService(
             ProvinciaRepository provinciaRepository,
@@ -68,7 +73,7 @@ public class NucleoEscrituraService {
             AreaRepository areaRepository,
             JurisdiccionRepository jurisdiccionRepository,
             FeriadoRepository feriadoRepository,
-            @Value("${app.auditoria.usuario:SISTEMA}") String usuarioAuditoria) {
+            ResolvedorUsuarioAuditor resolvedorUsuarioAuditor) {
         this.provinciaRepository = provinciaRepository;
         this.localidadRepository = localidadRepository;
         this.calleRepository = calleRepository;
@@ -76,7 +81,7 @@ public class NucleoEscrituraService {
         this.areaRepository = areaRepository;
         this.jurisdiccionRepository = jurisdiccionRepository;
         this.feriadoRepository = feriadoRepository;
-        this.usuarioAuditoria = usuarioAuditoria;
+        this.resolvedorUsuarioAuditor = resolvedorUsuarioAuditor;
     }
 
     // --- Provincia -----------------------------------------------------------
@@ -280,7 +285,7 @@ public class NucleoEscrituraService {
     private void aplicarFeriado(Feriado feriado, FeriadoEscrituraDto dto) {
         feriado.setFerTipo(dto.ferTipo());
         feriado.setFerFchReg(LocalDateTime.now());
-        feriado.setFerUsuario(usuarioAuditoria);
+        feriado.setFerUsuario(resolvedorUsuarioAuditor.usuarioActual());
     }
 
     private Feriado buscarFeriado(LocalDateTime ferFecha) {

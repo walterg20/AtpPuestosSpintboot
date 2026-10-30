@@ -1,132 +1,7 @@
 /*
- * Componentes del nucleo — Mapeo de docs/design.md §5 (legacy -> componente).
- *
- * Regla: ningún literal de color ni de tipografía. Todo sale de var(--atp-*), definido en
- * tokens.css.
- *
- * Componentes: .atp-table, .atp-btn (+ --primary / --ghost), .atp-alert (+ variantes),
- * .atp-form, .atp-grid-2col, .atp-field. Se suman los elementos de disposición de la pantalla
- * (cabecera, paneles, botonera, grilla con scroll horizontal).
+ * Componentes — botones, alertas, tablas, formularios, campos, paneles.
+ * Regla: solo tokens var(--atp-*), sin literales de color ni tipografía.
  */
-
-* {
-  box-sizing: border-box;
-}
-
-body.atp-body {
-  margin: 0;
-  background: var(--atp-surface-alt);
-  color: var(--atp-text);
-  font-family: var(--atp-font);
-  font-size: var(--atp-text-body);
-  line-height: 1.45;
-}
-
-/* --------------------------------------------------------------- Foco visible (AA) */
-:focus-visible {
-  outline: 2px solid var(--atp-primary);
-  outline-offset: 2px;
-}
-
-.atp-oculto {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.atp-saltar {
-  position: absolute;
-  left: -9999px;
-  top: 0;
-  padding: var(--atp-space-2) var(--atp-space-3);
-  background: var(--atp-surface);
-  color: var(--atp-primary);
-}
-
-.atp-saltar:focus {
-  left: var(--atp-space-2);
-  top: var(--atp-space-2);
-  z-index: 10;
-}
-
-/* ------------------------------------------------------------------- Estructura */
-.atp-cabecera {
-  display: flex;
-  align-items: center;
-  gap: var(--atp-space-3);
-  padding: var(--atp-space-3) var(--atp-space-5);
-  background: var(--atp-primary);
-  color: var(--atp-primary-contrast);
-}
-
-.atp-cabecera__marca {
-  margin: 0;
-  font-size: var(--atp-text-title);
-  font-weight: 600;
-}
-
-.atp-pie {
-  padding: var(--atp-space-4) var(--atp-space-5);
-  color: var(--atp-text-muted);
-  font-size: var(--atp-text-caption);
-}
-
-.atp-pagina {
-  padding: var(--atp-space-5);
-}
-
-.atp-pagina__titulo {
-  margin: 0 0 var(--atp-space-4);
-  font-size: var(--atp-text-display);
-  color: var(--atp-primary-dark);
-}
-
-.atp-paneles {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(480px, 2fr);
-  gap: var(--atp-space-4);
-  align-items: start;
-}
-
-.atp-panel {
-  /* Permite que el panel (ítem del grid) se encoja por debajo de su min-content: sin esto, el
-     `min-width: 720px` de la tabla de vigencias se propaga al track del grid y la página desborda
-     en vez de aparecer el scroll interno de `.atp-grilla-scroll` (H2 del informe QA del
-     2026-10-22, R-PROD-16). */
-  min-width: 0;
-  background: var(--atp-surface);
-  border: 1px solid var(--atp-border);
-  border-radius: var(--atp-radius);
-  box-shadow: var(--atp-shadow-1);
-  padding: var(--atp-space-4);
-}
-
-.atp-panel__titulo {
-  margin: 0 0 var(--atp-space-3);
-  font-size: var(--atp-text-title);
-  color: var(--atp-primary-dark);
-}
-
-.atp-panel__estado {
-  margin: var(--atp-space-2) 0 0;
-  color: var(--atp-text-muted);
-  font-style: italic;
-}
-
-.atp-vacio {
-  margin: var(--atp-space-3) 0;
-  padding: var(--atp-space-4);
-  border: 1px dashed var(--atp-border);
-  border-radius: var(--atp-radius);
-  color: var(--atp-text-muted);
-  text-align: center;
-}
 
 /* --------------------------------------------------------------------- Botones */
 .atp-btn {
@@ -148,14 +23,14 @@ body.atp-body {
 }
 
 .atp-btn--primary {
-  background: var(--atp-primary);
-  border-color: var(--atp-primary);
+  background: var(--atp-button);
+  border-color: var(--atp-button);
   color: var(--atp-primary-contrast);
 }
 
 .atp-btn--primary:hover {
-  background: var(--atp-primary-dark);
-  border-color: var(--atp-primary-dark);
+  background: var(--atp-button-dark);
+  border-color: var(--atp-button-dark);
 }
 
 .atp-btn--ghost {
@@ -270,11 +145,6 @@ body.atp-body {
 }
 
 .atp-grilla-scroll {
-  /* `position: relative` para que los descendientes absolutamente posicionados (por ejemplo el
-     texto oculto de una cabecera) tengan a esta caja como bloque contenedor: si escaparan al
-     bloque contenedor inicial se medirían desde el borde de la tabla (720px) y volverían a
-     desbordar el documento en lugar de quedar dentro del scroll interno (H2 del informe QA del
-     2026-10-22). */
   position: relative;
   overflow-x: auto;
   border: 1px solid var(--atp-border);
@@ -303,8 +173,6 @@ body.atp-body {
   text-transform: lowercase;
 }
 
-/* Marca de rótulo derivado (D-20): el texto de la cabecera queda verbatim y la marca se
-   agrega en el render, de modo que la columna siga leyéndose exactamente "ProdFchVig". */
 .atp-th-derivado::after {
   content: " (derivado)";
   margin-left: var(--atp-space-1);
@@ -387,20 +255,141 @@ body.atp-body {
   font-size: var(--atp-text-caption);
 }
 
-/* ---------------------------------------------------------------------- Responsive */
-@media (max-width: 960px) {
-  .atp-paneles {
-    /* `1fr` equivale a `minmax(auto, 1fr)`: el mínimo automático del track es el min-content del
-       panel, que con la tabla de vigencias (720px) mantiene el desborde de la página. Con
-       `minmax(0, 1fr)` el track puede encogerse y el scroll queda dentro de la grilla. */
-    grid-template-columns: minmax(0, 1fr);
-  }
+/* --------------------------------------------------------------------- Paneles */
+.atp-panel {
+  min-width: 0;
+  background: var(--atp-surface);
+  border: 1px solid var(--atp-border);
+  border-radius: var(--atp-radius);
+  box-shadow: var(--atp-shadow-1);
+  padding: var(--atp-space-4);
+}
 
-  .atp-grid-2col {
-    grid-template-columns: 1fr;
-  }
+.atp-panel__titulo {
+  margin: 0 0 var(--atp-space-3);
+  font-size: var(--atp-text-title);
+  color: var(--atp-primary-dark);
+}
 
-  .atp-pagina {
-    padding: var(--atp-space-3);
-  }
+.atp-panel__estado {
+  margin: var(--atp-space-2) 0 0;
+  color: var(--atp-text-muted);
+  font-style: italic;
+}
+
+.atp-vacio {
+  margin: var(--atp-space-3) 0;
+  padding: var(--atp-space-4);
+  border: 1px dashed var(--atp-border);
+  border-radius: var(--atp-radius);
+  color: var(--atp-text-muted);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- Pantalla de acceso */
+.atp-login {
+  display: flex;
+  justify-content: center;
+}
+
+.atp-login__panel {
+  width: 100%;
+  max-width: 400px;
+  min-height: 293px;
+}
+
+.atp-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--atp-space-4);
+}
+
+.atp-login__clave {
+  display: flex;
+  gap: var(--atp-space-2);
+  align-items: stretch;
+}
+
+.atp-login__clave .atp-field__control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ------------------------------------------------- Pantalla de inicio (Home) */
+.atp-paneles {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(480px, 2fr);
+  gap: var(--atp-space-4);
+  align-items: start;
+}
+
+.atp-paneles--apilado {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.atp-contexto {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--atp-space-3) var(--atp-space-4);
+  margin: 0;
+}
+
+.atp-contexto__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--atp-space-1);
+  min-width: 0;
+}
+
+.atp-contexto__rotulo {
+  color: var(--atp-text-muted);
+  font-size: var(--atp-text-caption);
+  font-weight: 600;
+}
+
+.atp-contexto__valor {
+  margin: 0;
+  overflow-wrap: break-word;
+}
+
+.atp-inicio {
+  margin: 0;
+}
+
+.atp-home__salir {
+  margin-top: var(--atp-space-4);
+}
+
+/* ------------------------------------------------- Menú de programas autorizados */
+.atp-menu-programas {
+  overflow-x: auto;
+}
+
+.atp-menu-programas__lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--atp-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.atp-menu-programas__item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--atp-space-2);
+  align-items: baseline;
+  padding: var(--atp-space-2) var(--atp-space-3);
+  border: 1px solid var(--atp-border);
+  border-radius: var(--atp-radius);
+  background: var(--atp-surface);
+}
+
+.atp-menu-programas__nombre {
+  color: var(--atp-primary-dark);
+  font-weight: 600;
+}
+
+.atp-menu-programas__descripcion {
+  color: var(--atp-text-muted);
 }

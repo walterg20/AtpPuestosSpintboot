@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!--
+  Pantalla de acceso denegado (NotAuthorized del legacy) — T-205.
+
+  El legacy muestra `Msg('You are not authorized to do this action')` en el `Event Start` del
+  WebPanel. El texto viaja en el atributo `mensaje` del modelo (R-LOG-026) para que el mensaje
+  verbatim viva en un solo lugar.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('No autorizado')}">
+  <title>No autorizado</title>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+
+  <div th:replace="~{layout/base :: sesion}"></div>
+
+  <div th:replace="~{layout/base :: navegacion}"></div>
+
+  <main id="contenido" class="atp-pagina">
+    <h1 class="atp-pagina__titulo">No autorizado</h1>
+
+    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive">
+      <p class="atp-alert__texto" th:text="${mensaje}">You are not authorized to do this action</p>
+    </div>
+  </main>
+
+  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+</body>
+</html>

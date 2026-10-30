@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--
+  Lista de programas autorizados — T-205.
+
+  Fragmento reutilizable: lo incluye la pantalla de inicio (`nucleo/home`) y cualquier otra
+  pantalla que deba mostrar el menú de programas del usuario (R-LOG-025).
+
+  Estado `empty` (sin programas): `Sin programas disponibles` + link `Recargar`.
+  Los 3 datos del programa son los del legacy: nombre del objeto, descripción (rótulo del menú) y
+  enlace (hoy `null`: los WebPanels del legacy no tienen equivalente en el sistema nuevo,
+  SA-LOG-10).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="atp-menu-programas" th:fragment="menu-programas">
+  <ul class="atp-menu-programas__lista" th:if="${not #lists.isEmpty(programas)}">
+    <li class="atp-menu-programas__item" th:each="programa : ${programas}">
+      <span class="atp-menu-programas__nombre" th:text="${programa.title()}">WWPPrim_Turnos</span>
+      <span class="atp-menu-programas__descripcion"
+            th:text="${programa.description()}">Turnos de Comisiones</span>
+    </li>
+  </ul>
+
+  <p class="atp-vacio" th:if="${#lists.isEmpty(programas)}">
+    Sin programas disponibles
+    <a class="atp-enlace" th:href="@{/home}">Recargar</a>
+  </p>
+</div>
+</body>
+</html>

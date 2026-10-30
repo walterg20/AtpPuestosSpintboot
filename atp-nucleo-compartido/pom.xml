@@ -39,12 +39,23 @@
       `templates/` deben renderizarse desde el jar desplegable => la dependencia va en scope
       `compile` (el de por defecto). Sin `thymeleaf-layout-dialect` (SA-P09 / D-07 de 00-alcance):
       los fragmentos `th:replace` alcanzan sin el dialecto.
-      Prohibido Spring Security en el nucleo (ni `compile` ni `test`): su autoconfiguracion se
-      activaria en los `@WebMvcTest` del nucleo y romperia la suite verde de 01-nucleo-datos.
     -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <!--
+      T-101 (modulo 03-login): el nucleo aloja la configuracion de seguridad del sistema
+      (`nucleo.config.SeguridadConfig`), que hereda el artefacto desplegable. La dependencia va en
+      scope `compile` porque el `SecurityFilterChain` del nucleo forma parte de su API publica.
+      NOTA: la prohibicion anterior de Spring Security en el nucleo (D-36) queda SUPERADA por la
+      spec aprobada de 03-login: la politica de seguridad (permitAll en `/api/v1/**`, CSRF
+      descartado en `/api/**`, CSRF exigido en las rutas MVC) debe ser la del nucleo, no la
+      autoconfiguracion por defecto de Spring Boot.
+    -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
     <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
@@ -60,6 +71,15 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!--
+      T-101 / T-312: utilidades de prueba de Spring Security (`csrf()`, `@WithMockUser`) para los
+      slices `@WebMvcTest` del nucleo (los formularios MVC exigen token CSRF).
+    -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

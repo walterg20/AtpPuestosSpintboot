@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--
+  Pantalla de acceso (Login del legacy) — T-201, T-202, T-203.
+
+  Contrato observable (spec §3.1 y §3.2, plan §4.3):
+
+  - Los 3 rótulos verbatim, EN ORDEN: `Acceso` (gxAttribute var:5), `Usuario` (var:6) y
+    `Contraseña` (var:7, `IsPassword="True"`).
+  - El control de la clave es `type="password"` (paridad con `IsPassword="True"`).
+  - El botón dice `Ingresar` (caption constante de `BtnIngresar`).
+  - El banner de error va JUNTO al campo de contraseña, con la clase visual de error
+    (equivalente al `ForeColor="Red"` del `TextBlockPass` del legacy) — R-LOG-020.
+  - El token CSRF lo inyecta Thymeleaf por el `th:action` (D-LOG-18(a)): el formulario es un
+    POST con token, como el resto de las escrituras MVC.
+  - La clave NUNCA se vuelve a renderizar tras un error: el controlador la deja en `null`.
+
+  Estados (T-203): inicial (sin banner), error (banner con el mensaje verbatim) y con errores de
+  binding (mensaje junto a cada campo y botón `Ingresar` deshabilitado).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Ingresar')}">
+  <title>Ingresar</title>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+
+  <div th:replace="~{layout/base :: sesion}"></div>
+
+  <div th:replace="~{layout/base :: navegacion}"></div>
+
+  <main id="contenido" class="atp-pagina">
+    <h1 class="atp-pagina__titulo">Ingresar</h1>
+
+    <div class="atp-login" th:style="|background-image: url(@{/img/login-bg.svg})|">
+      <section class="atp-panel atp-login__panel" aria-labelledby="titulo-formulario">
+        <h2 class="atp-panel__titulo" id="titulo-formulario">Formulario de acceso</h2>
+
+        <form class="atp-form atp-login__form" th:fragment="formulario-acceso"
+              th:object="${loginForm}" th:action="@{/login}" method="post">
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="tipo">Acceso</label>
+            <select class="atp-field__control" id="tipo" th:field="*{tipo}">
+              <option th:each="opcion : ${tipos}" th:value="${opcion.codigo}"
+                      th:text="${opcion.descripcion}">Puesto Caminero</option>
+            </select>
+            <p class="atp-field__error" th:if="${#fields.hasErrors('tipo')}"
+               th:errors="*{tipo}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="usuario">Usuario</label>
+            <input class="atp-field__control" id="usuario" type="text" maxlength="10"
+                   autocomplete="username" autofocus th:field="*{usuario}">
+            <p class="atp-field__error" th:if="${#fields.hasErrors('usuario')}"
+               th:errors="*{usuario}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="clave">Contraseña</label>
+            <div class="atp-login__clave">
+              <input class="atp-field__control" id="clave" type="password" maxlength="10"
+                     autocomplete="current-password" th:field="*{clave}">
+              <button class="atp-btn atp-btn--ghost" type="button" data-alternar-clave="true"
+                      aria-pressed="false" aria-label="Mostrar contraseña">Mostrar</button>
+            </div>
+
+            <!-- Banner de error: equivalente al TextBlockPass rojo del legacy (R-LOG-020). -->
+            <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive"
+                 th:if="${mensajeError}">
+              <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
+            </div>
+
+            <p class="atp-field__error" th:if="${#fields.hasErrors('clave')}"
+               th:errors="*{clave}">Error</p>
+          </div>
+
+          <div class="atp-botonera">
+            <button class="atp-btn atp-btn--primary" type="submit" th:disabled="${tieneErrores}">Ingresar</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+</body>
+</html>

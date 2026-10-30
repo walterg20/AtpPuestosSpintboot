@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--
+  Pantalla de Turnos (módulo 06-turnos) — T-TUR-C1, T-TUR-C3, T-TUR-C4.
+
+  - Réplica de la grilla `Gridturnos` del legacy (`TurnosListado`): las 5 columnas visibles con
+    sus rótulos verbatim (`Id. Turno`, `Comisión`, `Fecha Apertura`, `Fecha Cierre`, `Estado`).
+    Las tres columnas que el legacy ocultaba (la sucursal, el tipo de sucursal y el número de SN)
+    no se renderizan (R-TUR-002).
+  - Acciones `Nuevo Turno` y `Cerrar Turno` (R-TUR-004). La confirmación del cierre es la
+    verbatim del legacy (`¿Confirma que desea cerrar el Turno?`) y viaja en el modelo
+    (`mensajeConfirmacionCierre`), no literalizada aquí (R-TUR-005).
+  - Paginación de a 10 filas, como el `MaxRows="10"` del legacy (R-TUR-003).
+  - Estados: vacío, error (mensaje verbatim del backend) y éxito.
+  - La fila se elige por su número (`Id. Turno`), igual que la selección de fila del legacy: el
+    botón `Cerrar Turno` acts sobre el turno elegido y, si no hay ninguno, sobre el turno abierto
+    de la sesión (`Context.Turno`).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Turnos')}">
+  <title>Turnos</title>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+
+  <div th:replace="~{layout/base :: sesion}"></div>
+
+  <div th:replace="~{layout/base :: navegacion}"></div>
+
+  <main id="contenido" class="atp-pagina">
+    <h1 class="atp-pagina__titulo">Turnos</h1>
+
+    <!-- Mensaje de éxito: el de la última escritura (flash de la redirección). -->
+    <div class="atp-alert atp-alert--success" role="status" aria-live="polite" th:if="${mensajeExito}">
+      <p class="atp-alert__texto" th:text="${mensajeExito}">Ok</p>
+    </div>
+
+    <!-- Mensaje de error: el verbatim del backend o el de carga de la grilla. -->
+    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive" th:if="${mensajeError}">
+      <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
+    </div>
+
+    <section class="atp-panel" aria-labelledby="titulo-turnos">
+      <h2 class="atp-panel__titulo" id="titulo-turnos">Turnos de la sucursal</h2>
+
+      <!-- Botonera: las dos acciones del legacy. Los formularios llevan `th:action`, que es lo que
+           inyecta el token CSRF (T-TUR-C4). -->
+      <div class="atp-botonera">
+        <form class="atp-form" th:action="@{/turnos/nuevo}" method="post">
+          <button class="atp-btn atp-btn--primary" type="submit">Nuevo Turno</button>
+        </form>
+
+        <form class="atp-form" th:if="${turnoObjetivo != null}"
+              th:action="@{/turnos/{turNroId}/cerrar(turNroId=${turnoObjetivo})}" method="post">
+          <button class="atp-btn atp-btn--peligro" type="submit"
+                  th:attr="data-confirmar=${mensajeConfirmacionCierre}">Cerrar Turno</button>
+        </form>
+        <button class="atp-btn atp-btn--peligro" type="button" th:if="${turnoObjetivo == null}" disabled
+                th:attr="data-confirmar=${mensajeConfirmacionCierre}">Cerrar Turno</button>
+      </div>
+
+      <p class="atp-field__ayuda">
+        Para cerrar un turno, elegí su número en la grilla y presioná «Cerrar Turno».
+      </p>
+
+      <!-- Paginación de la grilla (10 filas por página, como el legacy). -->
+      <nav class="atp-nav" aria-label="Paginación de turnos" th:if="${cantidadPaginas > 1}">
+        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
+           th:href="@{/turnos(pagina=0)}">First</a>
+        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>First</button>
+
+        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
+           th:href="@{/turnos(pagina=${paginaActual - 1})}">Prev</a>
+        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>Prev</button>
+
+        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
+           th:href="@{/turnos(pagina=${paginaActual + 1})}">Next</a>
+        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Next</button>
+
+        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
+           th:href="@{/turnos(pagina=${cantidadPaginas - 1})}">Last</a>
+        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Last</button>
+      </nav>
+
+      <!-- Grilla: los rótulos de las columnas son los verbatim del legacy (R-TUR-002). -->
+      <div class="atp-grilla-scroll" th:if="${not #lists.isEmpty(turnos)}">
+        <table class="atp-table">
+          <caption class="atp-table__caption">Turnos cargados</caption>
+          <thead>
+            <tr>
+              <th scope="col">Id. Turno</th>
+              <th scope="col">Comisión</th>
+              <th scope="col">Fecha Apertura</th>
+              <th scope="col">Fecha Cierre</th>
+              <th scope="col">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="fila : ${turnos}"
+                th:classappend="${fila.turno == turnoSeleccionado} ? 'atp-table__fila--seleccionada' : ''">
+              <td>
+                <a class="atp-enlace" th:href="@{/turnos(turNroId=${fila.turno})}"
+                   th:text="${fila.turno}">0</a>
+              </td>
+              <td th:text="${fila.comision}">0</td>
+              <td th:text="${fila.fechaApertura}">01/01/2026</td>
+              <td th:text="${fila.fechaCierre}">01/01/2026</td>
+              <td th:text="${fila.estado}">A</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="atp-vacio" th:if="${#lists.isEmpty(turnos) and (mensajeError == null)}">
+        No hay turnos para mostrar.
+      </p>
+      <p class="atp-vacio" th:if="${#lists.isEmpty(turnos) and (mensajeError != null)}">
+        No se pudieron mostrar los turnos.
+      </p>
+    </section>
+  </main>
+
+  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+</body>
+</html>

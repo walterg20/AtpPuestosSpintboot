@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!--
+  Pantalla de inicio (Home / Inicio del legacy) — T-204, R-UI-005.
+
+  Lógica de Home (spec 03-login §R-LOG-024, R-UI-005):
+    - Si no hay sesión válida: mostrar el Login.
+    - Si hay sesión: ocultar el Login y renderizar Inicio (contexto + texto + programas).
+
+  - Los 10 campos del contexto que carga el login, con el rótulo de cada atributo del SDT
+    `Context` (spec §3.5): Usuario, UsuarioNombre, PersonaId, Comision, Turno, Sucursal,
+    SucursalNombre, Tipo, Responsable y ResponsableNombre.
+  - El texto de bienvenida de `Inicio`, VERBATIM (plan §4.3), incluida la falta de espacio antes
+    de "Otra": lo entrega el controlador en el atributo `textoInicio`.
+  - El menú de programas autorizados (nombre + descripción), en el fragmento reutilizable
+    `nucleo/fragments/menu-programas`.
+  - El formulario de cierre de sesión: es un POST con token CSRF (`th:action`).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Inicio')}">
+  <title>Inicio</title>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+
+  <div th:replace="~{layout/base :: sesion}"></div>
+
+  <div th:replace="~{layout/base :: navegacion}"></div>
+
+  <main id="contenido" class="atp-pagina">
+    <h1 class="atp-pagina__titulo">Inicio</h1>
+
+    <!-- Sin sesión: se muestra el formulario de acceso (Login). -->
+    <div class="atp-login" th:if="${#strings.isEmpty(contexto.usuario())}"
+         th:style="|background-image: url(@{/img/login-bg.svg})|">
+      <section class="atp-panel atp-login__panel" aria-labelledby="titulo-formulario">
+        <h2 class="atp-panel__titulo" id="titulo-formulario">Formulario de acceso</h2>
+        <div th:replace="~{nucleo/login :: formulario-acceso}"></div>
+      </section>
+    </div>
+
+    <!-- Con sesión: se oculta el Login y se renderiza Inicio. -->
+    <div class="atp-paneles atp-paneles--apilado"
+         th:unless="${#strings.isEmpty(contexto.usuario())}">
+
+      <section class="atp-panel" aria-labelledby="titulo-contexto">
+        <h2 class="atp-panel__titulo" id="titulo-contexto">Datos del contexto</h2>
+
+        <dl class="atp-contexto">
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">Usuario</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.usuario()}">Usuario</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">UsuarioNombre</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.usuarioNombre()}">Nombre</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">PersonaId</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.personaId()}">0</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">Comision</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.comision()}">0</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">Turno</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.turno()}">0</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">Sucursal</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.sucursal()}">0</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">SucursalNombre</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.sucursalNombre()}">Sucursal</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">Tipo</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.tipo()}">PUE</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">Responsable</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.responsable()}">0</dd>
+          </div>
+          <div class="atp-contexto__item">
+            <dt class="atp-contexto__rotulo">ResponsableNombre</dt>
+            <dd class="atp-contexto__valor" th:text="${contexto.responsableNombre()}">Responsable</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="atp-panel" aria-labelledby="titulo-proposito">
+        <h2 class="atp-panel__titulo" id="titulo-proposito">Propósito</h2>
+        <p class="atp-inicio" th:text="${textoInicio}">Texto de inicio</p>
+      </section>
+
+      <section class="atp-panel" aria-labelledby="titulo-programas">
+        <h2 class="atp-panel__titulo" id="titulo-programas">Programas</h2>
+        <div th:replace="~{nucleo/fragments/menu-programas :: menu-programas}"></div>
+      </section>
+
+    </div>
+
+    <form class="atp-form atp-home__salir" th:if="${not #strings.isEmpty(contexto.usuario())}"
+          th:action="@{/logout}" method="post">
+      <button class="atp-btn atp-btn--ghost" type="submit">Cerrar sesión</button>
+    </form>
+  </main>
+
+  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+</body>
+</html>

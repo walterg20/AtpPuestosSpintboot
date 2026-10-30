@@ -49,7 +49,10 @@ import org.springframework.test.context.TestPropertySource;
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
         "spring.jpa.hibernate.ddl-auto=create-drop",
-        "spring.jpa.properties.hibernate.generate_statistics=true"})
+        "spring.jpa.properties.hibernate.generate_statistics=true",
+        // T-129: el nucleo fija el dialecto de SQL Server (para que el arranque contra `Rentas`
+        // no emita HHH000511). Esta fixture corre contra H2 en memoria => necesita su dialecto.
+        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"})
 @DisplayName("T-103 - Listado de Productos sin N+1 (H2 en memoria, fixture efimera)")
 class ProductoListadoN1H2Test {
 

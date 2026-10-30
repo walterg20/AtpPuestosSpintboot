@@ -29,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -38,8 +39,13 @@ import org.springframework.test.web.servlet.MockMvc;
  *
  * <p>El servicio se sustituye por un mock: la pantalla no habla por HTTP con la propia API
  * (R-PROD-01, D-29). Las escrituras están en {@code ProductoMvcEscrituraTest}.
+ *
+ * <p><strong>03-login</strong>: desde que el núcleo trae Spring Security, las rutas MVC exigen
+ * sesión ⇒ la prueba se ejecuta con un usuario autenticado ({@code @WithMockUser}), igual que la
+ * prueba equivalente del módulo desplegable.
  */
 @WebMvcTest(controllers = ProductoMvcController.class)
+@WithMockUser(username = "tester", roles = "USER")
 class ProductoMvcControllerTest {
 
     private static final Pattern ROTULOS = Pattern.compile("<label[^>]*>([^<]*)</label>");
@@ -64,12 +70,24 @@ class ProductoMvcControllerTest {
     @MockitoBean
     private ProductoService productoService;
 
+    /** La barra de navegación (contexto + menú) la provee el componente de presentación. */
+    @MockitoBean
+    private ProveedorNavegacion proveedorNavegacion;
+
     @BeforeEach
     void coleccionVaciaPorDefecto() {
         lenient().when(productoService.listarProductos(any())).thenReturn(List.of());
     }
 
     // ------------------------------------------------------------------ lectura
+
+    @Test
+    @DisplayName("GET /productos carga la barra de navegación (contexto + menú de programas)")
+    void laPantallaCargaLaBarraDeNavegacion() throws Exception {
+        mockMvc.perform(get("/productos")).andExpect(status().isOk());
+
+        org.mockito.Mockito.verify(proveedorNavegacion).poblar(any(), any());
+    }
 
     @Test
     @DisplayName("GET /productos devuelve la vista nucleo/productos con el view model completo")

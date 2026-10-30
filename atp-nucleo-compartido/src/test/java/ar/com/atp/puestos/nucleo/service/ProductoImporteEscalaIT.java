@@ -1,6 +1,7 @@
 package ar.com.atp.puestos.nucleo.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -247,7 +248,8 @@ class ProductoImporteEscalaIT {
         LocalDateTime fecha = aLocalDateTime(fila[1]);
         ProductoVigenciaDto lectura = vigenciaLeida(prodCod, fecha);
 
-        String html = mockMvc.perform(get("/productos").param("prodCod", String.valueOf(prodCod)))
+        String html = mockMvc.perform(get("/productos").with(user("tester"))
+                        .param("prodCod", String.valueOf(prodCod)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 

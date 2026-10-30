@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import ar.com.atp.puestos.nucleo.service.ProductoService;
 import ar.com.atp.puestos.nucleo.web.dto.ProductoDto;
 import ar.com.atp.puestos.nucleo.web.mvc.ProductoMvcController;
+import ar.com.atp.puestos.nucleo.web.mvc.ProveedorNavegacion;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +70,10 @@ class ProductoMvcCsrfTest {
 
     @MockitoBean
     private ProductoService productoService;
+
+    /** La barra de navegación (contexto + menú) la provee el componente de presentación. */
+    @MockitoBean
+    private ProveedorNavegacion proveedorNavegacion;
 
     @BeforeEach
     void coleccionVaciaPorDefecto() {

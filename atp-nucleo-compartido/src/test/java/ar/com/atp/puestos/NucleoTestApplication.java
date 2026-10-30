@@ -19,6 +19,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * <p>Como el escaneo alcanza el arbol de test, tambien registra los dobles de prueba REST
  * ({@code ExplodingController}, {@code MetodoUnicoController}). Es inocuo: solo agregan dos
  * rutas bajo {@code /api/v1/test/} que ningun test ejercita.
+ *
+ * <p><strong>03-login / D-LOG-16</strong>: la exclusion de
+ * {@code UserDetailsServiceAutoConfiguration} (para que no se cree el usuario {@code user} con
+ * contrasena aleatoria) esta en la propiedad {@code spring.autoconfigure.exclude} del
+ * {@code application.yml} del nucleo: es la unica via que cubre tambien los slices
+ * {@code @WebMvcTest}.</p>
  */
 @SpringBootApplication
 public class NucleoTestApplication {

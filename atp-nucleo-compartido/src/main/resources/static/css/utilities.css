@@ -1,0 +1,39 @@
+/*
+ * Utilidades — clases auxiliares del sistema de diseño.
+ * Regla: solo tokens var(--atp-*), sin literales de color ni tipografía.
+ */
+
+/* --------------------------------------------------------------- Foco visible (AA) */
+:focus-visible {
+  outline: 2px solid var(--atp-primary);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------- Oculto (a11y) */
+.atp-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------- Saltar al contenido */
+.atp-saltar {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: var(--atp-space-2) var(--atp-space-3);
+  background: var(--atp-surface);
+  color: var(--atp-primary);
+}
+
+.atp-saltar:focus {
+  left: var(--atp-space-2);
+  top: var(--atp-space-2);
+  z-index: 10;
+}

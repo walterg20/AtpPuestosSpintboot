@@ -10,24 +10,37 @@
  *  - Error: #C0392B en lugar del #FF0000 del legacy (contraste AA sobre blanco).
  *  - Superficies suaves: añadidas para las variantes de alerta, de modo que el texto conserve
  *    contraste AA sin relying en tintes calculados en la hoja de componentes.
+ *  - Azul de las tabs del menú horizontal: #1D6893 (legacy) y su derivado #175478 para el hover.
  */
 
 :root {
-  /* ---------------------------------------------------------------- Marca */
-  --atp-primary: #C60B44;
-  --atp-primary-dark: #9D1F1F;
+  /* ---------------------------------------------------------------- Marca (paleta Figma ATP) */
+  --atp-primary: #001A35;
+  --atp-primary-dark: #001229;
   --atp-primary-contrast: #FFFFFF;
 
   /* ------------------------------------------------ Neutrales (superficie / texto) */
   --atp-surface: #FFFFFF;
-  --atp-surface-alt: #F0F0F0;
+  --atp-surface-alt: #E5E5E5;
   --atp-border: #D3D4D3;
   --atp-text: #333333;
   --atp-text-muted: #555555;
   --atp-disabled: #A9A9A9;
 
   /* ------------------------------------------------------------ Semánticos */
-  --atp-info: #1D6893;
+  --atp-info: #1D5B7D;
+  /* Tono derivado de --atp-info para el estado hover del menú (Figma: #1D5B7D → más oscuro). */
+  --atp-info-dark: #174A66;
+  --atp-button: #206E92;
+  --atp-button-dark: #1A5A77;
+  --atp-session-label: #618DB4;
+  --atp-footer-bg: #5B5C5E;
+  --atp-footer-seg-1: #2D86F3;
+  --atp-footer-seg-2: #00AEF4;
+  --atp-footer-seg-3: #87C9F2;
+  --atp-footer-seg-4: #9DC569;
+  --atp-footer-seg-5: #83AF4C;
+  --atp-footer-seg-6: #648F3D;
   --atp-warn: #FF8000;
   --atp-warn-strong: #8A4B00;
   --atp-error: #C0392B;
@@ -39,8 +52,9 @@
   --atp-error-surface: #FBEAE8;
   --atp-success-surface: #E8F3E9;
 
-  /* ----------------------------------------------------------- Tipografía */
-  --atp-font: "Segoe UI", "Trebuchet MS", Verdana, Arial, sans-serif;
+  /* ----------------------------------------------------------- Tipografía (Figma: Arimo sans, Lora/Tinos serif) */
+  --atp-font: "Arimo", "Segoe UI", "Trebuchet MS", Verdana, Arial, sans-serif;
+  --atp-font-serif: "Lora", "Tinos", "Georgia", "Times New Roman", serif;
   --atp-font-mono: "Cascadia Mono", Consolas, "Courier New", monospace;
 
   --atp-text-display: 24px;

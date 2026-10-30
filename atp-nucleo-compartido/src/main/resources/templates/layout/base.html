@@ -1,33 +1,92 @@
 <!DOCTYPE html>
-<!--
-  Layout base de las pantallas del nucleo (plan.md §4.1, T-203).
-
-  No usa thymeleaf-layout-dialect (SA-P09): el layout se compone con th:replace sobre los
-  fragmentos `head`, `cabecera` y `pie`. Cada pagina incluye:
-
-    <head th:replace="~{layout/base :: head('Titulo')}">
-    <header th:replace="~{layout/base :: cabecera}">
-    <footer th:replace="~{layout/base :: pie}">
-
-  Los estilos salen de los tokens (static/css/tokens.css) y de los componentes
-  (static/css/nucleo.css). El unico JS del layout es el de confirmaciones.
--->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="head(titulo)">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title th:text="${titulo}">ATP</title>
+  <link rel="icon" type="image/x-icon" th:href="@{/favicon.ico}">
   <link rel="stylesheet" th:href="@{/css/tokens.css}">
-  <link rel="stylesheet" th:href="@{/css/nucleo.css}">
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/components.css}">
+  <link rel="stylesheet" th:href="@{/css/utilities.css}">
   <script th:src="@{/js/confirmaciones.js}" defer></script>
+  <script th:src="@{/js/login.js}" defer></script>
 </head>
-<body>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <!-- Cabecera institucional (Figma: solo la parte oscura, 210px) -->
   <header class="atp-cabecera" th:fragment="cabecera">
-    <p class="atp-cabecera__marca">ATP · Puestos Camineros</p>
+    <div class="atp-cabecera__foto">
+      <img th:src="@{/img/referencia-institucional.png}"
+           alt="Control caminero" width="1434" height="905">
+    </div>
+    <img class="atp-cabecera__curva" th:src="@{/img/curva-decorativa.svg}" alt="" width="84" height="96">
+    <h1 class="atp-cabecera__titulo">Gestión de Puestos Camineros</h1>
+    <div class="atp-cabecera__logo-personal">
+      <img th:src="@{/img/referencia-institucional.png}"
+           alt="Personal caminero" width="1434" height="905">
+    </div>
   </header>
 
+  <!-- Barra de sesión (Figma: sección separada, fondo blanco, entre cabecera y menú) -->
+  <div class="atp-sesion" th:fragment="sesion"
+       th:if="${contexto != null and not #strings.isEmpty(contexto.usuario())}">
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Usuario</span>
+      <span class="atp-sesion__dato-valor" th:text="${contexto.usuarioNombre()}">Nombre</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo"
+            th:text="${contexto.tipo() == 'PUE'} ? 'Puesto' : 'Receptoria'">Puesto</span>
+      <span class="atp-sesion__dato-valor" th:text="${contexto.sucursalNombre()}">Sucursal</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Turno</span>
+      <span class="atp-sesion__dato-valor" th:text="${contexto.turno()}">0</span>
+    </div>
+    <div class="atp-sesion__dato" th:if="${contexto.comision() != null and contexto.comision() != 0}">
+      <span class="atp-sesion__dato-rotulo">Comision</span>
+      <span class="atp-sesion__dato-valor" th:text="${contexto.comision()}">0</span>
+    </div>
+    <form class="atp-sesion__salir-form" th:action="@{/logout}" method="post">
+      <button class="atp-sesion__salir" type="submit">Salir</button>
+    </form>
+  </div>
+
+  <!-- Barra de navegación (Figma: fondo #1D5B7D, sticky) -->
+  <div class="atp-nav-principal" th:fragment="navegacion"
+       th:if="${contexto != null and not #strings.isEmpty(contexto.usuario())}">
+    <div th:replace="~{fragments/menu :: menu}"></div>
+  </div>
+
+  <main id="contenido" class="atp-pagina">
+    <!-- contenido de la pagina -->
+  </main>
+
+  <!-- Pie institucional (Figma: barra de colores + logos sobre fondo gris, full-width) -->
   <footer class="atp-pie" th:fragment="pie">
-    <p>Administración de Rentas · módulo de productos</p>
+    <div class="atp-pie__barra">
+      <span class="atp-pie__segmento atp-pie__segmento--1"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--2"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--3"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--4"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--5"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--6"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--7"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--8"></span>
+    </div>
+    <div class="atp-pie__logos">
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--atp">
+        <img th:src="@{/img/referencia-institucional.png}" alt="ATP" width="1434" height="905">
+      </div>
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--chaco">
+        <img th:src="@{/img/referencia-institucional.png}" alt="Gobierno del Chaco" width="1434" height="905">
+      </div>
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--ecom">
+        <img th:src="@{/img/referencia-institucional.png}" alt="ECOM" width="1434" height="905">
+      </div>
+    </div>
   </footer>
 </body>
 </html>

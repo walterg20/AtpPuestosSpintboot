@@ -1,0 +1,36 @@
+﻿name: CI
+
+on:
+  pull_request:
+    branches: [develop, master]
+  push:
+    branches: [develop]
+
+jobs:
+  build:
+    name: Build & Test (JDK 17)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build & Unit Tests
+        run: ./mvnw -B clean test
+
+      # IT contra BD real (gated): descomentar y cargar secrets en GitHub para habilitar.
+      # - name: Integration Tests
+      #   if: ${{ secrets.ATP_DB_IT == 'true' }}
+      #   env:
+      #     ATP_DB_IT: ${{ secrets.ATP_DB_IT }}
+      #     ATP_DB_URL: ${{ secrets.ATP_DB_URL }}
+      #     ATP_DB_USER: ${{ secrets.ATP_DB_USER }}
+      #     ATP_DB_PASS: ${{ secrets.ATP_DB_PASS }}
+      #   run: ./mvnw -B test "-Dtest=*IT" "-Dsurefire.failIfNoSpecifiedTests=false"

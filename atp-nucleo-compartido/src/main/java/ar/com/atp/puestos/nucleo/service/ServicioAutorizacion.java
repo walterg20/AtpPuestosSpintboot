@@ -17,12 +17,13 @@ public class ServicioAutorizacion {
     /** Ruta de la pantalla de inicio. */
     private static final String RUTA_INICIO = "/home";
 
-    // ---- Menús recursivos por Tipo (spec 04-ui-legacy, D-UI-002) ----
+    /** Ruta de la pantalla de Control de Cargas (módulo cargas). */
+    private static final String RUTA_CARGAS = "/cargas";
 
+    // ---- Menús recursivos por Tipo (spec 04-ui-legacy, D-UI-002) ----
     private static final List<SmoothNavMenuData> MENU_PUE = List.of(
-            new SmoothNavMenuData("2", "Control de Cargas", "Control de Cargas", null, null, List.of()),
-            new SmoothNavMenuData("5", "Formularios ACTAS", "Listado de Actas de Infración", null, null, List.of()),
-            new SmoothNavMenuData("5", "Carga Manual", "Carga Manual de Actas de Infración", null, null, List.of()),
+            new SmoothNavMenuData("2", "Control de Cargas", "Control de Cargas", RUTA_CARGAS, null, List.of()),
+            new SmoothNavMenuData("5", "Formularios ACTAS", "Listado de Actas de Infración", null, null, List.of()),            new SmoothNavMenuData("5", "Carga Manual", "Carga Manual de Actas de Infración", null, null, List.of()),
             new SmoothNavMenuData("6", "Turnos", "Turnos de Comisión", RUTA_TURNOS, null, List.of()),
             new SmoothNavMenuData("7", "Comisiones", "Comisiones en Puestos Camineros", null, null, List.of()));
 

@@ -70,4 +70,22 @@ public interface TurnoRepositorio extends JpaRepository<Turno, TurnoId> {
 
     /** Lectura por clave primaria compuesta (R-TUR-012, paso 1). */
     Optional<Turno> findById(TurnoId id);
+
+    /**
+     * Turnos <strong>abiertos</strong> de la sucursal y tipo del contexto (R-TURNO-002, R-TURNO-005).
+     *
+     * <p>Reproduce el {@code ControlWhere} de {@code TurnosListadoAbiertos}: {@code TurEstado = 'A'},
+     * {@code SucNroId = :sucNroId}, {@code SucTipo = :sucTipo}, ordenado por {@code SucNroId,
+     * SucTipo, TurNroId}.
+     *
+     * @param sucNroId sucursal del contexto
+     * @param sucTipo tipo de sucursal del contexto
+     * @param pageable paginación (10 filas por defecto)
+     * @return la página de turnos abiertos
+     */
+    @Query("select t from Turno t where t.id.sucNroId = :sucNroId "
+            + "and t.id.sucTipo = :sucTipo and t.turEstado = 'A' "
+            + "order by t.id.sucNroId asc, t.id.sucTipo asc, t.id.turNroId asc")
+    Page<Turno> listarAbiertosPorSucursal(@Param("sucNroId") Integer sucNroId,
+            @Param("sucTipo") String sucTipo, Pageable pageable);
 }

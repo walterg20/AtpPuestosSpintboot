@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--
+  Pantalla de Comisiones (módulo 13-comisiones): listado paginado.
+  Paridad con `ComisionesListado` (R-COM-004..R-COM-008).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Comisiones')}">
+  <title>Comisiones</title>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+
+  <div th:replace="~{layout/base :: sesion}"></div>
+
+  <div th:replace="~{layout/base :: navegacion}"></div>
+
+  <main id="contenido" class="atp-pagina atp-comisiones__page">
+    <h1 class="atp-pagina__titulo">Comisiones</h1>
+
+    <!-- Mensaje de error de carga. -->
+    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive"
+         th:if="${mensajeError}">
+      <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
+    </div>
+
+    <!-- Paginación (First/Prev/Next/Last). -->
+    <nav class="atp-nav" aria-label="Paginación de comisiones" th:if="${cantidadPaginas > 1}">
+      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
+         th:href="@{/comisiones(pagina=0)}">First</a>
+      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>First</button>
+
+      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
+         th:href="@{/comisiones(pagina=${paginaActual - 1})}">Prev</a>
+      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>Prev</button>
+
+      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
+         th:href="@{/comisiones(pagina=${paginaActual + 1})}">Next</a>
+      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Next</button>
+
+      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
+         th:href="@{/comisiones(pagina=${cantidadPaginas - 1})}">Last</a>
+      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Last</button>
+    </nav>
+
+    <!-- Grilla. -->
+    <div class="atp-grilla-scroll" th:if="${not #lists.isEmpty(comisiones)}">
+      <table class="atp-table">
+        <caption class="atp-table__caption">Comisiones cargadas</caption>
+        <thead>
+          <tr>
+            <th scope="col">Id Comisión</th>
+            <th scope="col">Fecha Inicio</th>
+            <th scope="col">Hora Inicio</th>
+            <th scope="col">Fecha Fin</th>
+            <th scope="col">Hora Fin</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Responsable</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="c : ${comisiones}">
+            <td>
+              <a class="atp-enlace"
+                 th:href="@{/comisiones/{pueCod}/{cpcId}(pueCod=${c.pueCod},cpcId=${c.cpcId})}"
+                 th:text="${c.cpcId}">0</a>
+            </td>
+            <td th:text="${c.fechaInicio}">01/01/25</td>
+            <td th:text="${c.horaInicio}">0000</td>
+            <td th:text="${c.fechaFin}">01/01/25</td>
+            <td th:text="${c.horaFin}">0000</td>
+            <td th:text="${c.estado}">Abierto</td>
+            <td th:text="${c.responsable}">Responsable</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="atp-vacio" th:if="${#lists.isEmpty(comisiones) and (mensajeError == null)}">
+      No se encontraron registros. Sin comisiones para mostrar.
+    </p>
+    <p class="atp-vacio" th:if="${#lists.isEmpty(comisiones) and (mensajeError != null)}">
+      No se pudieron mostrar las comisiones.
+    </p>
+  </main>
+
+  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+</body>
+</html>

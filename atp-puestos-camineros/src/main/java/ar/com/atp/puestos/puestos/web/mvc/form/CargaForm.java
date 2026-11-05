@@ -14,6 +14,7 @@ public class CargaForm {
     private Integer duplicado;
     private String dpptipoGui;
     private List<DetalleProductoPrimario> formularios;
+    private Boolean mostrarModal;
 
     public String getBarCode() { return barCode; }
     public void setBarCode(String barCode) { this.barCode = barCode; }
@@ -33,4 +34,6 @@ public class CargaForm {
     public void setDpptipoGui(String dpptipoGui) { this.dpptipoGui = dpptipoGui; }
     public List<DetalleProductoPrimario> getFormularios() { return formularios; }
     public void setFormularios(List<DetalleProductoPrimario> formularios) { this.formularios = formularios; }
+    public Boolean getMostrarModal() { return mostrarModal; }
+    public void setMostrarModal(Boolean mostrarModal) { this.mostrarModal = mostrarModal; }
 }

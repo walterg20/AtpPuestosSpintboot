@@ -1,6 +1,6 @@
 # Plan — 08 Control de Cargas (Puestos Camineros)
 
-> **Estado**: `APROBADA (revisión v1, 2026-10-30)` — puerta **G-SPEC** cumplida.
+> **Estado**: `APROBADA (revisión v2, 2026-11-03)` — puerta **G-SPEC** cumplida.
 > Documento de arquitectura. No contiene tareas (ver `tasks.md`).
 > **Fuente**: KB `ATPPuestos` (solo lectura) + `Rentas` INFORMATION_SCHEMA (G-DATA 2026-10-30).
 
@@ -176,6 +176,10 @@ PK compuesta: (`ConCuit`, `DPPSucu`, `CalPerFisc`, `DPPSecu`, `DPPNroForm`).
 | `dppActaPue` | `DPPActaPue` | `Short` | SÍ | 5 | huérfana |
 | `ppTrataId` | `PPTrataId` | `Short` | SÍ | 5 | FK → `PPTrata` |
 
+> **Total General (`DPPTotGral`) NO es columna física**: es un atributo fórmula
+> (`DPPAdCMTot + DPPAdIBTot + DPPAdicFle + DPPImCMTot + DPPImIBTot + DPPImpuFle`). Se deriva
+> en `CargaService` (R-CC-21) y se expone en el view model como `totalGeneral` por fila; no se
+> mapea con `@Column`. Si se desea persistirlo en la entidad, usar `@Transient`.
 > **Nota**: las columnas `DPPNCpbte`, `DPPDestRS`, `DPPDestDom`, `DPPTranRS`, `DPPTranDom`,
 > `DPPVehicu`, `DPPChasis`, `DPPAcopla` son `char(n)` de ancho fijo ⇒ se leen con `RTRIM` y se
 > escriben con `trim` (paridad con el legacy).
@@ -243,6 +247,10 @@ PK compuesta: (`ConCuit`, `DPPSucu`, `CalPerFisc`, `DPPSecu`, `DPPNroForm`, `DPP
 
 > **Decisión**: los endpoints REST son opcionales; el módulo puede implementarse sólo con MVC
 > (servicio directo). Si se agregan, deben sincronizarse con Postman (G-POSTMAN).
+>
+> **Corrección de pantalla (2026-11-03)**: no se agregan endpoints nuevos; se reutilizan
+> `/cargas/buscar`, `/cargas/marcar` y `/cargas/detalle`. Por lo tanto la colección Postman **no
+> requiere cambios** en esta corrección (R-CC-25 se considera satisfecha sin diff de colección).
 
 ## 4. Contrato de vistas (Thymeleaf)
 
@@ -267,7 +275,8 @@ public class CargaForm {
     private String mensaje;         // &Mensaje
     private Integer duplicado;      // &Duplicado
     private String dpptipoGui;      // &DPPTipoGui
-    private List<DetalleProductoPrimario> formularios; // grilla
+    private Boolean mostrarModal;   // flag dedicado (R-CC-23): NO inferir de dppNroForm != null
+    private List<DetalleProductoPrimario> formularios; // grilla (7 columnas, R-CC-20)
 }
 ```
 
@@ -277,6 +286,11 @@ public class CargaForm {
 - `dppNroForm`: 10 caracteres (extraído del barcode).
 - La acción Marcar requiere confirmación JS (`confirm`).
 - El botón Marcar se deshabilita si `Context.Sucursal = 0`.
+- La grilla renderiza 7 columnas en el orden/anchos del Figma (R-CC-20); el header usa
+  `--atp-button` y los valores `--atp-cargas-text-secondary`.
+- Tokens de cargas en `tokens.css` (R-CC-24): `--atp-cargas-fieldset-border`,
+  `--atp-cargas-input-border`, `--atp-cargas-text-secondary`, `--atp-cargas-button-border`.
+- El modal sólo se renderiza si `mostrarModal = true` (R-CC-23).
 
 ### 4.4 Comportamiento ante error
 
@@ -297,6 +311,9 @@ public class CargaForm {
 | D-CC-07 | Se reutiliza `ContextoSesion` de `03-login` | No duplicar el contexto |
 | D-CC-08 | Se reutiliza `GestorContextoSesion` para recuperar el contexto | Paridad con `LoadContext` |
 | D-CC-09 | Se reutiliza la seguridad de `03-login` (CSRF, sesión) | No rediseñar seguridad |
+| D-CC-10 | El modal se abre desde 2 columnas ("Nro Guia" canónico + "Cuit" por pedido del usuario) | Satisfacer pedido del usuario sin perder paridad Figma/legacy |
+| D-CC-11 | Buscar sólo refresca la grilla; el modo detalle se controla con flag dedicado `mostrarModal` | Evitar inferencia desde `dppNroForm != null` |
+| D-CC-12 | El modal Thymeleaf incorpora botón de cierre explícito (JS puntual) | El legacy lo heredaba del popup de GeneXus |
 
 ## 6. Supuestos abiertos
 
@@ -307,6 +324,8 @@ Ver `spec.md` §6. Resumen:
 - SA-CC-04: validación de longitud de barcode.
 - SA-CC-05: `DPPPaseCo` null vs 0.
 - SA-CC-06: mensajes en popup vs vista separada.
+- SA-CC-07: el lienzo Figma `2024:371` cubre sólo la pantalla de consulta; el modal se deriva del
+  WebPanel legacy `Form506Detalle` (popup). El modal se mantiene como fragmento Thymeleaf (D-CC-04).
 
 ## 7. Alcance excluido
 

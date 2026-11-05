@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>body{margin:0;font:12px monospace}
+iframe{border:1px solid red;display:block}</style></head><body>
+<iframe id="f" src="/actas/nueva?measure=1" width="375" height="1400"></iframe>
+<pre id="out">MEASURE_START{"innerWidth":375,"scrollWidth":780,"bodyScrollWidth":780,"overflowCount":92,"offenders":["IMG. right=437 w=1434","MAIN.atp-pagina atp-actas__page right=780 w=780","H1.atp-pagina__titulo right=768 w=756","FORM.atp-form atp-actas__form right=768 w=756","FIELDSET.atp-actas__fieldset right=768 w=756","DIV.atp-field right=751 w=722","LABEL.atp-field__etiqueta right=751 w=722","SELECT.atp-field__control right=751 w=722","DIV.atp-field right=751 w=722","LABEL.atp-field__etiqueta right=751 w=722","SELECT.atp-field__control right=751 w=722","DIV.atp-field right=751 w=722","LABEL.atp-field__etiqueta right=751 w=722","INPUT.atp-field__control right=751 w=722","DIV.atp-actas__partes right=768 w=756","FIELDSET.atp-actas__fieldset atp-actas__fieldset--part right=768 w=756","DIV.atp-field right=751 w=722","LABEL.atp-field__etiqueta right=751 w=722","INPUT.atp-field__control right=751 w=722","DIV.atp-field right=751 w=722","LABEL.atp-field__etiqueta right=751 w=722","INPUT.atp-field__control right=751 w=722","DIV.atp-field right=751 w=722","LABEL.atp-field__etiqueta right=751 w=722","INPUT.atp-field__control right=751 w=722"],"widest":["IMG. w=1434 scrollW=1434","IMG. w=1434 scrollW=1434","IMG. w=1434 scrollW=1434","IMG. w=1434 scrollW=1434","MAIN.atp-pagina atp-actas__page w=780 scrollW=780","H1.atp-pagina__titulo w=756 scrollW=756","FORM.atp-form atp-actas__form w=756 scrollW=756","FIELDSET.atp-actas__fieldset w=756 scrollW=754","DIV.atp-actas__partes w=756 scrollW=756","FIELDSET.atp-actas__fieldset atp-actas__fieldset--part w=756 scrollW=754","FIELDSET.atp-actas__fieldset atp-actas__fieldset--part w=756 scrollW=754","FIELDSET.atp-actas__fieldset atp-actas__fieldset--part w=756 scrollW=754"]}MEASURE_END</pre>
+<script>
+document.getElementById('f').addEventListener('load', function () {
+  setTimeout(function () {
+    var d = document.getElementById('f').contentDocument;
+    var el = d.getElementById('measure-result') || d.getElementById('axe-result');
+    document.getElementById('out').textContent = el ? el.textContent : 'SIN_RESULTADO';
+  }, 2500);
+});
+</script></body></html>

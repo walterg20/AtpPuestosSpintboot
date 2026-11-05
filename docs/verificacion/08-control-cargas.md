@@ -50,7 +50,7 @@ $env:DB_HOST="devmssqlatp.ecom.com.ar"
 $env:DB_PORT="1433"
 $env:DB_NAME="Rentas"
 $env:DB_USER="rentas"
-$env:DB_PASSWORD="dev28rentas"
+$env:DB_PASSWORD="<redacted>"
 .\mvnw.cmd -B test "-Dtest=*IT" "-Dsurefire.failIfNoSpecifiedTests=false"
 ```
 

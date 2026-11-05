@@ -20,6 +20,9 @@ public class DetalleProductoPrimario {
     @Transient
     private String conRazSoc;
 
+    /** No persistido: total general (suma de totales). */
+    @Transient
+    private BigDecimal totalGeneral;
     @Column(name = "DPPTCpbte")
     private Short dppTCpbte;
 
@@ -207,6 +210,8 @@ public class DetalleProductoPrimario {
     public String getConRazSoc() { return conRazSoc; }
     public void setConRazSoc(String conRazSoc) { this.conRazSoc = conRazSoc; }
 
+    public BigDecimal getTotalGeneral() { return totalGeneral; }
+    public void setTotalGeneral(BigDecimal totalGeneral) { this.totalGeneral = totalGeneral; }
     public Short getDppTCpbte() { return dppTCpbte; }
     public void setDppTCpbte(Short dppTCpbte) { this.dppTCpbte = dppTCpbte; }
 

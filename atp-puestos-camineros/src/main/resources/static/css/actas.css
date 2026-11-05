@@ -1,0 +1,332 @@
+/*
+ * Actas (modulo 09 "Formularios Acta") — listado y formulario de alta.
+ *
+ * Regla: TODOS los colores salen de var(--atp-*). Este archivo no contiene literales
+ * hexadecimales ni de color (R-ACTA-053); las medidas del Figma "Carga manual · Acta"
+ * (nodo 2030:2) llegan por los tokens --atp-actas-* de `tokens.css`.
+ *
+ * Se reutilizan las clases de componente del nucleo (atp-btn, atp-table, atp-field,
+ * atp-field__etiqueta, atp-field__control, atp-field__error, atp-vacio, atp-alert, atp-grilla-scroll)
+ * y sólo se agregan las que faltan para esta pantalla.
+ */
+
+/* ------------------------------------------------------------------ Listado */
+
+.atp-actas__page {
+  background-color: var(--atp-surface-alt);
+  /* Override del flex del layout (atp-nucleo-compartido, intocable): flex: 1 0 auto fuerza
+     un ancho minimo de contenido que desborda a 375 px. Aqui forzamos ancho fluido. */
+  flex: 0 1 100%;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.atp-actas__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--atp-space-3);
+  margin-bottom: var(--atp-space-4);
+}
+
+/* El boton "Crear Acta" queda arriba a la derecha (R-ACTA-009, V-1). */
+.atp-actas__crear {
+  margin-left: auto;
+}
+
+.atp-actas__crear--inactivo {
+  background-color: var(--atp-surface-alt);
+  border-color: var(--atp-border);
+  color: var(--atp-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.atp-actas__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--atp-space-3);
+  margin-bottom: var(--atp-space-4);
+  padding-bottom: var(--atp-space-3);
+  border-bottom: 1px solid var(--atp-border);
+}
+
+.atp-actas__filtros .atp-field {
+  min-width: 9rem;
+  flex: 1 1 9rem;
+}
+
+.atp-actas__tabla thead tr {
+  background-color: var(--atp-button);
+}
+
+.atp-actas__tabla thead th {
+  color: var(--atp-primary-contrast);
+  font-family: var(--atp-font-serif);
+  font-weight: 700;
+  font-size: var(--atp-actas-titulo-size);
+  text-align: center;
+  border-radius: 0;
+}
+
+.atp-actas__tabla thead th:first-child {
+  border-top-left-radius: 7px;
+  text-align: left;
+}
+
+.atp-actas__tabla thead th:last-child {
+  border-top-right-radius: 7px;
+}
+
+.atp-actas__tabla tbody td {
+  font-family: var(--atp-font);
+  font-size: var(--atp-text-body);
+  color: var(--atp-text);
+  padding: var(--atp-space-2);
+}
+
+.atp-actas__nro { text-align: left; }
+.atp-actas__cuit { text-align: center; }
+.atp-actas__razonsoc { text-align: left; }
+.atp-actas__manual { text-align: center; }
+.atp-actas__operad { text-align: center; }
+.atp-actas__imprimir { text-align: center; }
+
+/* El icono de impresora se dibuja apagado cuando el acta no es imprimible. */
+.atp-actas__no-imprime {
+  color: var(--atp-disabled);
+}
+
+/* --------------------------------------------------------------- Paginación */
+
+.atp-paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--atp-space-2);
+  margin-top: var(--atp-space-4);
+}
+
+.atp-paginacion a {
+  display: inline-block;
+  min-width: 2rem;
+  padding: var(--atp-space-1) var(--atp-space-3);
+  border: 1px solid var(--atp-border);
+  border-radius: var(--atp-radius);
+  background-color: var(--atp-surface);
+  color: var(--atp-text);
+  text-align: center;
+  text-decoration: none;
+}
+
+.atp-paginacion a:hover {
+  background-color: var(--atp-surface-alt);
+}
+
+/* --------------------------------------------------------------- Formulario */
+
+.atp-actas__fieldset {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 0 0 var(--atp-space-4);
+  padding: var(--atp-space-3) var(--atp-space-4) var(--atp-space-4);
+  border: 1px solid var(--atp-actas-fieldset-border);
+  border-radius: var(--atp-radius);
+  background-color: var(--atp-surface);
+  box-sizing: border-box;
+}
+
+/* La leyenda se apoya sobre el borde superior del fieldset (Figma). */
+.atp-actas__legend {
+  padding: 0 var(--atp-space-2);
+  color: var(--atp-actas-legend);
+  font-family: var(--atp-font-serif);
+  font-weight: 700;
+  font-size: var(--atp-actas-legend-size);
+}
+
+.atp-actas__fieldset .atp-field {
+  margin-bottom: var(--atp-space-3);
+  min-width: 0;
+}
+
+.atp-actas__fieldset .atp-field__control {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.atp-actas__fieldset .atp-field__etiqueta {
+  color: var(--atp-actas-label);
+  font-size: var(--atp-actas-label-size);
+  font-weight: 400;
+}
+
+.atp-actas__fieldset .atp-field__control {
+  min-height: 24px;
+  border-color: var(--atp-actas-input-border);
+  border-radius: var(--atp-actas-input-radius);
+}
+
+/* Los tres fieldsets de partes (Vendedor / Destinatario / Transportista) van en 3 columnas. */
+.atp-actas__partes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--atp-space-4);
+  align-items: start;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.atp-actas__fieldset--parte {
+  margin-bottom: var(--atp-space-4);
+}
+
+.atp-actas__transporte {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--atp-space-3) var(--atp-space-4);
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------- Productos */
+
+.atp-actas__descripcion {
+  display: inline-block;
+  color: var(--atp-text);
+}
+
+.atp-actas__quitar {
+  min-width: 2rem;
+  padding: var(--atp-space-1) var(--atp-space-2);
+  border: 1px solid var(--atp-border);
+  border-radius: var(--atp-radius);
+  background-color: var(--atp-surface);
+  color: var(--atp-text);
+  font-family: var(--atp-font);
+  font-size: var(--atp-text-title);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.atp-actas__quitar:hover {
+  background-color: var(--atp-surface-alt);
+}
+
+.atp-actas__agregar {
+  min-width: 2.5rem;
+  padding: var(--atp-space-1) var(--atp-space-3);
+  border: 1px solid var(--atp-actas-agregar);
+  border-radius: var(--atp-radius);
+  background-color: var(--atp-actas-agregar);
+  color: var(--atp-primary);
+  font-family: var(--atp-font);
+  font-size: var(--atp-actas-agregar-size);
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------- Acciones */
+
+.atp-actas__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--atp-space-3);
+  margin-top: var(--atp-space-4);
+}
+
+.atp-actas__boton {
+  min-width: 120px;
+  min-height: 35px;
+  border-radius: 7px;
+  box-shadow: var(--atp-actas-boton-shadow);
+  font-family: var(--atp-font-serif);
+  font-size: var(--atp-actas-titulo-size);
+  font-weight: 700;
+  text-align: center;
+}
+
+.atp-actas__boton--confirmar {
+  background-color: var(--atp-button);
+  border-color: var(--atp-button);
+  color: var(--atp-primary-contrast);
+}
+
+.atp-actas__boton--confirmar:hover {
+  background-color: var(--atp-button-dark);
+  border-color: var(--atp-button-dark);
+}
+
+.atp-actas__boton--cancelar {
+  background-color: var(--atp-surface);
+  border-color: var(--atp-button);
+  color: var(--atp-button);
+}
+
+/* ------------------------------------------------------- Error de validación */
+
+/* `th:errorclass` del formulario: el control con error se marca con este token. */
+.atp-field__control--error {
+  border-color: var(--atp-error);
+  color: var(--atp-error);
+}
+
+/* Controles de formulario: nunca empujan el ancho (B3). */
+.atp-actas__page input,
+.atp-actas__page select,
+.atp-actas__page textarea {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* El formulario y la grilla de productos no desbordan la pagina. */
+.atp-actas__form {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.atp-actas__page .atp-grilla-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------- Responsive */
+
+@media (max-width: 960px) {
+  .atp-actas__partes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .atp-actas__filtros .atp-field {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .atp-actas__crear {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .atp-actas__boton {
+    width: 100%;
+  }
+}

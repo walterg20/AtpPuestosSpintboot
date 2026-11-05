@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--
+  Popup de seleccion manual de localidades (modulo 10) - paridad con ListadoLocalidades.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Localidades')}">
+  <title>Localidades</title>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+
+  <div th:replace="~{layout/base :: sesion}"></div>
+
+  <div th:replace="~{layout/base :: navegacion}"></div>
+
+  <main id="contenido" class="atp-pagina atp-localidades__page">
+
+    <h1 class="atp-pagina__titulo">Localidades</h1>
+
+    <!-- Filtros (Fieldset Filters) -->
+    <fieldset class="atp-fieldset">
+      <legend>Filters</legend>
+      <form class="atp-form atp-localidades__filtros" method="get" th:action="@{/localidades}">
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="filtroLocCod">Cod. Loc.</label>
+          <input class="atp-field__control" id="filtroLocCod" type="number" min="0" step="1"
+                 name="filtroLocCod" th:value="${filtroLocCod}">
+        </div>
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="filtroLocNom">Nombre</label>
+          <input class="atp-field__control" id="filtroLocNom" type="text" maxlength="20"
+                 name="filtroLocNom" th:value="${filtroLocNom}">
+        </div>
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="filtroProvNombre">Provincia</label>
+          <input class="atp-field__control" id="filtroProvNombre" type="text" maxlength="15"
+                 name="filtroProvNombre" th:value="${filtroProvNombre}">
+        </div>
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="filtroLocCodPost">Cod. Postal</label>
+          <input class="atp-field__control" id="filtroLocCodPost" type="number" min="0" step="1"
+                 name="filtroLocCodPost" th:value="${filtroLocCodPost}">
+        </div>
+        <button type="submit" class="atp-btn atp-btn--primary">Filtrar</button>
+      </form>
+    </fieldset>
+
+    <!-- Grilla de seleccion -->
+    <fieldset class="atp-fieldset">
+      <legend>Lista de Seleccion</legend>
+
+      <div class="atp-grilla-scroll" th:if="${localidades != null and not #lists.isEmpty(localidades.content)}">
+        <table class="atp-table atp-localidades__tabla">
+          <thead>
+            <tr>
+              <th scope="col"></th>
+              <th scope="col">Cod. Loc.</th>
+              <th scope="col">Nombre</th>
+              <th scope="col" hidden style="display:none;">LocNomProv</th>
+              <th scope="col">Provincia</th>
+              <th scope="col">Cod. Postal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="l : ${localidades.content}">
+              <td class="atp-localidades__selector">
+                <button type="button" class="atp-btn atp-btn--ghost"
+                        th:attr="onclick=|window.opener.setLocalidad(${l.locCod}, '${l.locNom}', '${l.provincia != null ? l.provincia.provNombre : (l.locNomProv != null ? l.locNomProv : '')}'); window.close();|">
+                  <img th:src="@{/img/selectRow.png}" alt="selectRow" width="21" height="21">
+                </button>
+              </td>
+              <td th:text="${l.locCod}">0</td>
+              <td>
+                <a class="atp-enlace" href="#"
+                   th:text="${l.locNom}"
+                   th:attr="onclick=|window.opener.setLocalidad(${l.locCod}, '${l.locNom}', '${l.provincia != null ? l.provincia.provNombre : (l.locNomProv != null ? l.locNomProv : '')}'); window.close(); return false;|">Nombre</a>
+              </td>
+              <td hidden style="display:none;" th:text="${l.locNomProv}">LocNomProv</td>
+              <td th:text="${l.provincia != null ? l.provincia.provNombre : ''}">Provincia</td>
+              <td th:text="${l.locCodPost}">0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="atp-vacio" th:if="${localidades == null or #lists.isEmpty(localidades.content)}">
+        Sin localidades para mostrar.
+      </p>
+
+      <!-- Paginacion preservando filtros -->
+      <nav class="atp-paginacion" aria-label="Paginacion de localidades"
+           th:if="${localidades != null and localidades.totalPages > 1}">
+        <a th:each="p : ${#numbers.sequence(0, localidades.totalPages - 1)}"
+           th:href="@{/localidades(filtroLocCod=${filtroLocCod},filtroLocNom=${filtroLocNom},filtroProvNombre=${filtroProvNombre},filtroLocCodPost=${filtroLocCodPost},page=${p},size=${size})}"
+           th:text="${p + 1}">1</a>
+      </nav>
+
+      <p class="atp-localidades__totales" th:if="${localidades != null}">
+        Total paginas: <span th:text="${totalPages}">0</span> -
+        Pagina actual: <span th:text="${number}">0</span> -
+        Total elementos: <span th:text="${totalElements}">0</span>
+      </p>
+    </fieldset>
+
+    <div class="atp-localidades__acciones">
+      <button type="button" class="atp-btn atp-btn--ghost" onclick="window.close()">Cancelar</button>
+    </div>
+
+  </main>
+
+  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+
+  <script th:src="@{/js/puestos/localidades-popup.js}" defer></script>
+</body>
+</html>

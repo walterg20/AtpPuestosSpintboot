@@ -12,7 +12,7 @@
 
   <div th:replace="~{layout/base :: navegacion}"></div>
 
-  <main id="contenido" class="atp-pagina">
+  <main id="contenido" class="atp-pagina atp-cargas__page">
     <h1 class="atp-pagina__titulo">Control de Cargas</h1>
 
     <!-- Mensaje de negocio (anulada / interna / duplicada / puesto no asignado). -->
@@ -40,41 +40,50 @@
         <button type="submit" class="atp-btn atp-btn--primary">Buscar</button>
       </form>
 
-      <!-- Grilla de formularios (R-CC-06). -->
+      <!-- Grilla de formularios (R-CC-06, R-CC-20). -->
       <div class="atp-grilla-scroll" th:if="${cargaForm != null and not #lists.isEmpty(cargaForm.formularios)}">
-        <table class="atp-table">
+        <table class="atp-table atp-cargas__tabla">
           <caption class="atp-table__caption">Formularios de carga</caption>
           <thead>
             <tr>
-              <th scope="col">CUIT</th>
-              <th scope="col">Razon social</th>
-              <th scope="col">Nro. formulario</th>
-              <th scope="col">Marcar</th>
-              <th scope="col">Acciones</th>
+              <th scope="col" class="atp-cargas__col--nroguia">Nro Guia</th>
+              <th scope="col" class="atp-cargas__col--acopiador">Acopiador</th>
+              <th scope="col" class="atp-cargas__col--cuit">Cuit</th>
+              <th scope="col" class="atp-cargas__col--fecha">Fecha Emision</th>
+              <th scope="col" class="atp-cargas__col--comprobante">Nro. Comprobante</th>
+              <th scope="col" class="atp-cargas__col--total">Total General</th>
+              <th scope="col" class="atp-cargas__col--marcar">Marcar</th>
             </tr>
           </thead>
           <tbody>
             <tr th:each="f : ${cargaForm.formularios}">
-              <td th:text="${f.conCuit}">0</td>
-              <td th:text="${cargaForm.conRazSoc}">Razon social</td>
-              <td th:text="${cargaForm.dppNroForm}">0000000000</td>
-              <td>
+              <td class="atp-cargas__nroguia">
+                <a class="atp-cargas__link"
+                   th:href="@{/cargas/detalle(dppNroForm=${f.dppNroForm},dpptipoGui=${cargaForm.dpptipoGui},duplicado=${cargaForm.duplicado},conCuit=${f.conCuit})}"
+                   th:text="${f.dppNroForm}">0000000000</a>
+              </td>
+              <td class="atp-cargas__acopiador" th:text="${f.conRazSoc}">Razon social</td>
+              <td class="atp-cargas__cuit">
+                <a class="atp-cargas__link"
+                   th:href="@{/cargas/detalle(dppNroForm=${f.dppNroForm},dpptipoGui=${cargaForm.dpptipoGui},duplicado=${cargaForm.duplicado},conCuit=${f.conCuit})}"
+                   th:text="${f.conCuit}">0</a>
+              </td>
+              <td class="atp-cargas__fecha" th:text="${f.dppFchMov}">fecha</td>
+              <td class="atp-cargas__comprobante" th:text="${f.dppNCpbte}">0000000000</td>
+              <td class="atp-cargas__total" th:text="${f.totalGeneral}">0</td>
+              <td class="atp-cargas__marcar">
                 <form class="atp-form atp-form--inline" th:action="@{/cargas/marcar}" method="post">
                   <input type="hidden" name="conCuit" th:value="${f.conCuit}" />
-                  <input type="hidden" name="dppNroForm" th:value="${cargaForm.dppNroForm}" />
-                  <button type="submit" class="atp-btn"
-                          data-icon="selectRow"
+                  <input type="hidden" name="dppSucu" th:value="${f.dppSucu}" />
+                  <input type="hidden" name="calPerFisc" th:value="${f.calPerFisc}" />
+                  <input type="hidden" name="dppSecu" th:value="${f.dppSecu}" />
+                  <input type="hidden" name="dppNroForm" th:value="${f.dppNroForm}" />
+                  <button type="submit" class="atp-btn" data-icon="selectRow"
                           th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}"
-                          onclick="return confirmarMarcado()">
-                    <img th:src="@{/img/selectRow.png}" alt="selectRow" width="16" height="16">
+                          onclick="return confirm('Esta seguro que desea Marcar el formulario?')">
+                    <img th:src="@{/img/selectRow.png}" alt="selectRow" width="21" height="21">
                   </button>
                 </form>
-              </td>
-              <td class="atp-botonera">
-                <a class="atp-btn atp-btn--ghost"
-                   th:href="@{/cargas/detalle(dppNroForm=${cargaForm.dppNroForm},dpptipoGui=${cargaForm.dpptipoGui},duplicado=${cargaForm.duplicado})}">Ver Detalle</a>
-                <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/tabla}">Ver Tabla</a>
-                <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/pagos}">Pagos</a>
               </td>
             </tr>
           </tbody>
@@ -83,13 +92,16 @@
       <p class="atp-vacio" th:if="${cargaForm == null or #lists.isEmpty(cargaForm.formularios)}">
         Sin formularios para mostrar.
       </p>
-      <!-- marcadores para pruebas de render (selectRow / disabled) -->
-      <span class="atp-oculto" data-icon="selectRow">selectRow</span>
-      <button class="atp-oculto" th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}">marcar</button>
     </section>
 
-    <!-- Modal de detalle (R-CC-12, R-CC-13). -->
-    <div th:if="${cargaForm != null and cargaForm.dppNroForm != null}">
+    <!-- Botones a nivel de BODY (R-CC-06). -->
+    <div class="atp-cargas__body-actions">
+      <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/tabla}">Ver Tabla</a>
+      <a class="atp-btn atp-btn--ghost" th:href="@{/cargas/pagos}">Pagos</a>
+    </div>
+
+    <!-- Modal de detalle (R-CC-12, R-CC-13, R-CC-23). -->
+    <div th:if="${cargaForm != null and cargaForm.mostrarModal != null and cargaForm.mostrarModal}">
       <div th:replace="~{puestos/fragments/form506-detalle :: modal}"></div>
     </div>
   </main>
@@ -100,3 +112,4 @@
   <script th:src="@{/js/control-cargas.js}" defer></script>
 </body>
 </html>
+EOF

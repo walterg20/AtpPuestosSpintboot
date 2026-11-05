@@ -119,6 +119,7 @@ public class CargaMvcController {
         cargaForm.setContext(contexto);
         cargaForm.setMensaje(resultado.mensaje());
         cargaForm.setDuplicado(resultado.duplicado());
+        cargaForm.setMostrarModal(true);
         model.addAttribute("cargaForm", cargaForm);
         if (!model.containsAttribute("programas")) {
             model.addAttribute("programas", List.of());
@@ -139,6 +140,7 @@ public class CargaMvcController {
         cargaForm.setDpptipoGui(dpptipoGui);
         cargaForm.setDuplicado(duplicado);
         cargaForm.setContext(contexto);
+        cargaForm.setMostrarModal(true);
         if (conCuitStr != null && !conCuitStr.isBlank()) {
             try {
                 cargaForm.setConCuit(new BigDecimal(conCuitStr).longValue());

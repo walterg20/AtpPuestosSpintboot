@@ -2,8 +2,8 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <body>
   <!-- Modal de detalle del formulario (Form506Detalle) -->
-  <div th:fragment="modal" class="atp-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-detalle"
-       th:if="${cargaForm != null and cargaForm.dppNroForm != null}">
+  <div th:fragment="modal" class="atp-modal" id="modalDetalle" role="dialog" aria-modal="true" aria-labelledby="titulo-detalle"
+       th:if="${cargaForm != null and cargaForm.mostrarModal != null and cargaForm.mostrarModal and cargaForm.dppNroForm != null}">
     <div class="atp-modal__contenido">
       <h2 id="titulo-detalle" class="atp-modal__titulo">Detalle de guia</h2>
 
@@ -59,7 +59,12 @@
           </tr>
         </tbody>
       </table>
+
+      <div class="atp-modal__cerrar">
+        <button type="button" class="atp-btn" onclick="cerrarModal()">Cerrar</button>
+      </div>
     </div>
   </div>
 </body>
 </html>
+EOF

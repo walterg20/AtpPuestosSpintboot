@@ -20,13 +20,18 @@ public class ServicioAutorizacion {
     /** Ruta de la pantalla de Control de Cargas (módulo cargas). */
     private static final String RUTA_CARGAS = "/cargas";
 
+    /** Ruta de la pantalla de Formularios ACTAS (módulo `09-formularios-acta`). */
+    private static final String RUTA_ACTAS = "/actas";
+
+    /** Ruta de la pantalla de Comisiones (módulo `07-comisiones`). */
+    private static final String RUTA_COMISIONES = "/comisiones";
+
     // ---- Menús recursivos por Tipo (spec 04-ui-legacy, D-UI-002) ----
     private static final List<SmoothNavMenuData> MENU_PUE = List.of(
             new SmoothNavMenuData("2", "Control de Cargas", "Control de Cargas", RUTA_CARGAS, null, List.of()),
-            new SmoothNavMenuData("5", "Formularios ACTAS", "Listado de Actas de Infración", null, null, List.of()),            new SmoothNavMenuData("5", "Carga Manual", "Carga Manual de Actas de Infración", null, null, List.of()),
+            new SmoothNavMenuData("5", "Formularios ACTAS", "Listado de Actas de Infración", RUTA_ACTAS, null, List.of()),            new SmoothNavMenuData("5", "Carga Manual", "Carga Manual de Actas de Infración", RUTA_ACTAS + "/nueva", null, List.of()),
             new SmoothNavMenuData("6", "Turnos", "Turnos de Comisión", RUTA_TURNOS, null, List.of()),
-            new SmoothNavMenuData("7", "Comisiones", "Comisiones en Puestos Camineros", null, null, List.of()));
-
+            new SmoothNavMenuData("7", "Comisiones", "Comisiones en Puestos Camineros", RUTA_COMISIONES, null, List.of()));
     private static final List<SmoothNavMenuData> MENU_RECEP = List.of(
             new SmoothNavMenuData("1", "Inicio", "Inicio", RUTA_INICIO, null, List.of()),
             new SmoothNavMenuData("2", "Formularios 2276", "Listado de Formularios 2276", null, null, List.of()),
@@ -34,8 +39,7 @@ public class ServicioAutorizacion {
             new SmoothNavMenuData("4", "Turnos", "Turnos de Comisión", RUTA_TURNOS, null, List.of()));
 
     private static final List<SmoothNavMenuData> MENU_COM = List.of(
-            new SmoothNavMenuData("1", "Comisiones", "Comisiones en Puestos Camineros", null, null, List.of()));
-
+            new SmoothNavMenuData("1", "Comisiones", "Comisiones en Puestos Camineros", RUTA_COMISIONES, null, List.of()));
     private final VerificadorAutorizacion verificador;
 
     public ServicioAutorizacion(VerificadorAutorizacion verificador) {

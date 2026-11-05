@@ -1,6 +1,6 @@
 # Spec — 08 Control de Cargas (Puestos Camineros)
 
-> **Estado**: `APROBADA (revisión v1, 2026-10-30)` — puerta **G-SPEC** cumplida.
+> **Estado**: `APROBADA (revisión v2, 2026-11-03)` — puerta **G-SPEC** cumplida.
 > **Sintaxis**: EARS (ISO/IEC 25030). Cada requisito incluye **criterio de verificación**.
 > **IDs**: prefijo `R-CC-<NN>`.
 > **Fuente legacy**: KB `ATPPuestos` (GeneXus 18.0.13.186702), alias `atppuestos` — **solo lectura**.
@@ -47,11 +47,11 @@ integra más adelante.
 |---|---|
 | 1 | Pantalla `Control de Cargas` en Thymeleaf con validación de puesto al entrar. |
 | 2 | Campo de código de barras con extracción de `DPPNroForm` (10 dígitos desde la posición 22). |
-| 3 | Grilla de formularios con columna de acción **Marcar** (bitmap `selectRow`). |
-| 4 | Acción **Marcar** ⇒ invoca `MarcarGuia` y muestra el resultado (éxito / duplicado / anulada / interna). |
-| 5 | Acción **Ver Detalle** ⇒ popup `Form506Detalle` (modo `DSP` / `UPD`). |
-| 6 | Acción **Ver Tabla** ⇒ navegación a `WWTDetProdPri`. |
-| 7 | Acción **Pagos** ⇒ navegación a `WPFormularioPago`. |
+| 3 | Grilla de formularios con 7 columnas (Nro Guia / Acopiador / Cuit / Fecha Emision / Nro. Comprobante / Total General / Marcar) y check verde `selectRow` por fila (R-CC-06, R-CC-20). |
+| 4 | Acción **Marcar** ⇒ invoca `MarcarGuia` y muestra el resultado (éxito / duplicado / anulada / interna); el form envía la PK compuesta completa (R-CC-22). |
+| 5 | Acción **Ver Detalle** ⇒ popup `Form506Detalle` (modo `DSP` / `UPD`), detonante en "Nro Guia" y en "Cuit" (R-CC-12). |
+| 6 | Acción **Ver Tabla** y **Pagos** ⇒ botones a nivel de BODY (R-CC-06). |
+| 7 | Modal `Form506Detalle` con control de cierre (R-CC-19). |
 | 8 | JavaScript puntual (vanilla): autofocus del barcode, confirmación de marcado. |
 | 9 | Paridad 1:1 con `CONTRIBU`, `DETPRODP` y `DETPROD2` (columnas, PK, FK, huérfanas). |
 
@@ -101,6 +101,14 @@ Event 'VerDetalle'
     &Duplicado = 0
     Form506Detalle.Popup(DPPNroForm,DPPTipoGui,&Duplicado,'DSP')
 EndEVent
+
+> **Triggers canónicos (verificado contra la KB, sólo lectura)**: `Event 'Buscar'` ejecuta
+> **únicamente** `Grid506.Refresh()` — **no** abre el popup `Form506Detalle` ni setea modo
+> detalle (R-CC-05). `Event 'VerDetalle'` está enganchado a la columna `att:283` (= `DPPNroForm`,
+> ColTitle "Nro Guia") con `eventGX='VerDetalle'`. La columna `att:1` (= `ConCuit`, ColTitle "Cuit")
+> es una columna de datos normal sin evento; el click en CUIT que abre el modal es una **desviación
+> consciente** del usuario (R-CC-12), no paridad legacy. Los botones "Ver Tabla" y "Pagos" están a
+> nivel de BODY, no por fila (R-CC-06).
 
 Event 'Ver Tabla'
     WWTDetProdPri.Call()
@@ -311,16 +319,20 @@ El login carga los **10 primeros**; los 3 restantes quedan en su valor por defec
 
 #### R-CC-05 — Refresco de la grilla
 > **CUANDO** el usuario active Buscar, **EL SISTEMA DEBE** refrescar la grilla de formularios
-> (`Grid506.Refresh()`) aplicando el filtro por `DPPNroForm` extraído.
+> (`Grid506.Refresh()`) aplicando el filtro por `DPPNroForm` extraído. **Buscar NO DEBE** abrir el
+> modal `Form506Detalle` ni setear el modo detalle: sólo recarga la grilla.
 
 * *Criterio de verificación*: test que comprueba que tras Buscar la grilla se recarga con el filtro
-  aplicado.
+  aplicado **y que el HTML resultante no contiene el fragmento modal** (`mostrarModal = false`).
 
 #### R-CC-06 — Icono de acción en la grilla
-> **EL SISTEMA DEBE** mostrar en cada fila de la grilla el icono de acción Marcar (`selectRow`)
-> como bitmap, asociado a la columna `&Marcar`.
+> **EL SISTEMA DEBE** mostrar en cada fila de la grilla, en la columna `&Marcar`, un check verde
+> de 21×21 px (bitmap `selectRow`), **sin** columna "Acciones" con botones ghost por fila. Los
+> botones "Ver Tabla" (→ `WWTDetProdPri`) y "Pagos" (→ `WPFormularioPago`) viven a nivel de
+> BODY, debajo de la grilla.
 
-* *Criterio de verificación*: test que verifica el render del icono en cada fila.
+* *Criterio de verificación*: test que verifica el render del check verde en cada fila y la
+  ausencia de la columna "Acciones"; test que verifica los 2 botones a nivel de BODY.
 
 ### 4.3 Operación de marcado
 
@@ -369,20 +381,26 @@ El login carga los **10 primeros**; los 3 restantes quedan en su valor por defec
 ### 4.4 Ver detalle
 
 #### R-CC-12 — Ver detalle del formulario (modo DSP)
-> **CUANDO** el usuario active Ver Detalle, **EL SISTEMA DEBE** abrir el popup `Form506Detalle`
-> con `Mode = 'DSP'`, mostrando la cabecera de la guía y, según `DPPTipoGui`, mostrando u
-> ocultando las tablas de comprador y de productos.
+> **CUANDO** el usuario active la acción de ver detalle (click en la columna "Nro Guia"
+> (`att:283 = DPPNroForm`, detonante canónico del legacy) **o** click en la columna "Cuit"
+> (`att:1 = ConCuit`, pedido explícito del usuario), **EL SISTEMA DEBE** abrir el popup
+> `Form506Detalle` con `Mode = 'DSP'`, navegando a `/cargas/detalle` pasando
+> `dppNroForm`, `dpptipoGui`, `duplicado` y `conCuit`. El CUIT se muestra con underline en ambas
+> columnas (paridad Figma). Se muestra la cabecera de la guía y, según `DPPTipoGui`, se muestran u
+> ocultan las tablas de comprador y de productos.
 
-* *Criterio de verificación*: test que verifica la apertura del popup con los parámetros correctos y
-  la visibilidad condicional (`DPPTipoGui = 'F'` ⇒ ocultas; otro ⇒ visibles).
+* *Criterio de verificación*: test que verifica que el click en "Nro Guia" y el click en "Cuit"
+  abren el modal con los 4 parámetros; test de visibilidad condicional
+  (`DPPTipoGui = 'F'` ⇒ ocultas; otro ⇒ visibles).
 
 #### R-CC-13 — Ver detalle tras marcar (modo UPD)
 > **CUANDO** el marcado se complete exitosamente, **EL SISTEMA DEBE** abrir `Form506Detalle`
 > con `Mode = 'UPD'`, mostrando `La guia ha sido marcada con exito` y, si `Duplicado > 1`,
-> adicionalmente `Guia Duplicada , ya paso por algun puesto`.
+> adicionalmente `Guia Duplicada , ya paso por algun puesto`. El modal **DEBE** proveer un control
+> de cierre (ver R-CC-19).
 
 * *Criterio de verificación*: test que verifica la apertura del popup con `Mode = 'UPD'` y los
-  mensajes correspondientes.
+  mensajes correspondientes; test que el modal incluye control de cierre.
 
 ### 4.5 Ver tabla y pagos
 
@@ -419,89 +437,62 @@ El login carga los **10 primeros**; los 3 restantes quedan en su valor por defec
 
 * *Criterio de verificación*: `axe-core` in-page sin hallazgos críticos.
 
-#### R-CC-19 — Sincronización de la colección Postman
+#### R-CC-19 — Modal con control de cierre
+> **EL SISTEMA DEBE** proveer un control de cierre (botón "Cerrar" y/o tecla Escape) en el modal
+> `Form506Detalle`, implementado como JS puntual (vanilla, sin framework) o navegación server-side
+> de vuelta a `/cargas`.
+
+* *Criterio de verificación*: prueba que el modal desaparece al activar el cierre.
+
+#### R-CC-20 — Paridad de grilla con Figma
+> **EL SISTEMA DEBE** renderizar la grilla con 7 columnas en el orden y anchos del Figma: Nro Guia
+> 110 px (clickeable, izquierda) / Acopiador 319 px (izquierda) / Cuit 130 px (centro, clickeable)
+> / Fecha Emision 143 px (centro) / Nro. Comprobante 183 px (centro) / Total General 134 px
+> (derecha) / Marcar 75 px (centro). Header de grilla con fondo `#206e92` (`--atp-button`), alto
+> 34 px, radios 7 px sólo arriba, texto Tinos Bold 20 px blanco. Valores Arimo 15 px
+> `#868686` (`--atp-cargas-text-secondary`). Fondo de página `#E5E5E5`, contenido con
+> `padding-top: 55 px`.
+
+* *Criterio de verificación*: test de vista que verifica las 7 columnas en el orden indicado y los
+  anchos; inspección visual contra Figma.
+
+#### R-CC-21 — Total General
+> **EL SISTEMA DEBE** calcular `Total General` (= `DPPTotGral`) en `CargaService` como
+> `DPPAdCMTot + DPPAdIBTot + DPPAdicFle + DPPImCMTot + DPPImIBTot + DPPImpuFle`, y exponerlo
+> en el view model.
+
+* *Criterio de verificación*: test unitario con valores conocidos que verifica la suma.
+
+#### R-CC-22 — PK completa en Marcar
+> **EL SISTEMA DEBE** enviar, en cada fila, los 5 componentes de la PK compuesta (`conCuit`,
+> `dppSucu`, `calPerFisc`, `dppSecu`, `dppNroForm`) como campos ocultos del form de Marcar, de
+> modo que `CargaService.marcarGuia` pueda reconstruir `DetalleProductoPrimarioId` y encontrar la
+> cabecera.
+
+* *Criterio de verificación*: test de vista que verifica los 5 hidden inputs por fila.
+
+#### R-CC-23 — Modal con flag dedicado
+> **EL SISTEMA DEBE** usar un flag dedicado `mostrarModal` en `CargaForm` para decidir si se
+> renderiza el modal, en lugar de inferirlo de `dppNroForm != null`. Buscar NO setea el flag;
+> `/detalle` y `/marcar` SÍ.
+
+* *Criterio de verificación*: tras Buscar, el HTML no contiene el fragmento modal; tras `/detalle`
+  y `/marcar`, sí.
+
+#### R-CC-24 — Tokens de cargas
+> **EL SISTEMA DEBE** agregar a `tokens.css` las custom properties
+> `--atp-cargas-fieldset-border: #acacac`, `--atp-cargas-input-border: #d0d0d0`,
+> `--atp-cargas-text-secondary: #868686`, `--atp-cargas-button-border: #262626`, y reutilizarlas en
+> `control-cargas.css` sin literales.
+
+* *Criterio de verificación*: `grep` sobre `control-cargas.css` no encuentra literales hexadecimales.
+
+#### R-CC-25 — Sincronización de la colección Postman
 > **SI** la implementación agrega, modifica o elimina un endpoint del contrato REST,
 > **ENTONCES EL SISTEMA DEBE** actualizar `docs/postman/ATPPuestos-API.postman_collection.json`
 > en el mismo commit.
 
 * *Criterio de verificación*: revisión del diff del commit.
 
-## 5. Trazabilidad
 
-### 5.1 Requisito legacy → requisito nuevo
-
-| Origen legacy (evidencia KB) | Requisito nuevo | Prueba |
-|---|---|---|
-| `WebPanel ControlDeCargas` (`Events`: Start, 'Buscar', Grid506.Load, 'Marcar', 'VerDetalle', 'Ver Tabla', 'Pagos') | R-CC-01…R-CC-15 | Tests de vistas + IT |
-| `substr(&BarCode,22,10)` | R-CC-04 | Test de extracción |
-| `&Context.Sucursal = 0` ⇒ `Usuario sin Puesto Asignado` | R-CC-02 | Test de validación de puesto |
-| `confirm('Esta seguro que desea Marcar el formulario?')` | R-CC-03 | Prueba de navegador |
-| `MarcarGuia.Udp(...)` | R-CC-07…R-CC-11 | IT + tests unitarios |
-| `Form506Detalle.Popup(..., 'DSP'/'UPD')` | R-CC-12, R-CC-13 | Test de popup |
-| `WWTDetProdPri.Call()` | R-CC-14 | Test de navegación |
-| `WpFormularioPago.Call()` | R-CC-15 | Test de navegación |
-| `Grid506.Load` ⇒ `&Marcar.FromImage(selectRow)` | R-CC-06 | Test de render |
-| SDT `Context` (13 campos, 10 cargados) | R-CC-02 | Test de contexto |
-| `03-login` (ContextoSesion, ServicioAcceso, GestorContextoSesion) | R-CC-01, R-CC-02 | Tests de integración |
-| `00-alcance` R-ALC-002 (sin DDL), R-ALC-006 (render por servidor) | R-CC-16, R-CC-19 | Revisión de diff |
-
-### 5.2 Columnas huérfanas (BD vs KB)
-
-#### `CONTRIBU` (columnas en BD no en KB)
-
-`AgeUltLin`, `ConBen7190`, `ConBenPrCh`, `ConCatAfipId`, `ConCNFdo`, `ConCtrlFis`,
-`ConDDJJAnu`, `ConInsPJur`, `ConLibRPC`, `ConMCMAnt`, `ConNomFan`, `ConNroCoMu`,
-`CodPosFis`, `CodPosReal`, `ConFJRPC`, `ConNroInmo` (KB: `ConNroInmobR`), `ConNroDCat`
-(KB: `ConNroDCatas`), `ConSellTip` (KB: `ConSellTipo`), `ConNomCall`.
-
-#### `DETPRODP` (columnas en BD no en KB)
-
-`DPPLocOr`, `DPPLocDe`, `DPPIncluid`, `DPPCorGre`, `DPPAnuObs`, `DPPActaNro`,
-`DPPActaPue`, `PPTrataId`, `DPPMEIBrut` (KB: `DPPMEIBrutos`).
-
-#### `DETPROD2`
-
-Sin columnas huérfanas adicionales (la BD coincide con la KB).
-
-> Las columnas huérfanas se **mapean** con `@Column(name="...")` y se dejan con su default de
-> aplicación (típicamente `null` o el valor que exija la columna NOT NULL). No se rediseñan.
-
-### 5.3 Matriz de paridad funcional
-
-| Operación legacy | Requisito | Prueba prevista |
-|---|---|---|
-| Validación de puesto al entrar | R-CC-02 | `MvcValidacionPuesto` |
-| Búsqueda por barcode | R-CC-04, R-CC-05 | `MvcBusquedaBarcode` |
-| Refresco de grilla | R-CC-05 | `MvcRefrescoGrilla` |
-| Icono de acción en grilla | R-CC-06 | `MvcIconoAccion` |
-| Confirmación de marcado | R-CC-03 | Prueba de navegador |
-| Marcado exitoso | R-CC-07 | IT `Rentas` + `MvcMarcado` |
-| Guía anulada | R-CC-08 | `MvcGuiaAnulada` |
-| Guía interna | R-CC-09 | `MvcGuiaInterna` |
-| Guía duplicada | R-CC-10, R-CC-11 | IT + test unitario |
-| Ver detalle (DSP) | R-CC-12 | `MvcVerDetalle` |
-| Ver detalle tras marcar (UPD) | R-CC-13 | `MvcVerDetalleUPD` |
-| Ver tabla | R-CC-14 | `MvcVerTabla` |
-| Pagos | R-CC-15 | `MvcPagos` |
-
-## 6. Supuestos abiertos
-
-| ID | Pregunta | Decisión provisional | Riesgo si se resuelve distinto |
-|---|---|---|---|
-| **SA-CC-01** | ¿La ruta de página debe ser `/cargas` o `/control-cargas`? La convención del repositorio es `/<recurso>` (sin prefijo). | `/cargas` | Bajo |
-| **SA-CC-02** | ¿El popup `Form506Detalle` debe implementarse como modal Thymeleaf o como página separada con parámetros en la URL? | Modal Thymeleaf (fragmento) | Medio |
-| **SA-CC-03** | ¿`WWTDetProdPri` y `WPFormularioPago` deben reimplementarse en este módulo o sólo referenciarse como navegación? | Sólo navegación (las pantallas se implementan en sus propios módulos) | Medio |
-| **SA-CC-04** | ¿El campo `&BarCode` (31 caracteres) debe validarse en longitud antes de extraer? | No validar (paridad con legacy) | Bajo |
-| **SA-CC-05** | ¿La columna `DPPPaseCo` (comisión) debe enviarse como `null` cuando no hay comisión o como `0`? | Enviar `&Context.Comision` (que puede ser 0) | Bajo |
-| **SA-CC-06** | ¿Los mensajes de `Form506Detalle` deben mostrarse en el mismo popup o en una vista separada? | En el mismo popup (modal) | Bajo |
-
-## 7. Decisiones
-
-| # | Decisión | Justificación |
-|---|---|---|
-| D-CC-01 | La pantalla se implementa en `atp-puestos-camineros` (no en el núcleo) | Es dominio de Puestos Camineros, no catálogo compartido |
-| D-CC-02 | `MarcarGuia` se implementa como servicio (`CargaService.marcarGuia`) | La lógica de negocio va en `service/**` (AGENTS.md regla 9) |
-| D-CC-03 | La grilla se refresca por submit del formulario (no por AJAX) | Thymeleaf renderiza por servidor; JS puntual sólo para barcode y confirmación |
-| D-CC-04 | El popup `Form506Detalle` se implementa como fragmento Thymeleaf modal | Evita duplicar la lógica de negocio en un controller separado |
-| D-CC-05 | Las columnas huérfanas se mapean con `@Column(name="...")` y default null/0 | Paridad de BD (G-DATA), sin rediseño (G5) |
-| D-CC-06 | Los mensajes verbatim se conservan con sus erratas | Paridad de identidad (docs/design.md §1.1) |
+> Anexo: la trazabilidad (seccion 5), los supuestos abiertos (seccion 6) y las decisiones (seccion 7) se encuentran en spec-anexo.md.

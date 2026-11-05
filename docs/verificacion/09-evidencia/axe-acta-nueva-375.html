@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>body{margin:0;font:12px monospace}
+iframe{border:1px solid red;display:block}</style></head><body>
+<iframe id="f" src="/actas/nueva?axe=1" width="375" height="1400"></iframe>
+<pre id="out">AXERESULT_START{"url":"/actas/nueva","violations":[{"id":"color-contrast","impact":"serious","help":"Elements must meet minimum color contrast ratio thresholds","nodes":11,"targets":[".atp-sesion__dato:nth-child(1) &gt; .atp-sesion__dato-rotulo",".atp-sesion__dato:nth-child(1) &gt; .atp-sesion__dato-valor",".atp-sesion__dato:nth-child(2) &gt; .atp-sesion__dato-rotulo",".atp-sesion__dato:nth-child(2) &gt; .atp-sesion__dato-valor",".atp-sesion__dato:nth-child(3) &gt; .atp-sesion__dato-rotulo",".atp-sesion__dato:nth-child(3) &gt; .atp-sesion__dato-valor",".atp-sesion__dato:nth-child(4) &gt; .atp-sesion__dato-rotulo",".atp-sesion__dato:nth-child(4) &gt; .atp-sesion__dato-valor","th:nth-child(1)","th:nth-child(2)","th:nth-child(3)"]},{"id":"region","impact":"moderate","help":"All page content should be contained by landmarks","nodes":4,"targets":[".atp-sesion__dato:nth-child(1)",".atp-sesion__dato:nth-child(2)",".atp-sesion__dato:nth-child(3)",".atp-sesion__dato:nth-child(4)"]}],"violationCount":2,"criticalOrSerious":1,"incompleteCount":2,"passesCount":42}AXERESULT_END</pre>
+<script>
+document.getElementById('f').addEventListener('load', function () {
+  setTimeout(function () {
+    var d = document.getElementById('f').contentDocument;
+    var el = d.getElementById('measure-result') || d.getElementById('axe-result');
+    document.getElementById('out').textContent = el ? el.textContent : 'SIN_RESULTADO';
+  }, 2500);
+});
+</script></body></html>

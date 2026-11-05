@@ -1,23 +1,33 @@
+/* JS puntual para Control de Cargas. Sin frameworks, sin fetch/XHR. */
 (function () {
   'use strict';
 
-  function autofocusBarcode() {
-    var input = document.getElementById('barCode');
-    if (input) {
-      try { input.focus(); } catch (e) { /* noop */ }
+  function confirmarMarcado() {
+    return confirm('Esta seguro que desea Marcar el formulario?');
+  }
+
+  function cerrarModal() {
+    var modal = document.getElementById('modalDetalle');
+    if (modal) {
+      modal.style.display = 'none';
     }
   }
 
-  function confirmarMarcado() {
-    return window.confirm('Esta seguro que desea Marcar el formulario?');
-  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      cerrarModal();
+    }
+  });
 
-  // Exponer para los handlers inline de las plantillas.
+  // autofocus del barcode
+  document.addEventListener('DOMContentLoaded', function () {
+    var bc = document.getElementById('barCode');
+    if (bc) {
+      bc.focus();
+    }
+  });
+
   window.confirmarMarcado = confirmarMarcado;
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autofocusBarcode);
-  } else {
-    autofocusBarcode();
-  }
+  window.cerrarModal = cerrarModal;
 })();
+EOF

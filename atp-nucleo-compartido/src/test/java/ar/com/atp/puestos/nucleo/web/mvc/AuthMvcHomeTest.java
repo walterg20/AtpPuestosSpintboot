@@ -62,8 +62,7 @@ class AuthMvcHomeTest {
     void programasPorDefecto() {
         when(servicioAutorizacion.programasPorTipo("PUE")).thenReturn(List.of(
                 new SmoothNavMenuData("2", "Control de Cargas", "Control de Cargas", null, null, List.of()),
-                new SmoothNavMenuData("7", "Comisiones", "Comisiones en Puestos Camineros", null, null, List.of())));
-    }
+                new SmoothNavMenuData("7", "Comisiones", "Comisiones en Puestos Camineros", "/comisiones", null, List.of())));    }
 
     @Test
     @DisplayName("T-204: GET /home devuelve la vista nucleo/home con el view model completo")

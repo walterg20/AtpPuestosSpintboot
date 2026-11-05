@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Actas</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+  <script src="/js/confirmaciones.js" defer=""></script>
+  <script src="/js/login.js" defer=""></script>
+</head>
+<body class="atp-body"><pre id="axe-result">AXERESULT_START{"url":"/actas","violations":[{"id":"color-contrast","impact":"serious","help":"Elements must meet minimum color contrast ratio thresholds","nodes":6,"targets":[".atp-sesion__dato:nth-child(2) &gt; .atp-sesion__dato-rotulo",".atp-sesion__dato:nth-child(2) &gt; .atp-sesion__dato-valor",".atp-sesion__dato:nth-child(3) &gt; .atp-sesion__dato-rotulo",".atp-sesion__dato:nth-child(3) &gt; .atp-sesion__dato-valor",".atp-sesion__dato:nth-child(4) &gt; .atp-sesion__dato-rotulo",".atp-sesion__dato:nth-child(4) &gt; .atp-sesion__dato-valor"]},{"id":"region","impact":"moderate","help":"All page content should be contained by landmarks","nodes":4,"targets":[".atp-sesion__dato:nth-child(1)",".atp-sesion__dato:nth-child(2)",".atp-sesion__dato:nth-child(3)",".atp-sesion__dato:nth-child(4)"]}],"violationCount":2,"criticalOrSerious":1,"incompleteCount":1,"passesCount":33}AXERESULT_END</pre>
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera">
+    <div class="atp-cabecera__foto">
+      <img src="/img/referencia-institucional.png" alt="Control caminero" width="1434" height="905">
+    </div>
+    <img class="atp-cabecera__curva" src="/img/curva-decorativa.svg" alt="" width="84" height="96">
+    <h1 class="atp-cabecera__titulo">Gestión de Puestos Camineros</h1>
+    <div class="atp-cabecera__logo-personal">
+      <img src="/img/referencia-institucional.png" alt="Personal caminero" width="1434" height="905">
+    </div>
+  </header>
+
+  <div class="atp-sesion">
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Usuario</span>
+      <span class="atp-sesion__dato-valor">Sebastian Montiel</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Puesto</span>
+      <span class="atp-sesion__dato-valor">LA VICUÑA</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Turno</span>
+      <span class="atp-sesion__dato-valor">20</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Comision</span>
+      <span class="atp-sesion__dato-valor">13</span>
+    </div>
+    <form class="atp-sesion__salir-form" action="/logout" method="post"><input type="hidden" name="_csrf" value="MqXon0Z2QoUPIF-LyjpN55O3Qajo_tilK5dnh_3j3w4V_4AQU5GNq38QJrwiF2y58hd5gquHbMqMn-uIGPQGs8nQ7zghxuIg">
+      <button class="atp-sesion__salir" type="submit">Salir</button>
+    </form>
+  </div>
+
+  <div class="atp-nav-principal">
+    <nav class="atp-menu">
+    <ul class="atp-menu__lista">
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="/cargas">
+        <span class="atp-menu__nombre">Control de Cargas</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="#">
+        <span class="atp-menu__nombre">Formularios ACTAS</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="#">
+        <span class="atp-menu__nombre">Carga Manual</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="/turnos">
+        <span class="atp-menu__nombre">Turnos</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="#">
+        <span class="atp-menu__nombre">Comisiones</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+    </ul>
+    
+  </nav>
+  </div>
+
+  <main id="contenido" class="atp-pagina atp-actas__page">
+
+    <div class="atp-actas__cabecera">
+      <h1 class="atp-pagina__titulo">Actas</h1>
+      <a class="atp-btn atp-btn--primary atp-actas__crear" href="/actas/nueva">Crear Acta</a>
+    </div>
+
+    <!-- Mensaje de éxito tras el alta (flash `mensajeExito`, verbatim del legacy). -->
+    
+
+    <!-- Sin turno: no se puede crear un Acta (R-ACTA-002). -->
+    
+
+    <!-- Filtros de búsqueda (R-ACTA-011). -->
+    <form class="atp-form atp-actas__filtros" method="get" action="/actas">
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="f276Id">Acto Nro.</label>
+        <input class="atp-field__control" id="f276Id" type="number" min="0" step="1" name="f276Id" value="">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="cuit">CUIT</label>
+        <input class="atp-field__control" id="cuit" type="number" min="0" step="1" name="cuit" value="">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="razonSocial">Razón Social</label>
+        <input class="atp-field__control" id="razonSocial" type="text" maxlength="35" name="razonSocial" value="">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="desde">Desde</label>
+        <input class="atp-field__control" id="desde" type="date" name="desde" value="">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="hasta">Hasta</label>
+        <input class="atp-field__control" id="hasta" type="date" name="hasta" value="">
+      </div>
+      <button type="submit" class="atp-btn">Buscar</button>
+    </form>
+
+    <!-- Grilla (R-ACTA-005): estado vacío cuando no hay Actas (R-ACTA-013). -->
+    
+
+    <p class="atp-vacio">Sin actas para mostrar.</p>
+
+    <!-- Paginación (R-ACTA-010, R-ACTA-012): los links preservan los filtros y el orden. -->
+    
+
+  </main>
+
+  <footer class="atp-pie">
+    <div class="atp-pie__barra">
+      <span class="atp-pie__segmento atp-pie__segmento--1"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--2"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--3"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--4"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--5"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--6"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--7"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--8"></span>
+    </div>
+    <div class="atp-pie__logos">
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--atp">
+        <img src="/img/referencia-institucional.png" alt="ATP" width="1434" height="905">
+      </div>
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--chaco">
+        <img src="/img/referencia-institucional.png" alt="Gobierno del Chaco" width="1434" height="905">
+      </div>
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--ecom">
+        <img src="/img/referencia-institucional.png" alt="ECOM" width="1434" height="905">
+      </div>
+    </div>
+  </footer>
+
+  <link rel="stylesheet" href="/css/actas.css">
+
+<script src="/__axe/axe.min.js"></script>
+<script>
+window.addEventListener('load', function () {
+  if (typeof axe === 'undefined') { document.title = 'AXE-NOT-LOADED'; return; }
+  axe.run(document, { resultTypes: ['violations','incomplete'] }).then(function (r) {
+    var out = {
+      url: location.pathname,
+      violations: r.violations.map(function (v) {
+        return { id: v.id, impact: v.impact, help: v.help, nodes: v.nodes.length,
+                 targets: v.nodes.map(function (n) { return n.target.join(' '); }) };
+      }),
+      violationCount: r.violations.length,
+      criticalOrSerious: r.violations.filter(function (v) {
+        return v.impact === 'critical' || v.impact === 'serious'; }).length,
+      incompleteCount: r.incomplete.length,
+      passesCount: r.passes ? r.passes.length : 0
+    };
+    var pre = document.createElement('pre');
+    pre.id = 'axe-result';
+    pre.textContent = 'AXERESULT_START' + JSON.stringify(out) + 'AXERESULT_END';
+    document.body.insertBefore(pre, document.body.firstChild);
+  });
+});
+</script>
+
+
+</body></html>

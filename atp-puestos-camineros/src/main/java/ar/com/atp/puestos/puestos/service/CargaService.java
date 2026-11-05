@@ -37,7 +37,29 @@ public class CargaService {
         if (dppNroForm == null || dppNroForm.isBlank()) {
             return List.of();
         }
-        return detalleRepository.findByDppNroForm(dppNroForm.trim());
+        List<DetalleProductoPrimario> result = detalleRepository.findByDppNroForm(dppNroForm.trim());
+        for (DetalleProductoPrimario d : result) {
+            d.setTotalGeneral(calcularTotalGeneral(d));
+        }
+        return result;
+    }
+
+    public BigDecimal calcularTotalGeneral(DetalleProductoPrimario d) {
+        if (d == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal sum = BigDecimal.ZERO;
+        sum = sum.add(nz(d.getDppAdCMTot()));
+        sum = sum.add(nz(d.getDppAdIBTot()));
+        sum = sum.add(nz(d.getDppAdicFle()));
+        sum = sum.add(nz(d.getDppImCMTot()));
+        sum = sum.add(nz(d.getDppImIBTot()));
+        sum = sum.add(nz(d.getDppImpuFle()));
+        return sum;
+    }
+
+    private static BigDecimal nz(BigDecimal v) {
+        return v == null ? BigDecimal.ZERO : v;
     }
 
     @Transactional

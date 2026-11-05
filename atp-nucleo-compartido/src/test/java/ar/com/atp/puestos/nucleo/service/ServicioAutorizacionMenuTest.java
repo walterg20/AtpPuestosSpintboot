@@ -36,4 +36,18 @@ class ServicioAutorizacionMenuTest {
         SmoothNavMenuData item = servicio.programasPorTipo("PUE").get(0);
         assertThat(item.items()).isNotNull();
     }
+
+    @Test
+    @DisplayName("Menú PUE: Formularios ACTAS apunta a /actas y Carga Manual a /actas/nueva")
+    void menuPueActasLinks() {
+        var items = servicio.programasPorTipo("PUE");
+        SmoothNavMenuData formularios = items.stream()
+                .filter(i -> "Formularios ACTAS".equals(i.title()))
+                .findFirst().orElseThrow();
+        SmoothNavMenuData cargaManual = items.stream()
+                .filter(i -> "Carga Manual".equals(i.title()))
+                .findFirst().orElseThrow();
+        assertThat(formularios.link()).isEqualTo("/actas");
+        assertThat(cargaManual.link()).isEqualTo("/actas/nueva");
+    }
 }

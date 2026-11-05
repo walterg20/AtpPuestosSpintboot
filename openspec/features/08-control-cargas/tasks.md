@@ -112,29 +112,41 @@
   *→ T-101, T-102, T-103* · **Criterio de aceptación**: el `git diff` no contiene `CREATE TABLE`/
   `ALTER TABLE` ni referencias a migraciones. **Plan**: G5, §5.5.
 
+- [x] **T-111** Implementar en `CargaService` el cálculo de `Total General` (`DPPTotGral`) como
+  `DPPAdCMTot + DPPAdIBTot + DPPAdicFle + DPPImCMTot + DPPImIBTot + DPPImpuFle`, exponiéndolo
+  en el view model por fila (R-CC-21). No es columna física (no `@Column`).
+  *→ T-102* · **Criterio de aceptación**: método unit-testeable con valores conocidos. **Req**: R-CC-21.
+  **Plan**: §2.2.
+
+- [x] **T-112** Agregar el campo `mostrarModal` (Boolean) a `CargaForm` y cablearlo en
+  `CargaMvcController`: Buscar NO lo setea (false); `/detalle` y `/marcar` SÍ (true). Eliminar la
+  inferencia `dppNroForm != null` (R-CC-23).
+  *→ T-108* · **Criterio de aceptación**: tras Buscar el HTML no contiene el fragmento modal; tras
+  `/detalle` y `/marcar`, sí. **Req**: R-CC-23, R-CC-05. **Plan**: §4.2.
+
 ---
 
 ## C. Vistas
 
-- [ ] **T-201** Crear `templates/puestos/control-cargas.html` con: campo de barcode, botón Buscar,
+- [x] **T-201** Crear `templates/puestos/control-cargas.html` con: campo de barcode, botón Buscar,
   grilla de formularios con columna Marcar (icono `selectRow`), botones Ver Detalle, Ver Tabla,
   Pagos, y validación de puesto (`Sucursal = 0` ⇒ mensaje + deshabilitación de Marcar).
   *→ T-108* · **Criterio de aceptación**: la vista renderiza con los elementos esperados.
   **Req**: R-CC-01, R-CC-02, R-CC-06. **Plan**: §4.1, §4.2.
 
-- [ ] **T-202** Crear `templates/puestos/fragments/form506-detalle.html` (modal) con: cabecera de la
+- [x] **T-202** Crear `templates/puestos/fragments/form506-detalle.html` (modal) con: cabecera de la
   guía, visibilidad condicional de `TblComprador` y `TblProd` según `DPPTipoGui`, y mensajes
   `La guia ha sido marcada con exito` / `Guia Duplicada , ya paso por algun puesto`.
   *→ T-108* · **Criterio de aceptación**: el fragmento renderiza correctamente en ambos modos
   (`DSP`/`UPD`). **Req**: R-CC-12, R-CC-13. **Plan**: §4.1.
 
-- [ ] **T-203** Crear `static/js/control-cargas.js` con: autofocus del barcode, confirmación de
+- [x] **T-203** Crear `static/js/control-cargas.js` con: autofocus del barcode, confirmación de
   marcado (`confirm('Esta seguro que desea Marcar el formulario?')`), y extracción de `DPPNroForm`
   del barcode (sólo visual, la lógica real está en el servicio).
   *→ T-201* · **Criterio de aceptación**: el JS **no** contiene `fetch`/`XMLHttpRequest`/`eval`
   ni lógica de negocio. **Req**: R-CC-03, R-CC-04. **Plan**: D-CC-03.
 
-- [ ] **T-204** Verificar el CSS: reutilizar `static/css/tokens.css` y `static/css/nucleo.css`
+- [x] **T-204** Verificar el CSS: reutilizar `static/css/tokens.css` y `static/css/nucleo.css`
   (creados por `02-abm-productos`); agregar sólo las clases nuevas necesarias.
   *→ T-004, T-201* · **Criterio de aceptación**: `grep` sobre `static/css/**` no encuentra
   literales hexadecimales ni nombres de fuente fuera de `tokens.css`.
@@ -145,6 +157,31 @@
 - [ ] **T-206** Aplicar los requisitos de accesibilidad AA: `<label for>` en cada control, foco
   visible, contraste ≥ 4,5:1, navegación por teclado.
   *→ T-201* · **Criterio de aceptación**: `axe-core` sin hallazgos críticos.
+
+- [x] **T-207** Agregar control de cierre al modal `form506-detalle.html`: botón "Cerrar" y/o tecla
+  Escape, implementado como JS puntual (vanilla) o navegación server-side a `/cargas` (R-CC-19).
+  *→ T-202* · **Criterio de aceptación**: prueba que el modal desaparece al activar el cierre.
+  **Req**: R-CC-19. **Plan**: §4.1.
+
+- [x] **T-208** Agregar a `tokens.css` las custom properties `--atp-cargas-fieldset-border: #acacac`,
+  `--atp-cargas-input-border: #d0d0d0`, `--atp-cargas-text-secondary: #868686`,
+  `--atp-cargas-button-border: #262626`, y reutilizarlas en `control-cargas.css` sin literales
+  (R-CC-24).
+  *→ T-204* · **Criterio de aceptación**: `grep` sobre `control-cargas.css` no encuentra literales
+  hexadecimales. **Req**: R-CC-24. **Plan**: §4.3.
+
+- [x] **T-209** Refactorizar `control-cargas.html` a la paridad de grilla Figma: 7 columnas en el
+  orden/anchos de R-CC-20, header fondo `--atp-button`, check verde 21×21 en Marcar, botones
+  "Ver Tabla" y "Pagos" a nivel de BODY, CUIT con underline y clickeable (abre modal), Nro Guia
+  clickeable (abre modal), Total General alineado a la derecha (R-CC-06, R-CC-12, R-CC-20).
+  *→ T-201, T-111* · **Criterio de aceptación**: test de vista con 7 columnas en el orden indicado.
+  **Req**: R-CC-06, R-CC-12, R-CC-20. **Plan**: §4.1, §4.2.
+
+- [x] **T-210** Corregir el form de Marcar para enviar los 5 componentes de la PK compuesta
+  (`conCuit`, `dppSucu`, `calPerFisc`, `dppSecu`, `dppNroForm`) como hidden inputs por fila
+  (R-CC-22).
+  *→ T-209* · **Criterio de aceptación**: test de vista que verifica los 5 hidden inputs por fila.
+  **Req**: R-CC-22. **Plan**: §4.1.
 
 ---
 
@@ -193,10 +230,41 @@
   *→ T-301…T-308* · **Criterio de aceptación**: cada fila de la matriz referencia su prueba y su
   resultado.
 
-- [ ] **T-310** Revisar y resolver los supuestos abiertos SA-CC-01…SA-CC-06 con los responsables y
+- [ ] **T-310** Revisar y resolver los supuestos abiertos SA-CC-01…SA-CC-07 con los responsables y
   actualizar `spec.md` §6 y `plan.md` §6 con la resolución (o la decisión de postergar con motivo).
   *→ T-001…T-109* · **Criterio de aceptación**: cada supuesto tiene una resolución escrita o una
   decisión de postergar con motivo y fecha.
+
+- [x] **T-311** Test MockMvc: Buscar NO renderiza el modal (mostrarModal=false) y `/detalle` y
+  `/marcar` SÍ lo renderizan (R-CC-23, R-CC-05).
+  *→ T-209, T-112* · **Criterio de aceptación**: assertions sobre presencia/ausencia del fragmento
+  modal. **Req**: R-CC-05, R-CC-23.
+
+- [x] **T-312** Test MockMvc: click en "Nro Guia" y en "Cuit" renderizan el modal con los 4
+  parámetros (`dppNroForm`, `dpptipoGui`, `duplicado`, `conCuit`) (R-CC-12).
+  *→ T-209* · **Criterio de aceptación**: assertions sobre los parámetros del modal. **Req**: R-CC-12.
+
+- [x] **T-313** Test MockMvc: la grilla renderiza 7 columnas en el orden indicado (R-CC-20).
+  *→ T-209* · **Criterio de aceptación**: assertions sobre headers/anchos. **Req**: R-CC-20.
+
+- [x] **T-314** Test MockMvc: el form de Marcar incluye los 5 hidden inputs de PK por fila
+  (R-CC-22).
+  *→ T-210* · **Criterio de aceptación**: assertions sobre hidden inputs. **Req**: R-CC-22.
+
+- [x] **T-315** Test unitario de `CargaService`: Total General = suma de los 6 componentes con
+  valores conocidos (R-CC-21).
+  *→ T-111* · **Criterio de aceptación**: test verde. **Req**: R-CC-21.
+
+- [x] **T-316** Test de CSS: `control-cargas.css` no contiene literales hexadecimales (R-CC-24).
+  *→ T-208* · **Criterio de aceptación**: `grep` sin hallazgos. **Req**: R-CC-24.
+
+- [x] **T-317** Test MockMvc: el modal incluye control de cierre y desaparece al activarlo (R-CC-19).
+  *→ T-207* · **Criterio de aceptación**: assertions sobre el botón "Cerrar"/Escape. **Req**: R-CC-19.
+
+- [x] **T-318** Memoria Engram: al cerrar la corrección, ejecutar `mem_save` con
+  `topic_key: spec/08-control-cargas` registrando objetos inventariados, decisiones tomadas y
+  supuestos abiertos (R-CC-19..R-CC-24).
+  *→ T-311…T-317* · **Criterio de aceptación**: observación guardada en Engram.
 
 ---
 
@@ -207,7 +275,9 @@
   correspondientes y su test de status + presencia de campos; actualizar `docs/postman/README.md`
   (§"Cobertura actual" y *Changelog*) **en el mismo commit** que el backend.
   *→ T-109* · **Criterio de aceptación**: la colección contiene la carpeta `Cargas` (si aplica);
-  el commit incluye backend **y** colección. **Req**: R-CC-19. **Plan**: §3.2.
+  el commit incluye backend **y** colección. **Req**: R-CC-25. **Plan**: §3.2.
+  > **Corrección 2026-11-03**: no se agregan endpoints nuevos; la colección **no** requiere
+  > cambios en esta corrección.
 
 - [ ] **T-402** Verificar que la colección **no** altera los requests preexistentes y que ningún
   endpoint del módulo cambió de contrato sin actualizar Postman.
@@ -270,6 +340,45 @@ T-110  →  T-203 … T-206  →  T-301 … T-310  →  T-401 … T-403
 | 6 | `tasks.md` se actualiza (con evidencia) **por el coordinador**, no por los implementadores. |
 | 7 | **No regresión**: T-301 debe verificar que las suites de `01-nucleo-datos`, `02-abm-productos` y `03-login` siguen verdes. |
 | 8 | **Sin DDL**: T-110 verifica que no hay cambios en `spring.jpa.hibernate.ddl-auto`. |
+
+---
+
+## H. Corrección de pantalla (registrada 2026-11-03)
+
+Decisiones del usuario (Engram #198): modal desde "Nro Guia" + "Cuit", paridad de grilla Figma
+(7 columnas), Total General derivado, PK completa en Marcar, flag dedicado `mostrarModal`, tokens
+nuevos y botón de cierre del modal.
+
+### H.1 Secuencia
+```text
+T-111, T-112  (backend: Total General, flag mostrarModal)
+   │
+   ▼
+T-207, T-208, T-209, T-210  (vistas: cierre modal, tokens, paridad grilla, PK completa)
+   │
+   ▼
+T-311 … T-317  (tests MockMvc/unit/CSS)
+   │
+   ▼
+T-318  (mem_save Engram)
+```
+
+### H.2 Qué puede hacer cada implementador en paralelo
+| Implementador | Escribe sólo en | Puede empezar cuando |
+|---|---|---|
+| `implementador-backend` | `puestos/service/CargaService.java`, `puestos/web/mvc/form/CargaForm.java`, `puestos/web/mvc/CargaMvcController.java` | T-111, T-112 (T-002/T-004 ya cerradas) |
+| `implementador-vistas` | `templates/puestos/control-cargas.html`, `templates/puestos/fragments/form506-detalle.html`, `static/css/tokens.css`, `static/css/control-cargas.css`, `static/js/control-cargas.js` | T-209 con el contrato de vista de T-112 |
+
+### H.3 Reglas de coordinación adicionales
+| Regla | Detalle |
+|---|---|
+| 1 | Ningún literal hexadecimal en `control-cargas.css` (R-CC-24); usar tokens. |
+| 2 | Buscar NO abre el modal ni setea `mostrarModal` (R-CC-05, R-CC-23). |
+| 3 | El modal sólo se renderiza si `mostrarModal = true` (R-CC-23). |
+| 4 | El form de Marcar envía los 5 componentes de la PK (R-CC-22). |
+| 5 | `Total General` se calcula en `CargaService`, no es columna física (R-CC-21). |
+| 6 | El botón "Cerrar" del modal es JS puntual vanilla (R-CC-19). |
+| 7 | G-POSTMAN: no se agregan endpoints nuevos en esta corrección (R-CC-25 satisfecha sin diff). |
 
 ---
 

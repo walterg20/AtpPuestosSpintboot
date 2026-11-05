@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--
+  Grilla de productos del formulario de alta del Acta — módulo 09 "Formularios Acta".
+
+  - Fragmento reutilizable (`:: grilla`): lo inserta `puestos/acta-formulario`.
+  - Columnas del legacy `Grid1`: `Código`, `Descripción`, `Tn.` y la acción `Eliminar` (R-ACTA-020).
+  - Alta/baja de filas con JS puntual (`static/js/actas.js`): el botón `+` clona la fila-plantilla
+    y el botón `−` quita la fila; ambos renumeran los índices para que el binding siga siendo
+    `productos[i].*` (D-ACTA-11).
+  - Accesibilidad (R-ACTA-055): cada control tiene su `<label for>` (oculto visualmente) con el
+    número de fila, que el JS renumera al quitar filas.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="grilla" th:object="${actaForm}">
+
+  <div class="atp-grilla-scroll">
+    <table class="atp-table atp-actas__tabla" id="acta-productos">
+      <caption class="atp-table__caption">Detalle de productos</caption>
+      <thead>
+        <tr>
+          <th scope="col">Código</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Tn.</th>
+          <th scope="col"><span class="atp-oculto">Acciones de la fila</span></th>
+        </tr>
+      </thead>
+      <tbody id="acta-productos-body">
+        <tr data-acta-producto="true" th:each="p, it : ${actaForm.productos}">
+          <td>
+            <label class="atp-oculto" th:attr="for=|productos_${it.index}_prodCod|,data-rotulo='Código'">Código fila 1</label>
+            <select class="atp-field__control" data-producto="true"
+                    th:field="*{productos[__${it.index}__].prodCod}"
+                    th:attr="id=|productos_${it.index}_prodCod|">
+              <option value="">Seleccionar...</option>
+              <option th:each="d : ${productosDisponibles}"
+                      th:value="${d.prodCod}"
+                      th:attr="data-tipcal=${d.prodTipCal},data-descripcion=${d.prodDesc}"
+                      th:text="${d.prodDesc} + ' (' + ${d.prodCod} + ')'">Producto</option>
+            </select>
+          </td>
+          <td>
+            <span class="atp-actas__descripcion" data-descripcion="true"
+                  th:text="${p.prodDesc}">Descripción</span>
+          </td>
+          <td>
+            <label class="atp-oculto" th:attr="for=|productos_${it.index}_f276RCant|,data-rotulo='Tn.'">Tn. fila 1</label>
+            <input class="atp-field__control" type="number" step="0.0001" min="0"
+                   data-cantidad="true"
+                   th:field="*{productos[__${it.index}__].f276RCant}"
+                   th:attr="id=|productos_${it.index}_f276RCant|">
+          </td>
+          <td>
+            <button type="button" class="atp-actas__quitar js-quitar-producto"
+                    th:attr="data-indice=${it.index},aria-label='Eliminar fila ' + ${it.count}">−</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="atp-field__error" th:if="${#fields.hasErrors('productos')}"
+     th:errors="*{productos}" role="alert">Debe ingresar el detalle de los productos</p>
+
+  <div class="atp-botonera">
+    <button type="button" class="atp-actas__agregar" id="acta-agregar-producto"
+            aria-label="Agregar producto">+</button>
+  </div>
+
+  <!-- Fila-plantilla: el JS clona este contenido y sustituye __INDEX__ por el índice de la nueva
+       fila (0-based, para name/id) y __FILA__ por el número de fila (1-based, para el label). -->
+  <template id="acta-producto-plantilla">
+    <tr data-acta-producto="true">
+      <td>
+        <label class="atp-oculto" for="productos___INDEX___prodCod" data-rotulo="Código">Código fila __FILA__</label>
+        <select class="atp-field__control" data-producto="true"
+                name="productos[__INDEX__].prodCod" id="productos___INDEX___prodCod">
+          <option value="">Seleccionar...</option>
+          <option th:each="d : ${productosDisponibles}"
+                  th:value="${d.prodCod}"
+                  th:attr="data-tipcal=${d.prodTipCal},data-descripcion=${d.prodDesc}"
+                  th:text="${d.prodDesc} + ' (' + ${d.prodCod} + ')'">Producto</option>
+        </select>
+      </td>
+      <td>
+        <span class="atp-actas__descripcion" data-descripcion="true">Descripción</span>
+      </td>
+      <td>
+        <label class="atp-oculto" for="productos___INDEX___f276RCant" data-rotulo="Tn.">Tn. fila __FILA__</label>
+        <input class="atp-field__control" type="number" step="0.0001" min="0"
+               data-cantidad="true"
+               name="productos[__INDEX__].f276RCant" id="productos___INDEX___f276RCant">
+      </td>
+      <td>
+        <button type="button" class="atp-actas__quitar js-quitar-producto"
+                data-indice="__INDEX__" aria-label="Eliminar fila __FILA__">−</button>
+      </td>
+    </tr>
+  </template>
+
+</div>
+</body>
+</html>

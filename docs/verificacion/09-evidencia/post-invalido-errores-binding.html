@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<!--
+  Formulario de alta del Acta (Formulario 2276 · "Carga manual") — módulo 09 "Formularios Acta".
+
+  - Extiende `layout/base` (cabecera, barra de sesión, navegación y pie): no se duplican.
+  - 6 fieldsets según el Figma `ztMkGHkjqvQL2TOjHP1DSN` nodo `2030:2` (R-ACTA-015…R-ACTA-020).
+  - El nº de Acta NO se renderiza en el alta (V-11) y la fecha viene del servidor en sólo lectura
+    (V-10). Localidad y Provincia son de sólo lectura: las deriva el servidor del CUIT (V-12).
+  - Errores por campo: `th:errorclass` en el control y `th:errors` en un párrafo de error (V-9).
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carga manual · Acta</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/utilities.css">
+  <script src="/js/confirmaciones.js" defer></script>
+  <script src="/js/login.js" defer></script>
+</head>
+<body class="atp-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <header class="atp-cabecera">
+    <div class="atp-cabecera__foto">
+      <img src="/img/referencia-institucional.png"
+           alt="Control caminero" width="1434" height="905">
+    </div>
+    <img class="atp-cabecera__curva" src="/img/curva-decorativa.svg" alt="" width="84" height="96">
+    <h1 class="atp-cabecera__titulo">Gestión de Puestos Camineros</h1>
+    <div class="atp-cabecera__logo-personal">
+      <img src="/img/referencia-institucional.png"
+           alt="Personal caminero" width="1434" height="905">
+    </div>
+  </header>
+
+  <div class="atp-sesion">
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Usuario</span>
+      <span class="atp-sesion__dato-valor">Sebastian Montiel</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Puesto</span>
+      <span class="atp-sesion__dato-valor">LA VICUÑA</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Turno</span>
+      <span class="atp-sesion__dato-valor">20</span>
+    </div>
+    <div class="atp-sesion__dato">
+      <span class="atp-sesion__dato-rotulo">Comision</span>
+      <span class="atp-sesion__dato-valor">13</span>
+    </div>
+    <form class="atp-sesion__salir-form" action="/logout" method="post"><input type="hidden" name="_csrf" value="k51dJQ-du62_1x63MGIFYmfXSZMOngCpRxkZJBX5-bUWEdup8qk4ETb735SS4C2FCE8xB1_nZPFq_zOEdHp4ECHKyYMiKLmZ"/>
+      <button class="atp-sesion__salir" type="submit">Salir</button>
+    </form>
+  </div>
+
+  <div class="atp-nav-principal">
+    <nav class="atp-menu">
+    <ul class="atp-menu__lista">
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="/cargas">
+        <span class="atp-menu__nombre">Control de Cargas</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="#">
+        <span class="atp-menu__nombre">Formularios ACTAS</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="#">
+        <span class="atp-menu__nombre">Carga Manual</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="/turnos">
+        <span class="atp-menu__nombre">Turnos</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+        
+    <li class="atp-menu__item">
+      <a class="atp-menu__enlace" href="#">
+        <span class="atp-menu__nombre">Comisiones</span>
+        <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->
+      </a>
+      
+    </li>
+  
+      
+    </ul>
+    
+  </nav>
+  </div>
+
+  <main id="contenido" class="atp-pagina atp-actas__page">
+
+    <h1 class="atp-pagina__titulo">Carga manual · Acta</h1>
+
+    <!-- Bloqueo por lote/turno: el formulario NO se renderiza, sólo el motivo (V-17). -->
+    
+
+    <!-- Error de negocio: banner por encima del formulario (V-14). -->
+    
+
+    <form class="atp-form atp-actas__form" method="post" action="/actas/guardar"><input type="hidden" name="_csrf" value="k51dJQ-du62_1x63MGIFYmfXSZMOngCpRxkZJBX5-bUWEdup8qk4ETb735SS4C2FCE8xB1_nZPFq_zOEdHp4ECHKyYMiKLmZ"/>
+
+      <!-- ============================================== Fieldset 1 · Datos del Acta -->
+      <fieldset class="atp-actas__fieldset">
+        <legend class="atp-actas__legend">Datos del Acta</legend>
+
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="f276ActaTi">Motivo de Acta</label>
+          <select class="atp-field__control" id="f276ActaTi"
+                  name="f276ActaTi">
+            <option value="N" selected="selected">Seleccionar...</option>
+            <option value="F">Falta Documentación de Fletes</option>
+            <option value="P">Falta Documentación de Prod. Prim.</option>
+            <option value="T">Sin Documentación</option>
+          </select>
+          
+        </div>
+
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="f276Clasif">Tipo Movimiento</label>
+          <select class="atp-field__control" id="f276Clasif"
+                  name="f276Clasif">
+            <option value="N" selected="selected">Seleccionar...</option>
+            <option value="S">Salida</option>
+            <option value="E">Entrada</option>
+          </select>
+          
+        </div>
+
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="f276FchMov">Fecha Acta</label>
+          <!-- La fecha la precarga el servidor y no se edita en el alta (V-10). -->
+          <input class="atp-field__control" id="f276FchMov" type="date" readonly
+                 name="f276FchMov" value="2026-11-04">
+          
+        </div>
+      </fieldset>
+
+      <!-- ============================== Fieldsets 2..4 · Vendedor / Destinatario / Transportista -->
+      <div class="atp-actas__partes">
+
+        <fieldset class="atp-actas__fieldset atp-actas__fieldset--parte">
+          <legend class="atp-actas__legend">Vendedor</legend>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276CuitVe">CUIT</label>
+            <input class="atp-field__control atp-field__control--error" id="f276CuitVe" type="number" min="0" step="1"
+                   aria-describedby="error-f276CuitVe" name="f276CuitVe" value="">
+            <p class="atp-field__error" id="error-f276CuitVe" role="alert">Debe ingresar CUIT del Vendedor</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenRS">Razón Social</label>
+            <input class="atp-field__control" id="f276VenRS" type="text" maxlength="35"
+                   name="f276VenRS" value="">
+            
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenDom">Domicilio</label>
+            <input class="atp-field__control" id="f276VenDom" type="text" maxlength="50"
+                   name="f276VenDom" value="">
+            
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenLoc">Localidad</label>
+            <input class="atp-field__control" id="f276VenLoc" type="text" readonly
+                   name="f276VenLoc" value="">
+            <input type="hidden" id="f276VenCLo" name="f276VenCLo" value="">
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenProv">Provincia</label>
+            <input class="atp-field__control" id="f276VenProv" type="text" readonly
+                   name="f276VenProv" value="">
+          </div>
+        </fieldset>
+
+        <fieldset class="atp-actas__fieldset atp-actas__fieldset--parte">
+          <legend class="atp-actas__legend">Destinatario</legend>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276CuitDe">CUIT</label>
+            <input class="atp-field__control atp-field__control--error" id="f276CuitDe" type="number" min="0" step="1"
+                   aria-describedby="error-f276CuitDe" name="f276CuitDe" value="">
+            <p class="atp-field__error" id="error-f276CuitDe" role="alert">Debe ingresar CUIT del Destinatario</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestRS">Razón Social</label>
+            <input class="atp-field__control" id="f276DestRS" type="text" maxlength="35"
+                   name="f276DestRS" value="">
+            
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestDo">Domicilio</label>
+            <input class="atp-field__control" id="f276DestDo" type="text" maxlength="50"
+                   name="f276DestDo" value="">
+            
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestLoc">Localidad</label>
+            <input class="atp-field__control" id="f276DestLoc" type="text" readonly
+                   name="f276DestLoc" value="">
+            <input type="hidden" id="f276DestCL" name="f276DestCL" value="">
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestProv">Provincia</label>
+            <input class="atp-field__control" id="f276DestProv" type="text" readonly
+                   name="f276DestProv" value="">
+          </div>
+        </fieldset>
+
+        <fieldset class="atp-actas__fieldset atp-actas__fieldset--parte">
+          <legend class="atp-actas__legend">Transportista</legend>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276CuitTr">CUIT</label>
+            <input class="atp-field__control atp-field__control--error" id="f276CuitTr" type="number" min="0" step="1"
+                   aria-describedby="error-f276CuitTr" name="f276CuitTr" value="">
+            <p class="atp-field__error" id="error-f276CuitTr" role="alert">Debe ingresar CUIT del Transportista</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranRS">Razón Social</label>
+            <input class="atp-field__control" id="f276TranRS" type="text" maxlength="35"
+                   name="f276TranRS" value="">
+            
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranDo">Domicilio</label>
+            <input class="atp-field__control" id="f276TranDo" type="text" maxlength="50"
+                   name="f276TranDo" value="">
+            
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranLoc">Localidad</label>
+            <input class="atp-field__control" id="f276TranLoc" type="text" readonly
+                   name="f276TranLoc" value="">
+            <input type="hidden" id="f276TranCL" name="f276TranCL" value="">
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranProv">Provincia</label>
+            <input class="atp-field__control" id="f276TranProv" type="text" readonly
+                   name="f276TranProv" value="">
+          </div>
+        </fieldset>
+
+      </div>
+
+      <!-- ============================================ Fieldset 5 · Datos del Transporte -->
+      <fieldset class="atp-actas__fieldset">
+        <legend class="atp-actas__legend">Datos del Transporte</legend>
+
+        <div class="atp-actas__transporte">
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276Chasis">Patente Chasis</label>
+            <input class="atp-field__control atp-field__control--error" id="f276Chasis" type="text" maxlength="10"
+                   aria-describedby="error-f276Chasis" name="f276Chasis" value="">
+            <p class="atp-field__error" id="error-f276Chasis" role="alert">Ingrese todos los datos del Transporte</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276Acopla">Patente Acoplado</label>
+            <input class="atp-field__control atp-field__control--error" id="f276Acopla" type="text" maxlength="10"
+                   aria-describedby="error-f276Acopla" name="f276Acopla" value="">
+            <p class="atp-field__error" id="error-f276Acopla" role="alert">Ingrese todos los datos del Transporte</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TCpbte">T. de Comp.</label>
+            <select class="atp-field__control atp-field__control--error" id="f276TCpbte"
+                    aria-describedby="error-f276TCpbte" name="f276TCpbte">
+              <option value="">Seleccionar...</option>
+              <option value="1">Carta Porte</option>
+              <option value="2">Factura</option>
+              <option value="3">Remito</option>
+              <option value="5">DT-e</option>
+              <option value="6">DT-v</option>
+              <option value="7">Guia Forestal</option>
+            </select>
+            <p class="atp-field__error" id="error-f276TCpbte" role="alert">Debe seleccionar un tipo de comprobante</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276NCpbte">N° Comp.</label>
+            <input class="atp-field__control atp-field__control--error" id="f276NCpbte" type="text" maxlength="15"
+                   aria-describedby="error-f276NCpbte" name="f276NCpbte" value="">
+            <p class="atp-field__error" id="error-f276NCpbte" role="alert">Debe ingresar un nro. de comprobante</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276KmFle">Flete (Km)</label>
+            <input class="atp-field__control atp-field__control--error" id="f276KmFle" type="number" min="0" step="0.0001"
+                   aria-describedby="error-f276KmFle" name="f276KmFle" value="">
+            <p class="atp-field__error" id="error-f276KmFle" role="alert">Ingrese todos los datos del Transporte</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- =================================================== Fieldset 6 · Productos -->
+      <fieldset class="atp-actas__fieldset">
+        <legend class="atp-actas__legend">Productos</legend>
+        <div>
+
+  <div class="atp-grilla-scroll">
+    <table class="atp-table atp-actas__tabla" id="acta-productos">
+      <caption class="atp-table__caption">Detalle de productos</caption>
+      <thead>
+        <tr>
+          <th scope="col">Código</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Tn.</th>
+          <th scope="col"><span class="atp-oculto">Acciones de la fila</span></th>
+        </tr>
+      </thead>
+      <tbody id="acta-productos-body">
+        
+      </tbody>
+    </table>
+  </div>
+
+  <p class="atp-field__error" role="alert">Debe ingresar el detalle de los productos</p>
+
+  <div class="atp-botonera">
+    <button type="button" class="atp-actas__agregar" id="acta-agregar-producto"
+            aria-label="Agregar producto">+</button>
+  </div>
+
+  <!-- Fila-plantilla: el JS clona este contenido y sustituye __INDEX__ por el índice de la nueva
+       fila (0-based, para name/id) y __FILA__ por el número de fila (1-based, para el label). -->
+  <template id="acta-producto-plantilla">
+    <tr data-acta-producto="true">
+      <td>
+        <label class="atp-oculto" for="productos___INDEX___prodCod" data-rotulo="Código">Código fila __FILA__</label>
+        <select class="atp-field__control" data-producto="true"
+                name="productos[__INDEX__].prodCod" id="productos___INDEX___prodCod">
+          <option value="">Seleccionar...</option>
+          <option value="6"
+                  data-tipcal="1" data-descripcion="Achicoria">Achicoria (6)</option>
+          <option value="425"
+                  data-tipcal="1" data-descripcion="Agroquimicos Camion">Agroquimicos Camion (425)</option>
+          <option value="426"
+                  data-tipcal="1" data-descripcion="Agroquimicos Camioneta">Agroquimicos Camioneta (426)</option>
+          <option value="7"
+                  data-tipcal="1" data-descripcion="Ajo">Ajo (7)</option>
+          <option value="413"
+                  data-tipcal="1" data-descripcion="Ala de pollo">Ala de pollo (413)</option>
+          <option value="414"
+                  data-tipcal="1" data-descripcion="Ala de Pollo x 20kg">Ala de Pollo x 20kg (414)</option>
+          <option value="8"
+                  data-tipcal="1" data-descripcion="Albahaca">Albahaca (8)</option>
+          <option value="41"
+                  data-tipcal="1" data-descripcion="Alfalfa">Alfalfa (41)</option>
+          <option value="1"
+                  data-tipcal="1" data-descripcion="Algodón">Algodón (1)</option>
+          <option value="347"
+                  data-tipcal="1" data-descripcion="APIO">APIO (347)</option>
+          <option value="365"
+                  data-tipcal="1" data-descripcion="Arena">Arena (365)</option>
+          <option value="388"
+                  data-tipcal="1" data-descripcion="Arrollado Carne">Arrollado Carne (388)</option>
+          <option value="12"
+                  data-tipcal="1" data-descripcion="Arroz">Arroz (12)</option>
+          <option value="49"
+                  data-tipcal="1" data-descripcion="Avena">Avena (49)</option>
+          <option value="10"
+                  data-tipcal="1" data-descripcion="Banana">Banana (10)</option>
+          <option value="9"
+                  data-tipcal="1" data-descripcion="Batata">Batata (9)</option>
+          <option value="422"
+                  data-tipcal="1" data-descripcion="Bebidas Alcoholicas">Bebidas Alcoholicas (422)</option>
+          <option value="421"
+                  data-tipcal="1" data-descripcion="Bebidas gaseosas">Bebidas gaseosas (421)</option>
+          <option value="383"
+                  data-tipcal="1" data-descripcion="Bondiola">Bondiola (383)</option>
+          <option value="445"
+                  data-tipcal="1" data-descripcion="Bueyes - Bovinos">Bueyes - Bovinos (445)</option>
+          <option value="454"
+                  data-tipcal="1" data-descripcion="Bueyes - Bubalinos">Bueyes - Bubalinos (454)</option>
+          <option value="2"
+                  data-tipcal="1" data-descripcion="Caña De Azúcar">Caña De Azúcar (2)</option>
+          <option value="301"
+                  data-tipcal="1" data-descripcion="Caprino cabra">Caprino cabra (301)</option>
+          <option value="302"
+                  data-tipcal="1" data-descripcion="Caprino cabrito">Caprino cabrito (302)</option>
+          <option value="336"
+                  data-tipcal="1" data-descripcion="Caprino Capon">Caprino Capon (336)</option>
+          <option value="303"
+                  data-tipcal="1" data-descripcion="Caprino macho">Caprino macho (303)</option>
+          <option value="335"
+                  data-tipcal="1" data-descripcion="Caprinos Chivitos">Caprinos Chivitos (335)</option>
+          <option value="219"
+                  data-tipcal="4" data-descripcion="Carbón">Carbón (219)</option>
+          <option value="407"
+                  data-tipcal="1" data-descripcion="Carne Ovina - Caprina">Carne Ovina - Caprina (407)</option>
+          <option value="370"
+                  data-tipcal="1" data-descripcion="Carne Porcina">Carne Porcina (370)</option>
+          <option value="359"
+                  data-tipcal="1" data-descripcion="Carne Vacuna">Carne Vacuna (359)</option>
+          <option value="44"
+                  data-tipcal="1" data-descripcion="Cartamo">Cartamo (44)</option>
+          <option value="13"
+                  data-tipcal="1" data-descripcion="Cebolla">Cebolla (13)</option>
+          <option value="15"
+                  data-tipcal="1" data-descripcion="Chaucha">Chaucha (15)</option>
+          <option value="419"
+                  data-tipcal="1" data-descripcion="Chía">Chía (419)</option>
+          <option value="16"
+                  data-tipcal="1" data-descripcion="Choclo">Choclo (16)</option>
+          <option value="348"
+                  data-tipcal="1" data-descripcion="Coliflor">Coliflor (348)</option>
+          <option value="45"
+                  data-tipcal="1" data-descripcion="Colza">Colza (45)</option>
+          <option value="14"
+                  data-tipcal="1" data-descripcion="Coreanito">Coreanito (14)</option>
+          <option value="400"
+                  data-tipcal="1" data-descripcion="Crema de Leche">Crema de Leche (400)</option>
+          <option value="337"
+                  data-tipcal="1" data-descripcion="Cuero Caprino">Cuero Caprino (337)</option>
+          <option value="338"
+                  data-tipcal="1" data-descripcion="Cuero Vacuno">Cuero Vacuno (338)</option>
+          <option value="349"
+                  data-tipcal="1" data-descripcion="Durazno">Durazno (349)</option>
+          <option value="346"
+                  data-tipcal="1" data-descripcion="Durmientes">Durmientes (346)</option>
+          <option value="458"
+                  data-tipcal="1" data-descripcion="Equino Asno">Equino Asno (458)</option>
+          <option value="457"
+                  data-tipcal="1" data-descripcion="Equino Burro">Equino Burro (457)</option>
+          <option value="304"
+                  data-tipcal="1" data-descripcion="Equino caballo (monta-tir">Equino caballo (monta-tir (304)</option>
+          <option value="305"
+                  data-tipcal="1" data-descripcion="Equino mular y equino p/">Equino mular y equino p/ (305)</option>
+          <option value="306"
+                  data-tipcal="1" data-descripcion="Equino padrillo">Equino padrillo (306)</option>
+          <option value="307"
+                  data-tipcal="1" data-descripcion="Equino potrillo-potranca">Equino potrillo-potranca (307)</option>
+          <option value="308"
+                  data-tipcal="1" data-descripcion="Equino yegua (tiro-cría)">Equino yegua (tiro-cría) (308)</option>
+          <option value="386"
+                  data-tipcal="1" data-descripcion="Fiambre Cocido">Fiambre Cocido (386)</option>
+          <option value="371"
+                  data-tipcal="1" data-descripcion="Fibra de Algodón">Fibra de Algodón (371)</option>
+          <option value="410"
+                  data-tipcal="1" data-descripcion="Gallina">Gallina (410)</option>
+          <option value="367"
+                  data-tipcal="1" data-descripcion="Garbanzo">Garbanzo (367)</option>
+          <option value="34"
+                  data-tipcal="1" data-descripcion="Girasol">Girasol (34)</option>
+          <option value="420"
+                  data-tipcal="1" data-descripcion="Harina">Harina (420)</option>
+          <option value="382"
+                  data-tipcal="1" data-descripcion="Jamóm Crudo">Jamóm Crudo (382)</option>
+          <option value="381"
+                  data-tipcal="1" data-descripcion="Jamón Cocido">Jamón Cocido (381)</option>
+          <option value="399"
+                  data-tipcal="1" data-descripcion="Leche en polvo">Leche en polvo (399)</option>
+          <option value="398"
+                  data-tipcal="1" data-descripcion="Leche líquida x 1 litro">Leche líquida x 1 litro (398)</option>
+          <option value="17"
+                  data-tipcal="1" data-descripcion="Lechuga">Lechuga (17)</option>
+          <option value="215"
+                  data-tipcal="1" data-descripcion="Leña campana muerta">Leña campana muerta (215)</option>
+          <option value="216"
+                  data-tipcal="1" data-descripcion="Leña vegetal mezcla">Leña vegetal mezcla (216)</option>
+          <option value="18"
+                  data-tipcal="1" data-descripcion="Limón">Limón (18)</option>
+          <option value="40"
+                  data-tipcal="1" data-descripcion="Lino">Lino (40)</option>
+          <option value="363"
+                  data-tipcal="2" data-descripcion="Madera industrializada">Madera industrializada (363)</option>
+          <option value="39"
+                  data-tipcal="1" data-descripcion="Maiz">Maiz (39)</option>
+          <option value="19"
+                  data-tipcal="1" data-descripcion="Mandarina">Mandarina (19)</option>
+          <option value="20"
+                  data-tipcal="1" data-descripcion="Mandioca">Mandioca (20)</option>
+          <option value="21"
+                  data-tipcal="1" data-descripcion="Manzana">Manzana (21)</option>
+          <option value="22"
+                  data-tipcal="1" data-descripcion="Melón">Melón (22)</option>
+          <option value="408"
+                  data-tipcal="1" data-descripcion="Menudencias">Menudencias (408)</option>
+          <option value="48"
+                  data-tipcal="1" data-descripcion="Miel">Miel (48)</option>
+          <option value="476"
+                  data-tipcal="1" data-descripcion="Miel elaborada">Miel elaborada (476)</option>
+          <option value="385"
+                  data-tipcal="1" data-descripcion="Morcillón">Morcillón (385)</option>
+          <option value="387"
+                  data-tipcal="1" data-descripcion="Mortadela">Mortadela (387)</option>
+          <option value="412"
+                  data-tipcal="1" data-descripcion="Muslo de Pollo">Muslo de Pollo (412)</option>
+          <option value="24"
+                  data-tipcal="1" data-descripcion="Naranja">Naranja (24)</option>
+          <option value="441"
+                  data-tipcal="1" data-descripcion="Novillito - Bovinos">Novillito - Bovinos (441)</option>
+          <option value="450"
+                  data-tipcal="1" data-descripcion="Novillito - Bubalinos">Novillito - Bubalinos (450)</option>
+          <option value="440"
+                  data-tipcal="1" data-descripcion="Novillo - Bovinos">Novillo - Bovinos (440)</option>
+          <option value="449"
+                  data-tipcal="1" data-descripcion="Novillo - Bubalinos">Novillo - Bubalinos (449)</option>
+          <option value="459"
+                  data-tipcal="1" data-descripcion="Ovino Borrego/a">Ovino Borrego/a (459)</option>
+          <option value="460"
+                  data-tipcal="1" data-descripcion="Ovino Capón">Ovino Capón (460)</option>
+          <option value="312"
+                  data-tipcal="1" data-descripcion="Ovino carnero">Ovino carnero (312)</option>
+          <option value="313"
+                  data-tipcal="1" data-descripcion="Ovino cordero">Ovino cordero (313)</option>
+          <option value="314"
+                  data-tipcal="1" data-descripcion="Ovino oveja">Ovino oveja (314)</option>
+          <option value="362"
+                  data-tipcal="1" data-descripcion="Palet">Palet (362)</option>
+          <option value="384"
+                  data-tipcal="1" data-descripcion="Paleta Cocida">Paleta Cocida (384)</option>
+          <option value="26"
+                  data-tipcal="1" data-descripcion="Papa Blanca">Papa Blanca (26)</option>
+          <option value="25"
+                  data-tipcal="1" data-descripcion="Papa negra">Papa negra (25)</option>
+          <option value="27"
+                  data-tipcal="1" data-descripcion="Pepino">Pepino (27)</option>
+          <option value="350"
+                  data-tipcal="1" data-descripcion="Pera">Pera (350)</option>
+          <option value="28"
+                  data-tipcal="1" data-descripcion="Perejil">Perejil (28)</option>
+          <option value="376"
+                  data-tipcal="1" data-descripcion="Pernil">Pernil (376)</option>
+          <option value="467"
+                  data-tipcal="1" data-descripcion="Pescado de Mar">Pescado de Mar (467)</option>
+          <option value="468"
+                  data-tipcal="1" data-descripcion="Pescado de Rio">Pescado de Rio (468)</option>
+          <option value="366"
+                  data-tipcal="1" data-descripcion="Piedra">Piedra (366)</option>
+          <option value="29"
+                  data-tipcal="1" data-descripcion="Pimiento Rojo">Pimiento Rojo (29)</option>
+          <option value="30"
+                  data-tipcal="1" data-descripcion="Pimiento Verde">Pimiento Verde (30)</option>
+          <option value="466"
+                  data-tipcal="1" data-descripcion="Pollo">Pollo (466)</option>
+          <option value="369"
+                  data-tipcal="1" data-descripcion="Pollo fresco">Pollo fresco (369)</option>
+          <option value="46"
+                  data-tipcal="1" data-descripcion="Pomelo">Pomelo (46)</option>
+          <option value="463"
+                  data-tipcal="1" data-descripcion="Porcino Cachorra">Porcino Cachorra (463)</option>
+          <option value="461"
+                  data-tipcal="1" data-descripcion="Porcino Cachorro">Porcino Cachorro (461)</option>
+          <option value="315"
+                  data-tipcal="1" data-descripcion="Porcino capón">Porcino capón (315)</option>
+          <option value="316"
+                  data-tipcal="1" data-descripcion="Porcino chancha">Porcino chancha (316)</option>
+          <option value="317"
+                  data-tipcal="1" data-descripcion="Porcino lechón">Porcino lechón (317)</option>
+          <option value="462"
+                  data-tipcal="1" data-descripcion="Porcino M.E.I.">Porcino M.E.I. (462)</option>
+          <option value="318"
+                  data-tipcal="1" data-descripcion="Porcino padrillo">Porcino padrillo (318)</option>
+          <option value="47"
+                  data-tipcal="1" data-descripcion="Poroto">Poroto (47)</option>
+          <option value="217"
+                  data-tipcal="1" data-descripcion="Poste de cualquier madera">Poste de cualquier madera (217)</option>
+          <option value="401"
+                  data-tipcal="1" data-descripcion="Postres Elaborados">Postres Elaborados (401)</option>
+          <option value="417"
+                  data-tipcal="1" data-descripcion="Prod. Varios Camion">Prod. Varios Camion (417)</option>
+          <option value="416"
+                  data-tipcal="1" data-descripcion="Prod. varios Camioneta">Prod. varios Camioneta (416)</option>
+          <option value="393"
+                  data-tipcal="1" data-descripcion="Queso Barra">Queso Barra (393)</option>
+          <option value="394"
+                  data-tipcal="1" data-descripcion="Queso Cremoso">Queso Cremoso (394)</option>
+          <option value="395"
+                  data-tipcal="1" data-descripcion="Queso Cremoso">Queso Cremoso (395)</option>
+          <option value="390"
+                  data-tipcal="1" data-descripcion="Queso Dambo">Queso Dambo (390)</option>
+          <option value="389"
+                  data-tipcal="1" data-descripcion="Queso de Cerdo">Queso de Cerdo (389)</option>
+          <option value="392"
+                  data-tipcal="1" data-descripcion="Queso Muzzarela">Queso Muzzarela (392)</option>
+          <option value="391"
+                  data-tipcal="1" data-descripcion="Queso Tybo">Queso Tybo (391)</option>
+          <option value="396"
+                  data-tipcal="1" data-descripcion="Queso varios">Queso varios (396)</option>
+          <option value="351"
+                  data-tipcal="1" data-descripcion="Remolacha">Remolacha (351)</option>
+          <option value="352"
+                  data-tipcal="1" data-descripcion="Repollo">Repollo (352)</option>
+          <option value="423"
+                  data-tipcal="1" data-descripcion="Repuestos Var. Camion">Repuestos Var. Camion (423)</option>
+          <option value="424"
+                  data-tipcal="1" data-descripcion="Repuestos Var. Camioneta">Repuestos Var. Camioneta (424)</option>
+          <option value="220"
+                  data-tipcal="1" data-descripcion="Rodrigones">Rodrigones (220)</option>
+          <option value="203"
+                  data-tipcal="1" data-descripcion="Rollizo de algarrobo">Rollizo de algarrobo (203)</option>
+          <option value="214"
+                  data-tipcal="1" data-descripcion="Rollizo de espina corona">Rollizo de espina corona (214)</option>
+          <option value="218"
+                  data-tipcal="1" data-descripcion="Rollizo de Eucaliptus">Rollizo de Eucaliptus (218)</option>
+          <option value="204"
+                  data-tipcal="1" data-descripcion="Rollizo de Francisco Alva">Rollizo de Francisco Alva (204)</option>
+          <option value="212"
+                  data-tipcal="1" data-descripcion="Rollizo de guaraniná">Rollizo de guaraniná (212)</option>
+          <option value="205"
+                  data-tipcal="1" data-descripcion="Rollizo de guayacán">Rollizo de guayacán (205)</option>
+          <option value="206"
+                  data-tipcal="1" data-descripcion="Rollizo de guayaibí">Rollizo de guayaibí (206)</option>
+          <option value="213"
+                  data-tipcal="1" data-descripcion="Rollizo de ibirá-pitá-i">Rollizo de ibirá-pitá-i (213)</option>
+          <option value="207"
+                  data-tipcal="1" data-descripcion="Rollizo de lapacho">Rollizo de lapacho (207)</option>
+          <option value="208"
+                  data-tipcal="1" data-descripcion="Rollizo de laurel negro y">Rollizo de laurel negro y (208)</option>
+          <option value="209"
+                  data-tipcal="1" data-descripcion="Rollizo de palo lanza">Rollizo de palo lanza (209)</option>
+          <option value="202"
+                  data-tipcal="1" data-descripcion="Rollizo de quebracho blan">Rollizo de quebracho blan (202)</option>
+          <option value="201"
+                  data-tipcal="1" data-descripcion="Rollizo de quebracho colo">Rollizo de quebracho colo (201)</option>
+          <option value="200"
+                  data-tipcal="1" data-descripcion="Rollizo de quebracho uso">Rollizo de quebracho uso (200)</option>
+          <option value="210"
+                  data-tipcal="1" data-descripcion="Rollizo de timbó colorado">Rollizo de timbó colorado (210)</option>
+          <option value="211"
+                  data-tipcal="1" data-descripcion="Rollizo de urunday">Rollizo de urunday (211)</option>
+          <option value="31"
+                  data-tipcal="1" data-descripcion="Rúcula">Rúcula (31)</option>
+          <option value="380"
+                  data-tipcal="1" data-descripcion="Salame Milán">Salame Milán (380)</option>
+          <option value="377"
+                  data-tipcal="1" data-descripcion="Salamin">Salamin (377)</option>
+          <option value="378"
+                  data-tipcal="1" data-descripcion="Salchicha">Salchicha (378)</option>
+          <option value="379"
+                  data-tipcal="1" data-descripcion="Salchichón">Salchichón (379)</option>
+          <option value="32"
+                  data-tipcal="1" data-descripcion="Sandía">Sandía (32)</option>
+          <option value="360"
+                  data-tipcal="1" data-descripcion="Semilla de Algodon">Semilla de Algodon (360)</option>
+          <option value="23"
+                  data-tipcal="1" data-descripcion="Soja">Soja (23)</option>
+          <option value="42"
+                  data-tipcal="1" data-descripcion="Sorgo">Sorgo (42)</option>
+          <option value="411"
+                  data-tipcal="1" data-descripcion="Suprema de Pollo">Suprema de Pollo (411)</option>
+          <option value="4"
+                  data-tipcal="1" data-descripcion="Tabaco Criollo Correntino">Tabaco Criollo Correntino (4)</option>
+          <option value="3"
+                  data-tipcal="1" data-descripcion="Tabaco virginia">Tabaco virginia (3)</option>
+          <option value="443"
+                  data-tipcal="1" data-descripcion="Ternera - Bovinos">Ternera - Bovinos (443)</option>
+          <option value="452"
+                  data-tipcal="1" data-descripcion="Ternera - Bubalinos">Ternera - Bubalinos (452)</option>
+          <option value="442"
+                  data-tipcal="1" data-descripcion="Ternero - Bovinos">Ternero - Bovinos (442)</option>
+          <option value="451"
+                  data-tipcal="1" data-descripcion="Ternero - Bubalinos">Ternero - Bubalinos (451)</option>
+          <option value="33"
+                  data-tipcal="1" data-descripcion="Tomate Perita">Tomate Perita (33)</option>
+          <option value="35"
+                  data-tipcal="1" data-descripcion="Tomate Redondo">Tomate Redondo (35)</option>
+          <option value="446"
+                  data-tipcal="1" data-descripcion="Torito/MEJ - Bovinos">Torito/MEJ - Bovinos (446)</option>
+          <option value="455"
+                  data-tipcal="1" data-descripcion="Torito/MEJ - Bubalinos">Torito/MEJ - Bubalinos (455)</option>
+          <option value="444"
+                  data-tipcal="1" data-descripcion="Toro - Bovinos">Toro - Bovinos (444)</option>
+          <option value="453"
+                  data-tipcal="1" data-descripcion="Toro - Bubalinos">Toro - Bubalinos (453)</option>
+          <option value="325"
+                  data-tipcal="1" data-descripcion="Toro Reproductor -Bovinos">Toro Reproductor -Bovinos (325)</option>
+          <option value="456"
+                  data-tipcal="1" data-descripcion="Toro Reproductor-Bubalino">Toro Reproductor-Bubalino (456)</option>
+          <option value="43"
+                  data-tipcal="1" data-descripcion="Trigo">Trigo (43)</option>
+          <option value="353"
+                  data-tipcal="1" data-descripcion="Uva">Uva (353)</option>
+          <option value="438"
+                  data-tipcal="1" data-descripcion="Vaca - Bovinos">Vaca - Bovinos (438)</option>
+          <option value="447"
+                  data-tipcal="1" data-descripcion="Vaca - Bubalinos">Vaca - Bubalinos (447)</option>
+          <option value="439"
+                  data-tipcal="1" data-descripcion="Vaquillona - Bovinos">Vaquillona - Bovinos (439)</option>
+          <option value="448"
+                  data-tipcal="1" data-descripcion="Vaquillona - Bubalinos">Vaquillona - Bubalinos (448)</option>
+          <option value="402"
+                  data-tipcal="1" data-descripcion="Yogurt envase chico">Yogurt envase chico (402)</option>
+          <option value="397"
+                  data-tipcal="1" data-descripcion="Yogurt sachet x 1 litro">Yogurt sachet x 1 litro (397)</option>
+          <option value="38"
+                  data-tipcal="1" data-descripcion="Zanahoria">Zanahoria (38)</option>
+          <option value="37"
+                  data-tipcal="1" data-descripcion="Zapallito">Zapallito (37)</option>
+          <option value="36"
+                  data-tipcal="1" data-descripcion="Zapallo">Zapallo (36)</option>
+          <option value="354"
+                  data-tipcal="1" data-descripcion="Zapallo Tronco">Zapallo Tronco (354)</option>
+        </select>
+      </td>
+      <td>
+        <span class="atp-actas__descripcion" data-descripcion="true">Descripción</span>
+      </td>
+      <td>
+        <label class="atp-oculto" for="productos___INDEX___f276RCant" data-rotulo="Tn.">Tn. fila __FILA__</label>
+        <input class="atp-field__control" type="number" step="0.0001" min="0"
+               data-cantidad="true"
+               name="productos[__INDEX__].f276RCant" id="productos___INDEX___f276RCant">
+      </td>
+      <td>
+        <button type="button" class="atp-actas__quitar js-quitar-producto"
+                data-indice="__INDEX__" aria-label="Eliminar fila __FILA__">−</button>
+      </td>
+    </tr>
+  </template>
+
+</div>
+      </fieldset>
+
+      <!-- ======================================================= Acciones del formulario -->
+      <div class="atp-actas__acciones">
+        <button type="submit" class="atp-btn atp-actas__boton atp-actas__boton--confirmar"
+                data-confirmar-acta="¿Confirma que desea enviar el Formulario de Acta?">Confirmar</button>
+        <a class="atp-btn atp-actas__boton atp-actas__boton--cancelar" href="/actas">Cancelar</a>
+      </div>
+
+    </form>
+
+  </main>
+
+  <footer class="atp-pie">
+    <div class="atp-pie__barra">
+      <span class="atp-pie__segmento atp-pie__segmento--1"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--2"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--3"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--4"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--5"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--6"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--7"></span>
+      <span class="atp-pie__segmento atp-pie__segmento--8"></span>
+    </div>
+    <div class="atp-pie__logos">
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--atp">
+        <img src="/img/referencia-institucional.png" alt="ATP" width="1434" height="905">
+      </div>
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--chaco">
+        <img src="/img/referencia-institucional.png" alt="Gobierno del Chaco" width="1434" height="905">
+      </div>
+      <div class="atp-pie__logo-wrap atp-pie__logo-wrap--ecom">
+        <img src="/img/referencia-institucional.png" alt="ECOM" width="1434" height="905">
+      </div>
+    </div>
+  </footer>
+
+  <link rel="stylesheet" href="/css/actas.css">
+  <script src="/js/actas.js" defer></script>
+</body>
+</html>

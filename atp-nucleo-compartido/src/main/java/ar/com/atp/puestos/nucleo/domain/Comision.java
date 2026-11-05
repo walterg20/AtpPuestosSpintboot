@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.ColumnTransformer;
 
@@ -75,6 +76,34 @@ public class Comision {
     /** Fecha de cierre de la comisión ({@code datetime}). */
     @Column(name = "CPCFchCie")
     private LocalDateTime cpcFchCie;
+
+    /**
+     * Fecha de log de la comisión ({@code datetime}) — columna huérfana {@code CPCFeLog} (no existe
+     * en la KB). Se mapea, <strong>no se escribe</strong> (SA-COM-01). Sólo lectura.
+     */
+    @Column(name = "CPCFeLog")
+    private LocalDateTime cpcFeLog;
+
+    /**
+     * Usuario de log de la comisión ({@code char(10)}) — columna huérfana {@code CPCUsuLog}. Se
+     * mapea, <strong>no se escribe</strong> (SA-COM-01). Sólo lectura.
+     */
+    @Column(name = "CPCUsuLog", length = 10)
+    private String cpcUsuLog;
+
+    /**
+     * Número SN de la comisión ({@code decimal}) — columna huérfana {@code CPCSnNum}. Se mapea,
+     * <strong>no se escribe</strong> (SA-COM-01). Sólo lectura.
+     */
+    @Column(name = "CPCSnNum")
+    private BigDecimal cpcSnNum;
+
+    /**
+     * Fecha de pago de la comisión ({@code datetime}) — columna huérfana {@code CPCFePag}. Se
+     * mapea, <strong>no se escribe</strong> (SA-COM-01). Sólo lectura.
+     */
+    @Column(name = "CPCFePag")
+    private LocalDateTime cpcFePag;
 
     public Comision() {
         // requerido por JPA
@@ -164,5 +193,25 @@ public class Comision {
 
     public void setCpcFchCie(LocalDateTime cpcFchCie) {
         this.cpcFchCie = cpcFchCie;
+    }
+
+    /** Sólo lectura: columna huérfana {@code CPCFeLog} (SA-COM-01). */
+    public LocalDateTime getCpcFeLog() {
+        return cpcFeLog;
+    }
+
+    /** Sólo lectura: columna huérfana {@code CPCUsuLog} (SA-COM-01). */
+    public String getCpcUsuLog() {
+        return cpcUsuLog;
+    }
+
+    /** Sólo lectura: columna huérfana {@code CPCSnNum} (SA-COM-01). */
+    public BigDecimal getCpcSnNum() {
+        return cpcSnNum;
+    }
+
+    /** Sólo lectura: columna huérfana {@code CPCFePag} (SA-COM-01). */
+    public LocalDateTime getCpcFePag() {
+        return cpcFePag;
     }
 }

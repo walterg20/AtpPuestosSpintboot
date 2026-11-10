@@ -23,7 +23,7 @@ jobs:
           cache: maven
 
       - name: Build & Unit Tests
-        run: ./mvnw -B clean test
+        run: chmod +x mvnw && ./mvnw -B clean test
 
       # IT contra BD real (gated): descomentar y cargar secrets en GitHub para habilitar.
       # - name: Integration Tests

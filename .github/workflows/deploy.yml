@@ -23,7 +23,7 @@ jobs:
           cache: maven
 
       - name: Build artifact
-        run: ./mvnw -B -pl atp-puestos-camineros -am package -DskipTests
+        run: chmod +x mvnw && ./mvnw -B -pl atp-puestos-camineros -am package -DskipTests
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

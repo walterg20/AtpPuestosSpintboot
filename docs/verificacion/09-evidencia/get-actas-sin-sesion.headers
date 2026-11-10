@@ -1,0 +1,12 @@
+HTTP/1.1 302 
+Set-Cookie: JSESSIONID=BC9CB7C67C7B5E8BD8BDC71DE01F0C5E; Path=/; HttpOnly; SameSite=Lax
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Location: http://localhost:8080/login
+Content-Length: 0
+Date: Wed, 04 Nov 2026 11:37:35 GMT
+

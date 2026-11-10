@@ -18,7 +18,7 @@
   <th:block th:fragment="menuItem(mitem, actual)">
     <li class="atp-menu__item" th:with="activo=${actual != null and mitem.link() != null and mitem.link() == actual}"
       th:classappend="${activo} ? 'atp-menu__item--activo' : ''">
-      <a class="atp-menu__enlace" th:href="${mitem.link() != null ? mitem.link() : '#'}"
+      <a class="atp-menu__enlace" th:href="${mitem.title() == 'Carga Manual' ? '/actas/carga-manual' : (mitem.link() != null ? mitem.link() : '#')}"
         th:target="${mitem.linkTarget()}" th:attr="aria-current=(${activo} ? 'page' : null)">
         <span class="atp-menu__nombre" th:text="${mitem.title()}">Programa</span>
         <!--<span class="atp-menu__descripcion" th:text="${mitem.description()}">Descripcion</span>-->

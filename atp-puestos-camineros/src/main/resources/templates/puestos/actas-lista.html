@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!--
+  Pantalla de listado de Actas (Formulario 2276) — módulo 09 "Formularios Acta".
+
+  - Extiende `layout/base-stitch` (cabecera, barra de sesión, navegación y pie): no se duplican.
+  - Grilla con las columnas visibles del legacy `Grid276`, en su orden.
+  - Filtros de búsqueda (R-ACTA-011) y paginación que los preserva (R-ACTA-012).
+  - Banner de turno inactivo cuando el turno de la sesión no es mayor que cero (R-ACTA-002).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head('Actas')}">
+  <title>Actas</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+
+    <div class="atp-actas__cabecera">
+      <h1 class="atp-pagina__titulo">Actas</h1>
+      <a class="atp-btn atp-btn--primary atp-actas__crear"
+         th:classappend="${turnoActivo} ? '' : 'atp-actas__crear--inactivo'"
+         th:href="${turnoActivo} ? @{/actas/nueva} : null"
+         th:attr="aria-disabled=${turnoActivo} ? null : 'true'">Crear Acta</a>
+    </div>
+
+    <!-- Mensaje de éxito tras el alta (flash `mensajeExito`, verbatim del legacy). -->
+    <div class="atp-alert atp-alert--success" role="status" aria-live="polite"
+         th:if="${mensaje != null and !#strings.isEmpty(mensaje)}">
+      <p class="atp-alert__texto" th:text="${mensaje}">El acta se ha creado correctamente</p>
+    </div>
+
+    <!-- Sin turno: no se puede crear un Acta (R-ACTA-002). -->
+    <div class="atp-alert atp-alert--warn" role="status" aria-live="polite"
+         th:if="${!turnoActivo}">
+      <p class="atp-alert__texto">Debe iniciar un turno...</p>
+    </div>
+
+    <!-- Filtros de búsqueda (R-ACTA-011). -->
+    <form class="atp-form atp-actas__filtros" method="get" th:action="@{/actas}"
+          th:object="${filtroActas}">
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="f276Id">Acto Nro.</label>
+        <input class="atp-field__control" id="f276Id" type="number" min="0" step="1"
+               th:field="*{f276Id}">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="cuit">CUIT</label>
+        <input class="atp-field__control" id="cuit" type="number" min="0" step="1"
+               th:field="*{cuit}">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="razonSocial">Razón Social</label>
+        <input class="atp-field__control" id="razonSocial" type="text" maxlength="35"
+               th:field="*{razonSocial}">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="desde">Desde</label>
+        <input class="atp-field__control" id="desde" type="date" th:field="*{desde}">
+      </div>
+      <div class="atp-field">
+        <label class="atp-field__etiqueta" for="hasta">Hasta</label>
+        <input class="atp-field__control" id="hasta" type="date" th:field="*{hasta}">
+      </div>
+      <button type="submit" class="atp-btn">Buscar</button>
+    </form>
+
+    <!-- Grilla (R-ACTA-005): estado vacío cuando no hay Actas (R-ACTA-013). -->
+    <div class="atp-grilla-scroll" th:if="${not #lists.isEmpty(actas.content)}">
+      <table class="atp-table atp-actas__tabla">
+        <caption class="atp-table__caption">Actas del turno</caption>
+        <thead>
+          <tr>
+            <th scope="col">Acto Nro.</th>
+            <th scope="col">CUIT</th>
+            <th scope="col">Razón Social</th>
+            <th scope="col">Gen. Manual?</th>
+            <th scope="col">Usuario Gen.</th>
+            <th scope="col">Imprimir</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="a : ${actas.content}">
+            <td class="atp-actas__nro" th:text="${a.f276Id}">0</td>
+            <td class="atp-actas__cuit" th:text="${a.conCuit}">0</td>
+            <td class="atp-actas__razonsoc" th:text="${a.conRazSoc}">Razón social</td>
+            <td class="atp-actas__manual" th:text="${a.genManual}">No</td>
+            <td class="atp-actas__operad" th:text="${a.f276Operad}">USUARIO</td>
+            <td class="atp-actas__imprimir">
+              <!-- La impresión está fuera de alcance (D-ACTA-15): la celda es decorativa. -->
+              <span th:if="${a.imprimible}" title="Imprimir" aria-label="Imprimir">&#128424;</span>
+              <span th:unless="${a.imprimible}" class="atp-actas__no-imprime"
+                    title="No Imprime" aria-label="No Imprime">&#128424;</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="atp-vacio" th:if="${#lists.isEmpty(actas.content)}">Sin actas para mostrar.</p>
+
+    <!-- Paginación (R-ACTA-010, R-ACTA-012): los links preservan los filtros y el orden. -->
+    <nav class="atp-paginacion" aria-label="Paginación de actas" th:if="${actas.totalPages > 1}">
+      <a th:each="p : ${#numbers.sequence(0, actas.totalPages - 1)}"
+         th:href="@{/actas(page=${p},size=${actas.size},sort=${sortActas},f276Id=${filtroActas.f276Id},cuit=${filtroActas.cuit},razonSocial=${filtroActas.razonSocial},desde=${filtroActas.desde},hasta=${filtroActas.hasta})}"
+         th:text="${p + 1}">1</a>
+    </nav>
+
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+
+  <link rel="stylesheet" th:href="@{/css/actas.css}">
+</body>
+</html>

@@ -110,3 +110,9 @@ set ATP_DB_IT=true
 # Ejecutar la app
 ./mvnw -pl atp-puestos-camineros spring-boot:run
 ```
+
+## Diseño Stitch
+
+Refs: openspec/features/99-stitch-design/design.md, tokens.json, screens/*.html, openspec/features/00-alcance/ui-stitch-reference.md.
+
+Implementacion: templates/layout/base-stitch.html (head, cabecera, sesion, navegacion, pie); static/css/stitch-tokens.css (--stitch-*); base.html queda como fallback.

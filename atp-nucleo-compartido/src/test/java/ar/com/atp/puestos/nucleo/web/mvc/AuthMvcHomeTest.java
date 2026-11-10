@@ -62,8 +62,7 @@ class AuthMvcHomeTest {
     void programasPorDefecto() {
         when(servicioAutorizacion.programasPorTipo("PUE")).thenReturn(List.of(
                 new SmoothNavMenuData("2", "Control de Cargas", "Control de Cargas", null, null, List.of()),
-                new SmoothNavMenuData("7", "Comisiones", "Comisiones en Puestos Camineros", null, null, List.of())));
-    }
+                new SmoothNavMenuData("7", "Comisiones", "Comisiones en Puestos Camineros", "/comisiones", null, List.of())));    }
 
     @Test
     @DisplayName("T-204: GET /home devuelve la vista nucleo/home con el view model completo")
@@ -77,56 +76,29 @@ class AuthMvcHomeTest {
     }
 
     @Test
-    @DisplayName("R-LOG-016: los 10 campos del contexto se renderizan con su rótulo y su valor")
-    void losDiezCamposDelContextoSeRenderizan() throws Exception {
+    @DisplayName("Variante A: con sesión el cuerpo queda vacío y se renderiza la navegación")
+    void conSesionElCuerpoQuedaVacioYSeRenderizaLaNavegacion() throws Exception {
         String html = mockMvc.perform(get("/home").session(sesionConContexto()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        assertThat(html).contains("Usuario").contains("YOLOFFG");
-        assertThat(html).contains("UsuarioNombre").contains("Yolanda Officer");
-        assertThat(html).contains("PersonaId").contains("12");
-        assertThat(html).contains("Comision").contains("345");
-        assertThat(html).contains("Turno").contains("7");
-        assertThat(html).contains("Sucursal").contains("10");
-        assertThat(html).contains("SucursalNombre").contains("Puesto Caminero 10");
-        assertThat(html).contains("Tipo").contains("PUE");
-        assertThat(html).contains("Responsable").contains("Responsable Nombre");
+        assertThat(html).contains("stitch-nav").contains("stitch-nav__link");
+        assertThat(html).doesNotContain("Datos del contexto");
+        assertThat(html).doesNotContain("Propósito");
+        assertThat(html).doesNotContain("Programas");
     }
 
     @Test
-    @DisplayName("T-204: el texto de Inicio se renderiza verbatim (incluida la falta de espacio)")
-    void elTextoDeInicioSeRenderizaVerbatim() throws Exception {
-        String html = mockMvc.perform(get("/home").session(sesionConContexto()))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertThat(html).contains(TEXTO_INICIO);
-        assertThat(html).contains("receptorías.Otra funcionalidad");
-    }
-
-    @Test
-    @DisplayName("R-LOG-025: la lista de programas muestra el nombre y la descripción")
-    void laListaDeProgramasMuestraNombreYDescripcion() throws Exception {
-        String html = mockMvc.perform(get("/home").session(sesionConContexto()))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        assertThat(html).contains("Control de Cargas");
-    }
-
-    @Test
-    @DisplayName("T-205: sin programas se muestra 'Sin programas disponibles' y el link Recargar")
-    void sinProgramasSeMuestraElEstadoVacio() throws Exception {
+    @DisplayName("T-205: sin programas el menú se renderiza y el cuerpo no contiene 'Recargar'")
+    void sinProgramasSeRenderizaElMenuYElCuerpoNoContieneRecargar() throws Exception {
         when(servicioAutorizacion.programasPorTipo("PUE")).thenReturn(List.of());
 
         String html = mockMvc.perform(get("/home").session(sesionConContexto()))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        assertThat(html).contains("Sin programas disponibles");
-        assertThat(html).contains("Recargar");
-        assertThat(html).doesNotContain("NoExiste");
+        assertThat(html).contains("stitch-nav").contains("stitch-nav__link");
+        assertThat(html).doesNotContain("Recargar");
     }
 
     /** Sesión con el contexto persistido, como la deja el login (clave {@code "context"}). */

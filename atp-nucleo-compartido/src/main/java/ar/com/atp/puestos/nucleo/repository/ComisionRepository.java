@@ -5,6 +5,8 @@ import ar.com.atp.puestos.nucleo.domain.ComisionId;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -123,4 +125,33 @@ public interface ComisionRepository extends JpaRepository<Comision, ComisionId> 
     @Query("select trim(c.cpcEstado) from Comision c "
             + "where c.id.pueCod = :pueCod and c.id.cpcId = :cpcId")
     Optional<String> estadoComision(@Param("pueCod") Integer pueCod, @Param("cpcId") Integer cpcId);
+
+    /**
+     * Listado de comisiones con el nombre del responsable (JOIN a {@code PERSONAS}) para el módulo
+     * {@code 13-comisiones} (R-COM-001..008).
+     *
+     * <p>Filtro legacy: {@code PueCod = :pueCod} (cuando no null) y {@code CPCResId = :cpcResId}
+     * (cuando no null). Orden {@code CPCId desc}.
+     */
+    @Query("select c, p from Comision c left join Persona p on p.perId = c.cpcResId "
+            + "where (:pueCod is null or c.id.pueCod = :pueCod) "
+            + "and (:cpcResId is null or c.cpcResId = :cpcResId)")
+    Page<Object[]> findComisionesConResponsable(@Param("pueCod") Integer pueCod,
+            @Param("cpcResId") Integer cpcResId, Pageable pageable);
+
+    /**
+     * Listado paginado de comisiones con filtro legacy (R-COM-001..008), sin JOIN a Persona.
+     */
+    @Query("select c from Comision c "
+            + "where (:pueCod is null or c.id.pueCod = :pueCod) "
+            + "and (:cpcResId is null or c.cpcResId = :cpcResId)")
+    Page<Comision> findComisionesFiltradas(@Param("pueCod") Integer pueCod,
+            @Param("cpcResId") Integer cpcResId, Pageable pageable);
+
+    /**
+     * Resuelve la descripción del puesto caminero ({@code PUEPPRIM.PueDesc}) por código
+     * (SA-COM-03: consulta nativa, sin crear entity {@code Puesto}).
+     */
+    @Query(value = "SELECT PueDesc FROM PUEPPRIM WHERE PueCod = :pueCod", nativeQuery = true)
+    Optional<String> findPueDescByPueCod(@Param("pueCod") Integer pueCod);
 }

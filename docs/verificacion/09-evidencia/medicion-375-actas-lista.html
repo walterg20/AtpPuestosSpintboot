@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>body{margin:0;font:12px monospace}
+iframe{border:1px solid red;display:block}</style></head><body>
+<iframe id="f" src="/actas?measure=1" width="375" height="1400"></iframe>
+<pre id="out">MEASURE_START{"innerWidth":375,"scrollWidth":375,"bodyScrollWidth":375,"overflowCount":3,"offenders":["IMG. right=452 w=1434","IMG. right=1437 w=1434","IMG. right=1378 w=1434"],"widest":["IMG. w=1434 scrollW=1434","IMG. w=1434 scrollW=1434","IMG. w=1434 scrollW=1434","IMG. w=1434 scrollW=1434","HTML. w=375 scrollW=375","BODY.atp-body w=375 scrollW=375","HEADER.atp-cabecera w=375 scrollW=375","H1.atp-cabecera__titulo w=375 scrollW=375","DIV.atp-sesion w=375 scrollW=375","DIV.atp-nav-principal w=375 scrollW=375","NAV.atp-menu w=375 scrollW=375","UL.atp-menu__lista w=375 scrollW=375"]}MEASURE_END</pre>
+<script>
+document.getElementById('f').addEventListener('load', function () {
+  setTimeout(function () {
+    var d = document.getElementById('f').contentDocument;
+    var el = d.getElementById('measure-result') || d.getElementById('axe-result');
+    document.getElementById('out').textContent = el ? el.textContent : 'SIN_RESULTADO';
+  }, 2500);
+});
+</script></body></html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!--
+  Detalle de Comisión (módulo 13-comisiones): tabs General e Integrantes.
+  Paridad con `Comisiones_ViewComisiones` (R-COM-009..R-COM-015).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head('Comisión')}">
+  <title>Comisión</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+    <h1 class="atp-pagina__titulo">Comisión</h1>
+
+    <!-- Inexistente. -->
+    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive"
+         th:if="${not existe}">
+      <p class="atp-alert__texto" th:text="${mensajeError}">No se encontraron registros</p>
+    </div>
+
+    <!-- Tabs + contenido (sólo si existe). -->
+    <div th:if="${existe}">
+      <nav class="atp-tabs" aria-label="Tabs de comisión">
+        <a class="atp-tab" th:classappend="${tabActiva == 'General'} ? 'atp-tab--activa' : ''"
+           th:href="@{/comisiones/{pueCod}/{cpcId}(pueCod=${general.pueCod},cpcId=${general.cpcId},tab='General')}">General</a>
+        <a class="atp-tab" th:classappend="${tabActiva == 'Integrantes'} ? 'atp-tab--activa' : ''"
+           th:href="@{/comisiones/{pueCod}/{cpcId}(pueCod=${general.pueCod},cpcId=${general.cpcId},tab='Integrantes')}">Integrantes</a>
+      </nav>
+
+      <!-- Tab General. -->
+      <section class="atp-panel" th:if="${tabActiva == 'General'}" aria-labelledby="titulo-general">
+        <h2 class="atp-panel__titulo" id="titulo-general">General</h2>
+        <dl class="atp-detalle">
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Código del Puesto</dt>
+            <dd class="atp-detalle__valor" th:text="${general.pueCod}">0</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Puesto Caminero</dt>
+            <dd class="atp-detalle__valor" th:text="${general.pueDesc}">Puesto</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Id Comisión</dt>
+            <dd class="atp-detalle__valor" th:text="${general.cpcId}">0</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Fecha Inicio</dt>
+            <dd class="atp-detalle__valor" th:text="${general.fechaInicio}">01/01/25</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Hora Inicio</dt>
+            <dd class="atp-detalle__valor" th:text="${general.horaInicio}">0000</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Fecha Fin</dt>
+            <dd class="atp-detalle__valor" th:text="${general.fechaFin}">01/01/25</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Hora Fin</dt>
+            <dd class="atp-detalle__valor" th:text="${general.horaFin}">0000</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Estado</dt>
+            <dd class="atp-detalle__valor" th:text="${general.estado}">Abierto</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Id. Responsable</dt>
+            <dd class="atp-detalle__valor" th:text="${general.cpcResId}">0</dd>
+          </div>
+          <div class="atp-detalle__fila">
+            <dt class="atp-detalle__rotulo">Responsable</dt>
+            <dd class="atp-detalle__valor" th:text="${general.responsable}">Responsable</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Tab Integrantes. -->
+      <section class="atp-panel" th:if="${tabActiva == 'Integrantes'}" aria-labelledby="titulo-integrantes">
+        <h2 class="atp-panel__titulo" id="titulo-integrantes">Integrantes</h2>
+        <div class="atp-grilla-scroll" th:if="${not #lists.isEmpty(integrantes)}">
+          <table class="atp-table">
+            <caption class="atp-table__caption">Integrantes de la comisión</caption>
+            <thead>
+              <tr>
+                <th scope="col">Personal Afectado</th>
+                <th scope="col">Ap. y Nombre Persona Comis.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="i : ${integrantes}">
+                <td th:text="${i.cpcPerId}">0</td>
+                <td th:text="${i.perNomyApe}">Nombre</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="atp-vacio" th:if="${#lists.isEmpty(integrantes)}">
+          No se encontraron registros.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+</body>
+</html>

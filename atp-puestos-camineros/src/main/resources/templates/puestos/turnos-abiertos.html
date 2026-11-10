@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+  Listado de turnos abiertos para el flujo de "Carga Manual" — módulo 12.
+  Paridad con `TurnosListadoAbiertos` (R-TURNO-002, R-TURNO-005, R-TURNO-006, R-TURNO-015).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head('Turnos abiertos')}">
+  <title>Turnos abiertos</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+
+    <header class="atp-turnos-abiertos__cabecera">
+      <h1 class="atp-pagina__titulo">Seleccione un Turno</h1>
+    </header>
+
+    <div class="atp-grilla-scroll" th:if="${turnos != null and not #lists.isEmpty(turnos.content)}">
+      <table class="atp-table atp-turnos-abiertos__tabla">
+        <thead>
+          <tr>
+            <th scope="col">Turno</th>
+            <th scope="col">Fecha apertura</th>
+            <th scope="col">Seleccionar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="t : ${turnos.content}">
+            <td th:text="${t.id.turNroId}">0</td>
+            <td th:text="${t.turFchApe}">—</td>
+            <td>
+              <a class="atp-btn atp-btn--primary"
+                 th:href="@{/actas/nueva(turNroId=${t.id.turNroId},manual=true)}">Seleccionar</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="atp-vacio" th:if="${turnos == null or #lists.isEmpty(turnos.content)}">Sin turnos abiertos.</p>
+
+    <!-- Paginación (si aplica). -->
+    <nav class="atp-paginacion" aria-label="Paginación de turnos" th:if="${turnos != null and turnos.totalPages > 1}">
+      <a th:each="p : ${#numbers.sequence(0, turnos.totalPages - 1)}"
+         th:href="@{/actas/carga-manual(page=${p},size=${turnos.size})}"
+         th:text="${p + 1}">1</a>
+    </nav>
+
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+
+  <link rel="stylesheet" th:href="@{/css/actas.css}">
+</body>
+</html>

@@ -1,0 +1,126 @@
+/* Clases especificas de Control de Cargas. Solo tokens (custom properties) de tokens.css. */
+#barCode {
+  max-width: 24rem;
+  font-family: var(--atp-font-mono);
+}
+
+.atp-form--inline {
+  display: inline;
+}
+
+.atp-cargas__page {
+  background-color: var(--atp-cargas-page-bg);
+  padding-top: 55px;
+}
+
+.atp-cargas__tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.atp-cargas__tabla thead tr {
+  background-color: var(--atp-button);
+  height: 34px;
+}
+
+.atp-cargas__tabla thead th {
+  color: var(--atp-primary-contrast);
+  font-family: var(--atp-font-serif);
+  font-weight: 700;
+  font-size: 20px;
+  text-align: center;
+  border-radius: 0;
+}
+
+.atp-cargas__tabla thead th:first-child {
+  border-top-left-radius: 7px;
+  text-align: left;
+}
+
+.atp-cargas__tabla thead th:nth-child(2) {
+  text-align: left;
+}
+
+.atp-cargas__tabla thead th:last-child {
+  border-top-right-radius: 7px;
+}
+
+.atp-cargas__tabla tbody td {
+  font-family: var(--atp-font);
+  font-size: 15px;
+  color: var(--atp-cargas-text-secondary);
+  padding: var(--atp-space-2);
+}
+
+.atp-cargas__col--nroguia { width: 110px; }
+.atp-cargas__col--acopiador { width: 319px; }
+.atp-cargas__col--cuit { width: 130px; }
+.atp-cargas__col--fecha { width: 143px; }
+.atp-cargas__col--comprobante { width: 183px; }
+.atp-cargas__col--total { width: 134px; }
+.atp-cargas__col--marcar { width: 75px; }
+
+.atp-cargas__nroguia { text-align: left; }
+.atp-cargas__acopiador { text-align: left; }
+.atp-cargas__cuit { text-align: center; }
+.atp-cargas__fecha { text-align: center; }
+.atp-cargas__comprobante { text-align: center; }
+.atp-cargas__total { text-align: right; }
+.atp-cargas__marcar { text-align: center; }
+
+.atp-cargas__link {
+  color: var(--atp-cargas-text-secondary);
+  text-decoration: underline;
+}
+
+.atp-cargas__marcar img {
+  width: 21px;
+  height: 21px;
+}
+
+.atp-cargas__body-actions {
+  margin-top: var(--atp-space-4);
+  display: flex;
+  gap: var(--atp-space-2);
+}
+
+/* Modal */
+.atp-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.atp-modal__contenido {
+  background-color: var(--atp-surface);
+  padding: var(--atp-space-4);
+  border-radius: var(--atp-radius);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  border: 1px solid var(--atp-cargas-fieldset-border);
+}
+
+.atp-modal__titulo {
+  font-family: var(--atp-font-serif);
+  font-size: var(--atp-text-title);
+  color: var(--atp-text);
+}
+
+.atp-modal__cerrar {
+  margin-top: var(--atp-space-3);
+}
+
+.atp-detalle__cabecera dt {
+  font-weight: 700;
+  color: var(--atp-text);
+}
+
+.atp-detalle__cabecera dd {
+  color: var(--atp-cargas-text-secondary);
+}
+EOF

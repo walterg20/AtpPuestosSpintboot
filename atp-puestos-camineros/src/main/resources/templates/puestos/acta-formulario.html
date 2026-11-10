@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<!--
+  Formulario de alta del Acta (Formulario 2276 · "Carga manual") — módulo 09 "Formularios Acta".
+
+  - Extiende `layout/base-stitch` (cabecera, barra de sesión, navegación y pie): no se duplican.
+  - 6 fieldsets según el Figma `ztMkGHkjqvQL2TOjHP1DSN` nodo `2030:2` (R-ACTA-015…R-ACTA-020).
+  - El nº de Acta NO se renderiza en el alta (V-11) y la fecha viene del servidor en sólo lectura
+    (V-10). Localidad y Provincia son de sólo lectura: las deriva el servidor del CUIT (V-12).
+  - Errores por campo: `th:errorclass` en el control y `th:errors` en un párrafo de error (V-9).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head('Carga manual · Acta')}">
+  <title>Carga manual · Acta</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+
+    <h1 class="atp-pagina__titulo">Carga manual · Acta</h1>
+
+    <!-- Bloqueo por lote/turno: el formulario NO se renderiza, sólo el motivo (V-17). -->
+    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive"
+         th:if="${bloqueado}">
+      <p class="atp-alert__texto" th:text="${mensajeBloqueo}">No se puede generar el Acta</p>
+      <p class="atp-alert__texto">
+        <a class="atp-enlace" th:href="@{/actas}">Volver al listado</a>
+      </p>
+    </div>
+
+    <!-- Error de negocio: banner por encima del formulario (V-14). -->
+    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive"
+         th:if="${mensajeError != null and !#strings.isEmpty(mensajeError)}">
+      <p class="atp-alert__texto" th:text="${mensajeError}">Mensaje</p>
+    </div>
+
+    <form class="atp-form atp-actas__form" method="post" th:action="@{/actas/guardar}"
+          th:object="${actaForm}" th:if="${bloqueado == null or !bloqueado}">
+
+      <!-- ============================================== Fieldset 1 · Datos del Acta -->
+      <fieldset class="atp-actas__fieldset">
+        <legend class="atp-actas__legend">Datos del Acta</legend>
+
+        <!-- Sólo en modo manual (carga manual de turno): número de acta editable. -->
+        <div class="atp-field atp-acta-manual" th:if="${manual}">
+          <label class="atp-field__etiqueta" for="f276Id">Nro. Acta</label>
+          <input id="f276Id" type="number" class="atp-field__control"
+                 th:field="*{f276Id}" th:errorclass="atp-field__control--error"
+                 th:attr="aria-describedby=${#fields.hasErrors('f276Id')} ? 'error-f276Id' : null">
+          <p class="atp-field__error" id="error-f276Id" role="alert"
+             th:if="${#fields.hasErrors('f276Id')}" th:errors="*{f276Id}">Error</p>
+        </div>
+
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="f276ActaTi">Motivo de Acta</label>
+          <select class="atp-field__control" id="f276ActaTi"
+                  th:field="*{f276ActaTi}" th:errorclass="atp-field__control--error"
+                  th:attr="aria-describedby=${#fields.hasErrors('f276ActaTi')} ? 'error-f276ActaTi' : null">
+            <option value="N">Seleccionar...</option>
+            <option value="F">Falta Documentación de Fletes</option>
+            <option value="P">Falta Documentación de Prod. Prim.</option>
+            <option value="T">Sin Documentación</option>
+          </select>
+          <p class="atp-field__error" id="error-f276ActaTi" role="alert"
+             th:if="${#fields.hasErrors('f276ActaTi')}" th:errors="*{f276ActaTi}">Error</p>
+        </div>
+
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="f276Clasif">Tipo Movimiento</label>
+          <select class="atp-field__control" id="f276Clasif"
+                  th:field="*{f276Clasif}" th:errorclass="atp-field__control--error"
+                  th:attr="aria-describedby=${#fields.hasErrors('f276Clasif')} ? 'error-f276Clasif' : null">
+            <option value="N">Seleccionar...</option>
+            <option value="S">Salida</option>
+            <option value="E">Entrada</option>
+          </select>
+          <p class="atp-field__error" id="error-f276Clasif" role="alert"
+             th:if="${#fields.hasErrors('f276Clasif')}" th:errors="*{f276Clasif}">Error</p>
+        </div>
+
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="f276FchMov">Fecha Acta</label>
+          <!-- La fecha la precarga el servidor y no se edita en el alta (V-10). -->
+          <input class="atp-field__control" id="f276FchMov" type="date" readonly
+                 th:field="*{f276FchMov}" th:errorclass="atp-field__control--error"
+                 th:attr="aria-describedby=${#fields.hasErrors('f276FchMov')} ? 'error-f276FchMov' : null">
+          <p class="atp-field__error" id="error-f276FchMov" role="alert"
+             th:if="${#fields.hasErrors('f276FchMov')}" th:errors="*{f276FchMov}">Error</p>
+        </div>
+      </fieldset>
+
+      <!-- ============================== Fieldsets 2..4 · Vendedor / Destinatario / Transportista -->
+      <div class="atp-actas__partes">
+
+        <fieldset class="atp-actas__fieldset atp-actas__fieldset--parte">
+          <legend class="atp-actas__legend">Vendedor</legend>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276CuitVe">CUIT</label>
+            <input class="atp-field__control" id="f276CuitVe" type="number" min="0" step="1"
+                   th:field="*{f276CuitVe}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276CuitVe')} ? 'error-f276CuitVe' : null">
+            <p class="atp-field__error" id="error-f276CuitVe" role="alert"
+               th:if="${#fields.hasErrors('f276CuitVe')}" th:errors="*{f276CuitVe}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenRS">Razón Social</label>
+            <input class="atp-field__control" id="f276VenRS" type="text" maxlength="35"
+                   th:field="*{f276VenRS}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276VenRS')} ? 'error-f276VenRS' : null">
+            <p class="atp-field__error" id="error-f276VenRS" role="alert"
+               th:if="${#fields.hasErrors('f276VenRS')}" th:errors="*{f276VenRS}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenDom">Domicilio</label>
+            <input class="atp-field__control" id="f276VenDom" type="text" maxlength="50"
+                   th:field="*{f276VenDom}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276VenDom')} ? 'error-f276VenDom' : null">
+            <p class="atp-field__error" id="error-f276VenDom" role="alert"
+               th:if="${#fields.hasErrors('f276VenDom')}" th:errors="*{f276VenDom}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenLoc">Localidad</label>
+            <input class="atp-field__control" id="f276VenLoc" type="text" readonly
+                   th:field="*{f276VenLoc}" th:errorclass="atp-field__control--error">
+            <input type="hidden" th:field="*{f276VenCLo}">
+            <button type="button" class="localidad-popup-trigger"
+                    th:classappend="${locCodVenDerivado} ? ' is-disabled' : ' is-enabled'"
+                    th:attr="data-popup-enabled=${!locCodVenDerivado},aria-disabled=${locCodVenDerivado} ? 'true' : 'false',data-target='ven'"
+                    th:disabled="${locCodVenDerivado}">⇧</button>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276VenProv">Provincia</label>
+            <input class="atp-field__control" id="f276VenProv" type="text" readonly
+                   th:field="*{f276VenProv}" th:errorclass="atp-field__control--error">
+          </div>
+        </fieldset>
+
+        <fieldset class="atp-actas__fieldset atp-actas__fieldset--parte">
+          <legend class="atp-actas__legend">Destinatario</legend>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276CuitDe">CUIT</label>
+            <input class="atp-field__control" id="f276CuitDe" type="number" min="0" step="1"
+                   th:field="*{f276CuitDe}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276CuitDe')} ? 'error-f276CuitDe' : null">
+            <p class="atp-field__error" id="error-f276CuitDe" role="alert"
+               th:if="${#fields.hasErrors('f276CuitDe')}" th:errors="*{f276CuitDe}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestRS">Razón Social</label>
+            <input class="atp-field__control" id="f276DestRS" type="text" maxlength="35"
+                   th:field="*{f276DestRS}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276DestRS')} ? 'error-f276DestRS' : null">
+            <p class="atp-field__error" id="error-f276DestRS" role="alert"
+               th:if="${#fields.hasErrors('f276DestRS')}" th:errors="*{f276DestRS}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestDo">Domicilio</label>
+            <input class="atp-field__control" id="f276DestDo" type="text" maxlength="50"
+                   th:field="*{f276DestDo}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276DestDo')} ? 'error-f276DestDo' : null">
+            <p class="atp-field__error" id="error-f276DestDo" role="alert"
+               th:if="${#fields.hasErrors('f276DestDo')}" th:errors="*{f276DestDo}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestLoc">Localidad</label>
+            <input class="atp-field__control" id="f276DestLoc" type="text" readonly
+                   th:field="*{f276DestLoc}" th:errorclass="atp-field__control--error">
+            <input type="hidden" th:field="*{f276DestCL}">
+            <button type="button" class="localidad-popup-trigger"
+                    th:classappend="${locCodDesDerivado} ? ' is-disabled' : ' is-enabled'"
+                    th:attr="data-popup-enabled=${!locCodDesDerivado},aria-disabled=${locCodDesDerivado} ? 'true' : 'false',data-target='des'"
+                    th:disabled="${locCodDesDerivado}">⇧</button>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276DestProv">Provincia</label>
+            <input class="atp-field__control" id="f276DestProv" type="text" readonly
+                   th:field="*{f276DestProv}" th:errorclass="atp-field__control--error">
+          </div>
+        </fieldset>
+
+        <fieldset class="atp-actas__fieldset atp-actas__fieldset--parte">
+          <legend class="atp-actas__legend">Transportista</legend>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276CuitTr">CUIT</label>
+            <input class="atp-field__control" id="f276CuitTr" type="number" min="0" step="1"
+                   th:field="*{f276CuitTr}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276CuitTr')} ? 'error-f276CuitTr' : null">
+            <p class="atp-field__error" id="error-f276CuitTr" role="alert"
+               th:if="${#fields.hasErrors('f276CuitTr')}" th:errors="*{f276CuitTr}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranRS">Razón Social</label>
+            <input class="atp-field__control" id="f276TranRS" type="text" maxlength="35"
+                   th:field="*{f276TranRS}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276TranRS')} ? 'error-f276TranRS' : null">
+            <p class="atp-field__error" id="error-f276TranRS" role="alert"
+               th:if="${#fields.hasErrors('f276TranRS')}" th:errors="*{f276TranRS}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranDo">Domicilio</label>
+            <input class="atp-field__control" id="f276TranDo" type="text" maxlength="50"
+                   th:field="*{f276TranDo}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276TranDo')} ? 'error-f276TranDo' : null">
+            <p class="atp-field__error" id="error-f276TranDo" role="alert"
+               th:if="${#fields.hasErrors('f276TranDo')}" th:errors="*{f276TranDo}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranLoc">Localidad</label>
+            <input class="atp-field__control" id="f276TranLoc" type="text" readonly
+                   th:field="*{f276TranLoc}" th:errorclass="atp-field__control--error">
+            <input type="hidden" th:field="*{f276TranCL}">
+            <button type="button" class="localidad-popup-trigger"
+                    th:classappend="${locCodTranDerivado} ? ' is-disabled' : ' is-enabled'"
+                    th:attr="data-popup-enabled=${!locCodTranDerivado},aria-disabled=${locCodTranDerivado} ? 'true' : 'false',data-target='tran'"
+                    th:disabled="${locCodTranDerivado}">⇧</button>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TranProv">Provincia</label>
+            <input class="atp-field__control" id="f276TranProv" type="text" readonly
+                   th:field="*{f276TranProv}" th:errorclass="atp-field__control--error">
+          </div>
+        </fieldset>
+
+      </div>
+
+      <!-- ============================================ Fieldset 5 · Datos del Transporte -->
+      <fieldset class="atp-actas__fieldset">
+        <legend class="atp-actas__legend">Datos del Transporte</legend>
+
+        <div class="atp-actas__transporte">
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276Chasis">Patente Chasis</label>
+            <input class="atp-field__control" id="f276Chasis" type="text" maxlength="10"
+                   th:field="*{f276Chasis}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276Chasis')} ? 'error-f276Chasis' : null">
+            <p class="atp-field__error" id="error-f276Chasis" role="alert"
+               th:if="${#fields.hasErrors('f276Chasis')}" th:errors="*{f276Chasis}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276Acopla">Patente Acoplado</label>
+            <input class="atp-field__control" id="f276Acopla" type="text" maxlength="10"
+                   th:field="*{f276Acopla}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276Acopla')} ? 'error-f276Acopla' : null">
+            <p class="atp-field__error" id="error-f276Acopla" role="alert"
+               th:if="${#fields.hasErrors('f276Acopla')}" th:errors="*{f276Acopla}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276TCpbte">T. de Comp.</label>
+            <select class="atp-field__control" id="f276TCpbte"
+                    th:field="*{f276TCpbte}" th:errorclass="atp-field__control--error"
+                    th:attr="aria-describedby=${#fields.hasErrors('f276TCpbte')} ? 'error-f276TCpbte' : null">
+              <option value="">Seleccionar...</option>
+              <option value="1">Carta Porte</option>
+              <option value="2">Factura</option>
+              <option value="3">Remito</option>
+              <option value="5">DT-e</option>
+              <option value="6">DT-v</option>
+              <option value="7">Guia Forestal</option>
+            </select>
+            <p class="atp-field__error" id="error-f276TCpbte" role="alert"
+               th:if="${#fields.hasErrors('f276TCpbte')}" th:errors="*{f276TCpbte}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276NCpbte">N° Comp.</label>
+            <input class="atp-field__control" id="f276NCpbte" type="text" maxlength="15"
+                   th:field="*{f276NCpbte}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276NCpbte')} ? 'error-f276NCpbte' : null">
+            <p class="atp-field__error" id="error-f276NCpbte" role="alert"
+               th:if="${#fields.hasErrors('f276NCpbte')}" th:errors="*{f276NCpbte}">Error</p>
+          </div>
+
+          <div class="atp-field">
+            <label class="atp-field__etiqueta" for="f276KmFle">Flete (Km)</label>
+            <input class="atp-field__control" id="f276KmFle" type="number" min="0" step="0.0001"
+                   th:field="*{f276KmFle}" th:errorclass="atp-field__control--error"
+                   th:attr="aria-describedby=${#fields.hasErrors('f276KmFle')} ? 'error-f276KmFle' : null">
+            <p class="atp-field__error" id="error-f276KmFle" role="alert"
+               th:if="${#fields.hasErrors('f276KmFle')}" th:errors="*{f276KmFle}">Error</p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- =================================================== Fieldset 6 · Productos -->
+      <fieldset class="atp-actas__fieldset">
+        <legend class="atp-actas__legend">Productos</legend>
+        <div th:replace="~{puestos/fragments/acta-productos :: grilla}"></div>
+      </fieldset>
+
+      <!-- ======================================================= Acciones del formulario -->
+      <div class="atp-actas__acciones">
+        <button type="submit" class="atp-btn atp-actas__boton atp-actas__boton--confirmar"
+                data-confirmar-acta="¿Confirma que desea enviar el Formulario de Acta?">Confirmar</button>
+        <a class="atp-btn atp-actas__boton atp-actas__boton--cancelar" th:href="@{/actas}">Cancelar</a>
+      </div>
+
+      <!-- Campos ocultos para preservar el modo (manual / turno seleccionado). -->
+      <input type="hidden" th:field="*{manual}">
+      <input type="hidden" th:field="*{turNroId}">
+
+    </form>
+
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+
+  <link rel="stylesheet" th:href="@{/css/actas.css}">
+  <script th:src="@{/js/actas.js}" defer></script>
+  <script th:src="@{/js/puestos/localidades-popup.js}" defer></script>
+</body>
+</html>

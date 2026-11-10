@@ -4,111 +4,70 @@
 
   Lógica de Home (spec 03-login §R-LOG-024, R-UI-005):
     - Si no hay sesión válida: mostrar el Login.
-    - Si hay sesión: ocultar el Login y renderizar Inicio (contexto + texto + programas).
+    - Si hay sesión: el cuerpo (<main>) queda vacío hasta que el usuario elija un
+      programa del menú de navegación (Variante A). El menú se incluye vía
+      layout/base-stitch :: navegacion. El logout está en el fragmento de sesión.
 
-  - Los 10 campos del contexto que carga el login, con el rótulo de cada atributo del SDT
-    `Context` (spec §3.5): Usuario, UsuarioNombre, PersonaId, Comision, Turno, Sucursal,
-    SucursalNombre, Tipo, Responsable y ResponsableNombre.
-  - El texto de bienvenida de `Inicio`, VERBATIM (plan §4.3), incluida la falta de espacio antes
-    de "Otra": lo entrega el controlador en el atributo `textoInicio`.
-  - El menú de programas autorizados (nombre + descripción), en el fragmento reutilizable
-    `nucleo/fragments/menu-programas`.
-  - El formulario de cierre de sesión: es un POST con token CSRF (`th:action`).
+  - El texto de bienvenida de `Inicio` se entrega en el atributo `textoInicio`,
+    pero no se renderiza en el cuerpo (Variante A).
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/base :: head('Inicio')}">
+<head th:replace="~{layout/base-stitch :: head('Inicio')}">
   <title>Inicio</title>
 </head>
-<body class="atp-body">
+<body class="stitch-body">
   <a class="atp-saltar" href="#contenido">Ir al contenido</a>
 
-  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
 
-  <div th:replace="~{layout/base :: sesion}"></div>
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
 
-  <div th:replace="~{layout/base :: navegacion}"></div>
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
 
-  <main id="contenido" class="atp-pagina">
-    <h1 class="atp-pagina__titulo">Inicio</h1>
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
 
-    <!-- Sin sesión: se muestra el formulario de acceso (Login). -->
-    <div class="atp-login" th:if="${#strings.isEmpty(contexto.usuario())}"
-         th:style="|background-image: url(@{/img/login-bg.svg})|">
-      <section class="atp-panel atp-login__panel" aria-labelledby="titulo-formulario">
-        <h2 class="atp-panel__titulo" id="titulo-formulario">Formulario de acceso</h2>
-        <div th:replace="~{nucleo/login :: formulario-acceso}"></div>
-      </section>
+  <!-- Sin sesión: se muestra el formulario de acceso (Login), idéntico a /login. -->
+  <main id="contenido" class="stitch-main stitch-bg-grid" data-purpose="login-wrapper"
+        th:if="${#strings.isEmpty(contexto.usuario())}">
+    <div class="stitch-glow" aria-hidden="true"></div>
+    <div class="stitch-login-container">
+      <div class="stitch-login-card">
+        <div class="stitch-login-header">
+          <div class="stitch-login-header__icon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>
+          </div>
+          <h2 class="stitch-login-header__title">Identificación de Agente</h2>
+          <p class="stitch-login-header__subtitle">Ingrese sus credenciales de servicio para habilitar el puesto</p>
+        </div>
+        <div class="stitch-login-body">
+          <div th:replace="~{nucleo/login :: formulario-acceso}"></div>
+
+          <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--stitch-surface-container);display:flex;align-items:flex-start;gap:10px;color:var(--stitch-on-surface-variant);font-size:11px;line-height:1.5;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--stitch-warning)" aria-hidden="true" style="flex-shrink:0;margin-top:2px;"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <span>Uso restringido para personal autorizado del Cuerpo de Policía Caminera y Fiscalizadores Tributarios de ATP Chaco. Cualquier ingreso no autorizado está penado por Ley.</span>
+          </div>
+
+          <div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:16px;font-size:12px;color:var(--stitch-on-surface-variant);">
+            <a href="#" style="display:inline-flex;align-items:center;gap:6px;color:var(--stitch-on-surface-variant);text-decoration:none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+              Manual de Operaciones
+            </a>
+            <span style="color:var(--stitch-outline-variant);">·</span>
+            <a href="#" style="display:inline-flex;align-items:center;gap:6px;color:var(--stitch-on-surface-variant);text-decoration:none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              Ticket de Soporte ATP
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <!-- Con sesión: se oculta el Login y se renderiza Inicio. -->
-    <div class="atp-paneles atp-paneles--apilado"
-         th:unless="${#strings.isEmpty(contexto.usuario())}">
-
-      <section class="atp-panel" aria-labelledby="titulo-contexto">
-        <h2 class="atp-panel__titulo" id="titulo-contexto">Datos del contexto</h2>
-
-        <dl class="atp-contexto">
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">Usuario</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.usuario()}">Usuario</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">UsuarioNombre</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.usuarioNombre()}">Nombre</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">PersonaId</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.personaId()}">0</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">Comision</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.comision()}">0</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">Turno</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.turno()}">0</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">Sucursal</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.sucursal()}">0</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">SucursalNombre</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.sucursalNombre()}">Sucursal</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">Tipo</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.tipo()}">PUE</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">Responsable</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.responsable()}">0</dd>
-          </div>
-          <div class="atp-contexto__item">
-            <dt class="atp-contexto__rotulo">ResponsableNombre</dt>
-            <dd class="atp-contexto__valor" th:text="${contexto.responsableNombre()}">Responsable</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section class="atp-panel" aria-labelledby="titulo-proposito">
-        <h2 class="atp-panel__titulo" id="titulo-proposito">Propósito</h2>
-        <p class="atp-inicio" th:text="${textoInicio}">Texto de inicio</p>
-      </section>
-
-      <section class="atp-panel" aria-labelledby="titulo-programas">
-        <h2 class="atp-panel__titulo" id="titulo-programas">Programas</h2>
-        <div th:replace="~{nucleo/fragments/menu-programas :: menu-programas}"></div>
-      </section>
-
-    </div>
-
-    <form class="atp-form atp-home__salir" th:if="${not #strings.isEmpty(contexto.usuario())}"
-          th:action="@{/logout}" method="post">
-      <button class="atp-btn atp-btn--ghost" type="submit">Cerrar sesión</button>
-    </form>
   </main>
 
-  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+  <!-- Con sesión: cuerpo vacío (Variante A). -->
+  <main id="contenido" class="stitch-main" th:if="${not #strings.isEmpty(contexto.usuario())}">
+    <h1>Inicio</h1>
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
 </body>
 </html>

@@ -5,6 +5,7 @@ import ar.com.atp.puestos.nucleo.domain.TurnoId;
 import ar.com.atp.puestos.nucleo.repository.TurnoRepositorio;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +37,21 @@ public class ServicioCierreTurno {
     private final TurnoRepositorio turnoRepositorio;
     private final ServicioEstadoDeForm servicioEstadoDeForm;
     private final ServicioGeneradorSn servicioGeneradorSn;
+    private final ObjectProvider<ValidacionCierreTurno> validacionCierreTurnoProvider;
 
     public ServicioCierreTurno(TurnoRepositorio turnoRepositorio,
             ServicioEstadoDeForm servicioEstadoDeForm, ServicioGeneradorSn servicioGeneradorSn) {
+        this(turnoRepositorio, servicioEstadoDeForm, servicioGeneradorSn, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public ServicioCierreTurno(TurnoRepositorio turnoRepositorio,
+            ServicioEstadoDeForm servicioEstadoDeForm, ServicioGeneradorSn servicioGeneradorSn,
+            ObjectProvider<ValidacionCierreTurno> validacionCierreTurnoProvider) {
         this.turnoRepositorio = turnoRepositorio;
         this.servicioEstadoDeForm = servicioEstadoDeForm;
         this.servicioGeneradorSn = servicioGeneradorSn;
+        this.validacionCierreTurnoProvider = validacionCierreTurnoProvider;
     }
 
     /**
@@ -69,6 +79,15 @@ public class ServicioCierreTurno {
                 turno.getTurNroId())) {
             return ResultadoTurno.error(ResultadoTurno.FORMULARIOS_ABIERTOS,
                     MensajesTurno.FORMULARIOS_ABIERTOS);
+        }
+
+        // (2b) El turno tiene Actas pendientes (R-ACTA-043, B2): bloquea el cierre.
+        ValidacionCierreTurno validacion = validacionCierreTurnoProvider == null
+                ? null : validacionCierreTurnoProvider.getIfAvailable();
+        if (validacion != null && validacion.hayActasPendientes(turno.getSucNroId(),
+                turno.getSucTipo(), turno.getTurNroId())) {
+            return ResultadoTurno.error(ResultadoTurno.ACTAS_PENDIENTES,
+                    MensajesTurno.ACTAS_PENDIENTES);
         }
 
         // (3) y (4): escritura del cierre.

@@ -31,6 +31,9 @@ public final class MensajesTurno {
     /** Cierre efectivo (R-TUR-012, paso 4). */
     public static final String TURNO_CERRADO = "El turno seleccionado ha sido cerrado";
 
+    /** Actas pendientes bloquean el cierre (R-ACTA-043, B2) — texto NUEVO, no-legacy. */
+    public static final String ACTAS_PENDIENTES = "Existen Actas pendientes";
+
     /** Confirmación del botón {@code Cerrar Turno} (R-TUR-005). */
     public static final String CONFIRMAR_CIERRE = "¿Confirma que desea cerrar el Turno?";
 

@@ -2,6 +2,11 @@ package ar.com.atp.puestos.nucleo.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import ar.com.atp.puestos.nucleo.domain.Comision;
 import ar.com.atp.puestos.nucleo.domain.ComisionId;
 import ar.com.atp.puestos.nucleo.domain.ComisionIntegrante;
@@ -204,6 +209,22 @@ class ComisionRepositoryIT {
                 .filter(n -> n != null && !n.isBlank())
                 .max(Comparator.naturalOrder())
                 .orElse(null);
+    }
+
+    @Test
+    @DisplayName("13-comisiones: findComisionesConResponsable devuelve 2 para puesto 9 / responsable 91")
+    void findComisionesConResponsableDevuelveDos() {
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id.cpcId").descending());
+        Page<Object[]> pagina = comisionRepository.findComisionesConResponsable(9, 91, pageable);
+        System.out.println("COMISIONES size=" + pagina.getTotalElements());
+        for (Object[] fila : pagina.getContent()) {
+            Comision c = (Comision) fila[0];
+            Persona p = (Persona) fila[1];
+            System.out.println("COMISION id=" + c.getCpcId() + " pueCod=" + c.getPueCod()
+                    + " cpcResId=" + c.getCpcResId() + " responsable="
+                    + (p == null ? null : p.getPerNomyApe()));
+        }
+        assertThat(pagina.getTotalElements()).isEqualTo(2);
     }
 
     private static Integer horaActual() {

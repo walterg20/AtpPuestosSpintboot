@@ -30,6 +30,9 @@ public record ResultadoTurno(boolean exito, Integer numeroTurno, String codigo, 
     /** El turno tiene formularios abiertos (R-TUR-012, paso 2). */
     public static final String FORMULARIOS_ABIERTOS = "FORMULARIOS_ABIERTOS";
 
+    /** El turno tiene Actas pendientes (R-ACTA-043, B2). */
+    public static final String ACTAS_PENDIENTES = "ACTAS_PENDIENTES";
+
     /** El procedimiento de cierre falló (R-TUR-012, paso 3). */
     public static final String ERROR_CIERRE = "ERROR_CIERRE";
 

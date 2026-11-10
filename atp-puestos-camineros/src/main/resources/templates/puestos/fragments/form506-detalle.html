@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <!-- Modal de detalle del formulario (Form506Detalle) -->
+  <div th:fragment="modal" class="atp-modal" id="modalDetalle" role="dialog" aria-modal="true" aria-labelledby="titulo-detalle"
+       th:if="${cargaForm != null and cargaForm.mostrarModal != null and cargaForm.mostrarModal and cargaForm.dppNroForm != null}">
+    <div class="atp-modal__contenido">
+      <h2 id="titulo-detalle" class="atp-modal__titulo">Detalle de guia</h2>
+
+      <!-- Cabecera de la guia -->
+      <dl class="atp-detalle__cabecera">
+        <dt>Nro. formulario</dt>
+        <dd th:text="${cargaForm.dppNroForm}">0000000000</dd>
+        <dt>CUIT</dt>
+        <dd th:text="${cargaForm.conCuit}">0</dd>
+        <dt>Razon social</dt>
+        <dd th:text="${cargaForm.conRazSoc}">Razon social</dd>
+        <dt>Tipo de guia</dt>
+        <dd th:text="${cargaForm.dpptipoGui}">F</dd>
+      </dl>
+
+      <!-- Mensaje de exito (modo UPD). -->
+      <div class="atp-alert atp-alert--success" role="status" aria-live="polite"
+           th:if="${cargaForm.mensaje != null and cargaForm.mensaje == 'La guia ha sido marcada con exito'}">
+        <p class="atp-alert__texto">La guia ha sido marcada con exito</p>
+      </div>
+
+      <!-- Mensaje de guia duplicada (modo UPD, Duplicado > 1). -->
+      <div class="atp-alert atp-alert--warn" role="status" aria-live="polite"
+           th:if="${cargaForm.duplicado != null and cargaForm.duplicado > 1}">
+        <p class="atp-alert__texto">Guia Duplicada , ya paso por algun puesto</p>
+      </div>
+
+      <!-- Tablas condicionales segun DPPTipoGui: 'F' (509) -> ocultas. -->
+      <table id="TblComprador" class="atp-table" th:if="${cargaForm.dpptipoGui != 'F'}">
+        <caption class="atp-table__caption">Comprador</caption>
+        <thead>
+          <tr>
+            <th scope="col">Comprador</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td th:text="${cargaForm.conRazSoc}">Razon social</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table id="TblProd" class="atp-table" th:if="${cargaForm.dpptipoGui != 'F'}">
+        <caption class="atp-table__caption">Productos</caption>
+        <thead>
+          <tr>
+            <th scope="col">Producto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Producto</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="atp-modal__cerrar">
+        <button type="button" class="atp-btn" onclick="cerrarModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+EOF

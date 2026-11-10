@@ -2,26 +2,28 @@
 <!--
   Formulario de alta del Acta (Formulario 2276 · "Carga manual") — módulo 09 "Formularios Acta".
 
-  - Extiende `layout/base` (cabecera, barra de sesión, navegación y pie): no se duplican.
+  - Extiende `layout/base-stitch` (cabecera, barra de sesión, navegación y pie): no se duplican.
   - 6 fieldsets según el Figma `ztMkGHkjqvQL2TOjHP1DSN` nodo `2030:2` (R-ACTA-015…R-ACTA-020).
   - El nº de Acta NO se renderiza en el alta (V-11) y la fecha viene del servidor en sólo lectura
     (V-10). Localidad y Provincia son de sólo lectura: las deriva el servidor del CUIT (V-12).
   - Errores por campo: `th:errorclass` en el control y `th:errors` en un párrafo de error (V-9).
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/base :: head('Carga manual · Acta')}">
+<head th:replace="~{layout/base-stitch :: head('Carga manual · Acta')}">
   <title>Carga manual · Acta</title>
 </head>
-<body class="atp-body">
+<body class="stitch-body">
   <a class="atp-saltar" href="#contenido">Ir al contenido</a>
 
-  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
 
-  <div th:replace="~{layout/base :: sesion}"></div>
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
 
-  <div th:replace="~{layout/base :: navegacion}"></div>
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
 
-  <main id="contenido" class="atp-pagina atp-actas__page">
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
 
     <h1 class="atp-pagina__titulo">Carga manual · Acta</h1>
 
@@ -325,7 +327,7 @@
 
   </main>
 
-  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
 
   <link rel="stylesheet" th:href="@{/css/actas.css}">
   <script th:src="@{/js/actas.js}" defer></script>

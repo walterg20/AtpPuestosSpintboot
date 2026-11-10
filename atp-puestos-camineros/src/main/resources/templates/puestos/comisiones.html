@@ -1,90 +1,213 @@
 <!DOCTYPE html>
 <!--
   Pantalla de Comisiones (módulo 13-comisiones): listado paginado.
-  Paridad con `ComisionesListado` (R-COM-004..R-COM-008).
+  Diseño moderno Stitch. Paridad con `ComisionesListado` (R-COM-004..R-COM-008).
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/base :: head('Comisiones')}">
+<head th:replace="~{layout/base-stitch :: head('Comisiones')}">
   <title>Comisiones</title>
 </head>
-<body class="atp-body">
+<body class="stitch-body">
   <a class="atp-saltar" href="#contenido">Ir al contenido</a>
 
-  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
 
-  <div th:replace="~{layout/base :: sesion}"></div>
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
 
-  <div th:replace="~{layout/base :: navegacion}"></div>
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
 
-  <main id="contenido" class="atp-pagina atp-comisiones__page">
-    <h1 class="atp-pagina__titulo">Comisiones</h1>
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
 
-    <!-- Mensaje de error de carga. -->
-    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive"
-         th:if="${mensajeError}">
-      <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+    <div class="stitch-page">
+
+      <!-- Mensaje de error de carga. -->
+      <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive"
+           th:if="${mensajeError}">
+        <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
+      </div>
+
+      <!-- Breadcrumb / header -->
+      <!--<div class="stitch-page-header">
+        <nav aria-label="Migas de pan" class="stitch-breadcrumb">
+          <span>Inicio</span>
+          <span class="stitch-breadcrumb__sep">/</span>
+          <span>Comisiones</span>
+          <span class="stitch-breadcrumb__sep">/</span>
+          <span class="stitch-breadcrumb__current">Historial y Asignación</span>
+        </nav>
+        <h1 class="stitch-page-title">
+          Gestión y Registro de Comisiones de Servicio
+        </h1>
+        <p class="stitch-page-subtitle">
+          Control operativo de relevos, asignación de inspectores viales, apertura y cierre de comisiones de fiscalización tributaria caminera.
+        </p>
+      </div>-->
+
+      <!-- Métricas Bento -->
+      <div class="stitch-grid-bento">
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Comisión Activa</div>
+          <div class="stitch-metric-card__value">N° 13</div>
+          <div class="stitch-metric-card__foot">
+            <strong>Oscar Meza</strong>
+            <span class="stitch-metric-card__badge">En Guardia</span>
+          </div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--tertiary"></div>
+        </div>
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Total Comisiones</div>
+          <div class="stitch-metric-card__value" th:text="${totalComisiones}">0</div>
+          <div class="stitch-metric-card__foot">
+            <span>Registros cargados</span>
+          </div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--secondary"></div>
+        </div>
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Comisiones Cerradas</div>
+          <div class="stitch-metric-card__value">23</div>
+          <div class="stitch-metric-card__foot">
+            <span>Libros y actas rubricadas</span>
+          </div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--outline"></div>
+        </div>
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Actas Fiscalizadas</div>
+          <div class="stitch-metric-card__value">142</div>
+          <div class="stitch-metric-card__foot">
+            <span>Comprobantes oficiales</span>
+          </div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--secondary-dark"></div>
+        </div>
+      </div>
+
+      <!-- Toolbar de filtros -->
+      <div class="stitch-filter-toolbar">
+        <form class="stitch-form-grid" method="get" th:action="@{/comisiones}">
+          <div class="stitch-col-4 stitch-field">
+            <label class="stitch-field__label" for="filtro-busqueda">Buscar Comisión</label>
+            <input class="stitch-input" id="filtro-busqueda" type="text" name="busqueda" placeholder="N° Comisión, Responsable o Legajo...">
+          </div>
+          <div class="stitch-col-3 stitch-field">
+            <label class="stitch-field__label" for="filtro-estado">Estado de Comisión</label>
+            <select class="stitch-select" id="filtro-estado" name="estado">
+              <option value="todos">Todos los estados</option>
+              <option value="abierta">Abierta (En curso)</option>
+              <option value="cerrado">Cerrada / Liquidada</option>
+            </select>
+          </div>
+          <div class="stitch-col-2 stitch-field">
+            <label class="stitch-field__label" for="filtro-desde">Desde</label>
+            <input class="stitch-input" id="filtro-desde" type="date" name="desde">
+          </div>
+          <div class="stitch-col-2 stitch-field">
+            <label class="stitch-field__label" for="filtro-hasta">Hasta</label>
+            <input class="stitch-input" id="filtro-hasta" type="date" name="hasta">
+          </div>
+          <div class="stitch-col-1 stitch-field">
+            <button type="submit" class="stitch-btn-primary" title="Aplicar Filtros">Aplicar</button>
+            <button type="reset" class="stitch-btn-secondary" title="Restablecer">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tabla -->
+      <div class="stitch-table-card">
+        <div class="stitch-table-toolbar">
+          <span class="stitch-table-title">Listado Oficial de Comisiones</span>
+          <span class="stitch-count-badge" th:text="${totalComisiones} + ' registros'">0 registros</span>
+        </div>
+        <div class="stitch-table-wrap">
+          <table class="stitch-table">
+            <thead>
+              <tr>
+                <th class="stitch-th--center" scope="col">Id Comisión</th>
+                <th scope="col">Fecha Inicio</th>
+                <th class="stitch-th--center" scope="col">Hora Inicio</th>
+                <th scope="col">Fecha Fin</th>
+                <th class="stitch-th--center" scope="col">Hora Fin</th>
+                <th class="stitch-th--center" scope="col">Estado</th>
+                <th scope="col">Responsable</th>
+                <th class="stitch-th--center" scope="col">Imprimir</th>
+                <th class="stitch-th--center" scope="col">Form. Emitidos</th>
+                <th class="stitch-th--center" scope="col">Operaciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-comisiones-body">
+              <tr th:each="c : ${comisiones}">
+                <td class="stitch-td--center">
+                  <a class="stitch-link stitch-data"
+                     th:href="@{/comisiones/{pueCod}/{cpcId}(pueCod=${c.pueCod},cpcId=${c.cpcId})}"
+                     th:text="${c.cpcId}">0</a>
+                </td>
+                <td class="stitch-data" th:text="${c.fechaInicio}">01/01/25</td>
+                <td class="stitch-td--center stitch-data" th:text="${c.horaInicio}">0000</td>
+                <td class="stitch-data" th:text="${c.fechaFin}">01/01/25</td>
+                <td class="stitch-td--center stitch-data" th:text="${c.horaFin}">0000</td>
+                <td class="stitch-td--center">
+                  <span class="stitch-badge"
+                        th:classappend="${c.estado} == 'Abierto' ? ' stitch-badge--open' : ' stitch-badge--closed'"
+                        th:text="${c.estado}">Abierto</span>
+                </td>
+                <td>
+                  <span class="stitch-name" th:text="${c.responsable}">Responsable</span>
+                </td>
+                <td class="stitch-td--center">
+                  <button class="stitch-btn-icon" title="Imprimir">
+                    <span class="material-symbols-outlined">print</span>
+                  </button>
+                </td>
+                <td class="stitch-td--center">
+                  <button class="stitch-btn-icon" title="Formularios Emitidos">
+                    <span class="material-symbols-outlined">assignment</span>
+                  </button>
+                </td>
+                <td class="stitch-td--center">
+                  <a class="stitch-btn-link"
+                     th:href="@{/comisiones/{pueCod}/{cpcId}(pueCod=${c.pueCod},cpcId=${c.cpcId})}">Auditar</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado vacío -->
+        <p class="stitch-empty" th:if="${#lists.isEmpty(comisiones) and (mensajeError == null)}">
+          No se encontraron registros. Sin comisiones para mostrar.
+        </p>
+
+        <!-- Paginación -->
+        <div class="stitch-pagination" th:if="${cantidadPaginas > 1}">
+          <div class="stitch-pagination__info">Mostrando comisiones registradas</div>
+          <div class="stitch-pagination__controls">
+            <a class="stitch-page-btn" th:if="${hayPaginaAnterior}"
+               th:href="@{/comisiones(pagina=0)}">First</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaAnterior}" disabled>First</button>
+
+            <a class="stitch-page-btn" th:if="${hayPaginaAnterior}"
+               th:href="@{/comisiones(pagina=${paginaActual - 1})}">Prev</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaAnterior}" disabled>Prev</button>
+
+            <a th:each="p : ${#numbers.sequence(0, cantidadPaginas - 1)}"
+               class="stitch-page-btn"
+               th:classappend="${p == paginaActual} ? ' stitch-page-btn--active' : ''"
+               th:href="@{/comisiones(pagina=${p})}"
+               th:text="${p + 1}">1</a>
+
+            <a class="stitch-page-btn" th:if="${hayPaginaSiguiente}"
+               th:href="@{/comisiones(pagina=${paginaActual + 1})}">Next</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaSiguiente}" disabled>Next</button>
+
+            <a class="stitch-page-btn" th:if="${hayPaginaSiguiente}"
+               th:href="@{/comisiones(pagina=${cantidadPaginas - 1})}">Last</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaSiguiente}" disabled>Last</button>
+          </div>
+        </div>
+      </div>
+
     </div>
-
-    <!-- Paginación (First/Prev/Next/Last). -->
-    <nav class="atp-nav" aria-label="Paginación de comisiones" th:if="${cantidadPaginas > 1}">
-      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
-         th:href="@{/comisiones(pagina=0)}">First</a>
-      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>First</button>
-
-      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
-         th:href="@{/comisiones(pagina=${paginaActual - 1})}">Prev</a>
-      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>Prev</button>
-
-      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
-         th:href="@{/comisiones(pagina=${paginaActual + 1})}">Next</a>
-      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Next</button>
-
-      <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
-         th:href="@{/comisiones(pagina=${cantidadPaginas - 1})}">Last</a>
-      <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Last</button>
-    </nav>
-
-    <!-- Grilla. -->
-    <div class="atp-grilla-scroll" th:if="${not #lists.isEmpty(comisiones)}">
-      <table class="atp-table">
-        <caption class="atp-table__caption">Comisiones cargadas</caption>
-        <thead>
-          <tr>
-            <th scope="col">Id Comisión</th>
-            <th scope="col">Fecha Inicio</th>
-            <th scope="col">Hora Inicio</th>
-            <th scope="col">Fecha Fin</th>
-            <th scope="col">Hora Fin</th>
-            <th scope="col">Estado</th>
-            <th scope="col">Responsable</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr th:each="c : ${comisiones}">
-            <td>
-              <a class="atp-enlace"
-                 th:href="@{/comisiones/{pueCod}/{cpcId}(pueCod=${c.pueCod},cpcId=${c.cpcId})}"
-                 th:text="${c.cpcId}">0</a>
-            </td>
-            <td th:text="${c.fechaInicio}">01/01/25</td>
-            <td th:text="${c.horaInicio}">0000</td>
-            <td th:text="${c.fechaFin}">01/01/25</td>
-            <td th:text="${c.horaFin}">0000</td>
-            <td th:text="${c.estado}">Abierto</td>
-            <td th:text="${c.responsable}">Responsable</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <p class="atp-vacio" th:if="${#lists.isEmpty(comisiones) and (mensajeError == null)}">
-      No se encontraron registros. Sin comisiones para mostrar.
-    </p>
-    <p class="atp-vacio" th:if="${#lists.isEmpty(comisiones) and (mensajeError != null)}">
-      No se pudieron mostrar las comisiones.
-    </p>
   </main>
 
-  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
 </body>
 </html>

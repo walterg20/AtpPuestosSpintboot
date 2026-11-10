@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <!-- Circular container background -->
+  <circle cx="50" cy="50" r="46" fill="#3b5998" stroke="#ffffff" stroke-width="2.5" />
+  
+  <!-- Officer Cap / Gorra policial -->
+  <path d="M30 40 C30 29 40 23 50 23 C60 23 70 29 70 40 Z" fill="#2d4373" stroke="#ffffff" stroke-width="2" />
+  <!-- Cap visor / Visera -->
+  <path d="M26 40 C34 43 66 43 74 40 C72 44 64 47 50 47 C36 47 28 44 26 40 Z" fill="#ffffff" />
+  <!-- Cap badge / Escudo o cucarda -->
+  <circle cx="50" cy="33" r="3.5" fill="#f8fafc" stroke="#2d4373" stroke-width="1" />
+  <path d="M50 30 L51.5 33 L50 36 L48.5 33 Z" fill="#e2e8f0" />
+  
+  <!-- Head / Cabeza -->
+  <path d="M37 43 C37 43 37 54 50 54 C63 54 63 43 63 43" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none" />
+  <!-- Ears -->
+  <path d="M37 45 C35 45 35 50 37 50" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" fill="none" />
+  <path d="M63 45 C65 45 65 50 63 50" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" fill="none" />
+  
+  <!-- Neck & Shirt / Cuello y camisa -->
+  <path d="M44 54 L44 60 L56 60 L56 54" stroke="#ffffff" stroke-width="2" fill="none" />
+  <!-- Uniform shoulders / Torso y hombros -->
+  <path d="M24 82 C25 67 36 62 44 60 L56 60 C64 62 75 67 76 82" stroke="#ffffff" stroke-width="2.5" fill="#2d4373" />
+  
+  <!-- Shirt collar & Tie / Cuello de camisa y corbata -->
+  <path d="M44 60 L50 69 L56 60" stroke="#ffffff" stroke-width="2" fill="none" />
+  <path d="M48 69 L52 69 L53 82 L47 82 Z" fill="#ffffff" />
+  
+  <!-- Epaulets / Charreteras -->
+  <line x1="28" y1="68" x2="36" y2="64" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+  <line x1="72" y1="68" x2="64" y2="64" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+  <!-- Pocket details -->
+  <line x1="33" y1="74" x2="42" y2="74" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+  <line x1="58" y1="74" x2="67" y2="74" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+</svg>

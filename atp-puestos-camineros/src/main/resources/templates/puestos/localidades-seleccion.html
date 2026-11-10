@@ -3,19 +3,21 @@
   Popup de seleccion manual de localidades (modulo 10) - paridad con ListadoLocalidades.
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/base :: head('Localidades')}">
+<head th:replace="~{layout/base-stitch :: head('Localidades')}">
   <title>Localidades</title>
 </head>
-<body class="atp-body">
+<body class="stitch-body">
   <a class="atp-saltar" href="#contenido">Ir al contenido</a>
 
-  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
 
-  <div th:replace="~{layout/base :: sesion}"></div>
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
 
-  <div th:replace="~{layout/base :: navegacion}"></div>
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
 
-  <main id="contenido" class="atp-pagina atp-localidades__page">
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
 
     <h1 class="atp-pagina__titulo">Localidades</h1>
 
@@ -110,7 +112,7 @@
 
   </main>
 
-  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
 
   <script th:src="@{/js/puestos/localidades-popup.js}" defer></script>
 </body>

@@ -23,7 +23,7 @@
   <div th:replace="~{layout/base-stitch :: navegacion}"></div>
 
   <main id="contenido" class="stitch-main stitch-bg-grid">
-
+    <div class="stitch-page">
     <div class="atp-actas__cabecera">
       <h1 class="atp-pagina__titulo">Actas</h1>
       <a class="atp-btn atp-btn--primary atp-actas__crear"
@@ -113,7 +113,7 @@
          th:href="@{/actas(page=${p},size=${actas.size},sort=${sortActas},f276Id=${filtroActas.f276Id},cuit=${filtroActas.cuit},razonSocial=${filtroActas.razonSocial},desde=${filtroActas.desde},hasta=${filtroActas.hasta})}"
          th:text="${p + 1}">1</a>
     </nav>
-
+    </div>
   </main>
 
   <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>

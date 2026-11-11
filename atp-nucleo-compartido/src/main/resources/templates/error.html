@@ -10,25 +10,35 @@
   `message` y `path`. Por eso cada dato se resuelve con el operador elvis `?:`: la plantilla
   sirve para los dos origenes sin duplicarse.
 
-  El diseno visual (tokens, tipografia, color) vive en el sistema de diseño derivado de
-  `docs/design.md`; esta version es funcional y deliberadamente sobria.
+  Diseno visual alineado al layout base-stitch (tokens stitch + tokens legacy).
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<head th:replace="~{layout/base-stitch :: head(${codigo} ?: 'Error')}">
   <title th:text="${codigo} ?: 'Error'">Error</title>
-  <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body class="atp-error">
-  <main class="atp-error__panel">
-    <p class="atp-error__status" th:text="${status} ?: '—'">—</p>
-    <h1 class="atp-error__code" th:text="${codigo} ?: (${error} ?: 'Error')">Error</h1>
-    <p class="atp-error__message" th:text="${mensaje} ?: (${message} ?: 'Ocurrió un error inesperado.')">
-      Ocurrió un error inesperado.
-    </p>
-    <p class="atp-error__path" th:if="${ruta} ?: ${path}" th:text="${ruta} ?: ${path}">/ruta</p>
-    <a class="atp-error__back" th:href="@{/}">Volver al inicio</a>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+    <div class="atp-error__panel">
+      <p class="atp-error__status" th:text="${status} ?: '?'">?</p>
+      <h1 class="atp-error__code" th:text="${codigo} ?: (${error} ?: 'Error')">Error</h1>
+      <p class="atp-error__message" th:text="${mensaje} ?: (${message} ?: 'Ocurrio un error inesperado.')">
+        Ocurrio un error inesperado.
+      </p>
+      <p class="atp-error__path" th:if="${ruta} ?: ${path}" th:text="${ruta} ?: ${path}">/ruta</p>
+      <a class="atp-error__back" th:href="@{/}">Volver al inicio</a>
+    </div>
   </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
 </body>
 </html>

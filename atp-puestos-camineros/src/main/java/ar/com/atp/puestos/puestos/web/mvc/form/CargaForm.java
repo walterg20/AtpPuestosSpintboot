@@ -6,6 +6,7 @@ import java.util.List;
 
 public class CargaForm {
     private String barCode;
+    private String nroGuia;
     private String dppNroForm;
     private Long conCuit;
     private String conRazSoc;
@@ -18,6 +19,8 @@ public class CargaForm {
 
     public String getBarCode() { return barCode; }
     public void setBarCode(String barCode) { this.barCode = barCode; }
+    public String getNroGuia() { return nroGuia; }
+    public void setNroGuia(String nroGuia) { this.nroGuia = nroGuia; }
     public String getDppNroForm() { return dppNroForm; }
     public void setDppNroForm(String dppNroForm) { this.dppNroForm = dppNroForm; }
     public Long getConCuit() { return conCuit; }

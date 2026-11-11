@@ -1,0 +1,122 @@
+/* Estilos específicos de la pantalla Turnos. Sólo tokens (custom properties) de stitch-tokens.css. */
+.atp-turnos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-lg);
+}
+
+.atp-turnos__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--stitch-space-md);
+  flex-wrap: wrap;
+}
+
+.atp-turnos__badge-activo {
+  font-size: var(--stitch-label-sm-size);
+  font-weight: var(--stitch-label-sm-weight);
+}
+
+.atp-turnos__filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--stitch-space-sm);
+}
+
+.atp-turnos__filter-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--stitch-space-xs);
+}
+
+.atp-turnos__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--stitch-space-xs);
+}
+
+.atp-turnos__pill {
+  padding: var(--stitch-space-xs) var(--stitch-space-sm);
+  border-radius: var(--stitch-radius-full);
+  border: 1px solid var(--stitch-outline-variant);
+  background: var(--stitch-surface-container-low);
+  color: var(--stitch-on-surface-variant);
+  font-size: var(--stitch-label-sm-size);
+  font-weight: var(--stitch-label-sm-weight);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.atp-turnos__pill:hover {
+  background: var(--stitch-surface-container-high);
+  color: var(--stitch-on-surface);
+}
+
+.atp-turnos__pill--active {
+  background: var(--stitch-primary);
+  color: var(--stitch-on-primary);
+  border-color: var(--stitch-primary);
+}
+
+.atp-turnos__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--stitch-space-sm);
+}
+
+.atp-turnos__acciones .atp-form {
+  display: inline-flex;
+}
+
+.atp-turnos__tabla .stitch-td--center {
+  text-align: center;
+}
+
+.atp-turnos__row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--stitch-space-xs);
+}
+
+/* Modales */
+.atp-turnos__modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.atp-turnos__modal:target {
+  display: flex;
+}
+
+.atp-turnos__modal-card {
+  background: var(--stitch-surface-container-lowest);
+  padding: var(--stitch-space-lg);
+  border-radius: var(--stitch-radius-xl);
+  max-width: 32rem;
+  width: 90vw;
+  box-shadow: var(--stitch-shadow-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-md);
+}
+
+.atp-turnos__modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--stitch-space-sm);
+  align-items: center;
+}
+
+.atp-turnos__modal-actions .stitch-btn-primary,
+.atp-turnos__modal-actions .stitch-btn-secondary {
+  width: auto;
+}

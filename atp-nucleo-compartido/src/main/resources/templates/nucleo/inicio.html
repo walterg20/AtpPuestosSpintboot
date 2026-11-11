@@ -1,32 +1,34 @@
 <!DOCTYPE html>
 <!--
-  Pantalla de Inicio (Inicio WebPanel del legacy) — T-UI-C3, R-UI-006.
+  Pantalla de Inicio (Inicio WebPanel del legacy) - T-UI-C3, R-UI-006.
 
   Muestra el texto descriptivo del sistema (verbatim, incluida la falta de espacio antes de
-  "Otra") y el menú de navegación activo. Usa el layout base.
+  "Otra") y la navegacion activa. Usa el layout base-stitch.
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/base :: head('Inicio')}">
+<head th:replace="~{layout/base-stitch :: head('Inicio')}">
   <title>Inicio</title>
 </head>
-<body class="atp-body">
+<body class="stitch-body">
   <a class="atp-saltar" href="#contenido">Ir al contenido</a>
 
-  <header class="atp-cabecera" th:replace="~{layout/base :: cabecera}"></header>
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
 
-  <div th:replace="~{layout/base :: sesion}"></div>
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
 
-  <div th:replace="~{layout/base :: navegacion}"></div>
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
 
-  <main id="contenido" class="atp-pagina">
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
     <h1 class="atp-pagina__titulo">Inicio</h1>
 
     <section class="atp-panel" aria-labelledby="titulo-inicio">
-      <h2 class="atp-panel__titulo" id="titulo-inicio">Sistema de Control de Puestos Camineros y Receptorías</h2>
+      <h2 class="atp-panel__titulo" id="titulo-inicio">Sistema de Control de Puestos Camineros y Receptor?as</h2>
       <p class="atp-inicio" th:text="${textoInicio}">Texto de inicio</p>
     </section>
   </main>
 
-  <footer class="atp-pie" th:replace="~{layout/base :: pie}"></footer>
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
 </body>
 </html>

@@ -52,6 +52,7 @@ public class CargaMvcController {
 
     @PostMapping("/buscar")
     public String buscar(@RequestParam(name = "barCode", required = false) String barCode,
+            @RequestParam(name = "nroGuia", required = false) String nroGuia,
             HttpServletRequest request, Model model) {
         proveedorNavegacion.poblar(model, request);
         ContextoSesion contexto = gestorContextoSesion.recuperar(request);
@@ -62,6 +63,8 @@ public class CargaMvcController {
             } else {
                 dppNroForm = barCode.trim();
             }
+        } else if (nroGuia != null && !nroGuia.isBlank()) {
+            dppNroForm = nroGuia.trim();
         }
         List<ar.com.atp.puestos.puestos.domain.DetalleProductoPrimario> formularios;
         try {
@@ -72,6 +75,7 @@ public class CargaMvcController {
         }
         CargaForm cargaForm = new CargaForm();
         cargaForm.setBarCode(barCode);
+        cargaForm.setNroGuia(nroGuia);
         cargaForm.setDppNroForm(dppNroForm);
         cargaForm.setContext(contexto);
         cargaForm.setFormularios(formularios);

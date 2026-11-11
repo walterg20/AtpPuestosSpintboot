@@ -64,8 +64,10 @@
   </main>
 
   <!-- Con sesión: cuerpo vacío (Variante A). -->
-  <main id="contenido" class="stitch-main" th:if="${not #strings.isEmpty(contexto.usuario())}">
+  <main id="contenido" class="stitch-main"  stitch-bg-grid th:if="${not #strings.isEmpty(contexto.usuario())}">
+     <div class="stitch-page"
     <h1>Inicio</h1>
+  </div>
   </main>
 
   <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>

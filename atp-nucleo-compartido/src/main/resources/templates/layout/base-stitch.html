@@ -75,9 +75,9 @@
   <nav class="stitch-nav" th:fragment="navegacion"
        th:if="${contexto != null and not #strings.isEmpty(contexto.usuario())}">
     <div class="stitch-container stitch-nav__row">
-      <a class="stitch-nav__link" data-path="control-de-cargas"
+      <a class="stitch-nav__link" data-path="cargas"
          th:classappend="${rutaActual != null and #strings.contains(rutaActual,'cargas')} ? ' stitch-nav__link--active' : ''"
-         th:href="@{/control-cargas}">Control de Cargas</a>
+         th:href="@{/cargas}">Control de Cargas</a>
       <a class="stitch-nav__link" data-path="formularios-actas"
          th:classappend="${rutaActual != null and #strings.contains(rutaActual,'actas')} ? ' stitch-nav__link--active' : ''"
          th:href="@{/actas}">Formularios ACTAS</a>

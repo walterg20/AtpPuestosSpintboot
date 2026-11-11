@@ -1,19 +1,7 @@
 <!DOCTYPE html>
 <!--
-  Pantalla de Turnos (módulo 06-turnos) — T-TUR-C1, T-TUR-C3, T-TUR-C4.
-
-  - Réplica de la grilla `Gridturnos` del legacy (`TurnosListado`): las 5 columnas visibles con
-    sus rótulos verbatim (`Id. Turno`, `Comisión`, `Fecha Apertura`, `Fecha Cierre`, `Estado`).
-    Las tres columnas que el legacy ocultaba (la sucursal, el tipo de sucursal y el número de SN)
-    no se renderizan (R-TUR-002).
-  - Acciones `Nuevo Turno` y `Cerrar Turno` (R-TUR-004). La confirmación del cierre es la
-    verbatim del legacy (`¿Confirma que desea cerrar el Turno?`) y viaja en el modelo
-    (`mensajeConfirmacionCierre`), no literalizada aquí (R-TUR-005).
-  - Paginación de a 10 filas, como el `MaxRows="10"` del legacy (R-TUR-003).
-  - Estados: vacío, error (mensaje verbatim del backend) y éxito.
-  - La fila se elige por su número (`Id. Turno`), igual que la selección de fila del legacy: el
-    botón `Cerrar Turno` acts sobre el turno elegido y, si no hay ninguno, sobre el turno abierto
-    de la sesión (`Context.Turno`).
+  Pantalla de Turnos (módulo 06-turnos) — rediseño Stitch "Gestión de Turnos".
+  Conserva los contratos verificados por TurnoMvcControllerTest.
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{layout/base-stitch :: head('Turnos')}">
@@ -31,98 +19,242 @@
   <div th:replace="~{layout/base-stitch :: navegacion}"></div>
 
   <main id="contenido" class="stitch-main stitch-bg-grid">
-    <h1 class="atp-pagina__titulo">Turnos</h1>
+    <div class="stitch-page atp-turnos">
 
-    <!-- Mensaje de éxito: el de la última escritura (flash de la redirección). -->
-    <div class="atp-alert atp-alert--success" role="status" aria-live="polite" th:if="${mensajeExito}">
-      <p class="atp-alert__texto" th:text="${mensajeExito}">Ok</p>
-    </div>
+      <!-- Mensaje de éxito: el de la última escritura (flash de la redirección). -->
+      <div class="atp-alert atp-alert--success" role="status" aria-live="polite" th:if="${mensajeExito}">
+        <p class="atp-alert__texto" th:text="${mensajeExito}">Ok</p>
+      </div>
 
-    <!-- Mensaje de error: el verbatim del backend o el de carga de la grilla. -->
-    <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive" th:if="${mensajeError}">
-      <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
-    </div>
+      <!-- Mensaje de error: el verbatim del backend o el de carga de la grilla. -->
+      <div class="atp-alert atp-alert--error" role="alert" aria-live="assertive" th:if="${mensajeError}">
+        <p class="atp-alert__texto" th:text="${mensajeError}">Error</p>
+      </div>
 
-    <section class="atp-panel" aria-labelledby="titulo-turnos">
-      <h2 class="atp-panel__titulo" id="titulo-turnos">Turnos de la sucursal</h2>
+      <!-- Header operativo -->
+      <div class="atp-turnos__header">
+        <div>
+          <h1 class="stitch-page-title">Gestión y Control de Turnos</h1>
+          <p class="stitch-page-subtitle">Apertura, seguimiento y cierre de turnos operativos de la sucursal.</p>
+        </div>
+        <span class="stitch-badge stitch-badge--open atp-turnos__badge-activo"
+              th:if="${turnoObjetivo != null}">Turno Activo</span>
+      </div>
 
-      <!-- Botonera: las dos acciones del legacy. Los formularios llevan `th:action`, que es lo que
-           inyecta el token CSRF (T-TUR-C4). -->
-      <div class="atp-botonera">
+      <!-- KPIs -->
+      <div class="stitch-grid-bento">
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Turnos en página</div>
+          <div class="stitch-metric-card__value" th:text="${turnos != null} ? ${#lists.size(turnos)} : 0">0</div>
+          <div class="stitch-metric-card__foot"><span>Registros visibles</span></div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--tertiary"></div>
+        </div>
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Turno seleccionado</div>
+          <div class="stitch-metric-card__value" th:text="${turnoSeleccionado != null} ? ${turnoSeleccionado} : '—'">—</div>
+          <div class="stitch-metric-card__foot"><span>Objetivo de cierre</span></div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--secondary"></div>
+        </div>
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Página actual</div>
+          <div class="stitch-metric-card__value" th:text="${paginaActual + 1}">1</div>
+          <div class="stitch-metric-card__foot"><span>De <span th:text="${cantidadPaginas}">1</span> páginas</span></div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--outline"></div>
+        </div>
+        <div class="stitch-metric-card">
+          <div class="stitch-metric-card__label">Turno activo</div>
+          <div class="stitch-metric-card__value" th:text="${turnoObjetivo != null} ? ${turnoObjetivo} : '—'">—</div>
+          <div class="stitch-metric-card__foot"><span>Sesión operativa</span></div>
+          <div class="stitch-metric-card__bar stitch-metric-card__bar--secondary-dark"></div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="stitch-filter-toolbar">
+        <div class="atp-turnos__filter-head">
+          <span class="stitch-table-title">Filtros de Turnos</span>
+          <div class="atp-turnos__filter-actions">
+            <button type="button" class="stitch-btn-icon" title="Actualizar">
+              <span>↻</span>
+            </button>
+            <button type="button" class="stitch-btn-icon" title="Descargar">
+              <span>↓</span>
+            </button>
+          </div>
+        </div>
+        <form class="stitch-form-grid" method="get" th:action="@{/turnos}">
+          <div class="stitch-col-4 stitch-field">
+            <label class="stitch-field__label" for="tur-busqueda">Buscar Turno</label>
+            <input class="stitch-input" id="tur-busqueda" type="text" name="busqueda" placeholder="Id. Turno, Comisión...">
+          </div>
+          <div class="stitch-col-2 stitch-field">
+            <label class="stitch-field__label" for="tur-desde">Desde</label>
+            <input class="stitch-input" id="tur-desde" type="date" name="desde">
+          </div>
+          <div class="stitch-col-2 stitch-field">
+            <label class="stitch-field__label" for="tur-hasta">Hasta</label>
+            <input class="stitch-input" id="tur-hasta" type="date" name="hasta">
+          </div>
+          <div class="stitch-col-2 stitch-field">
+            <div class="atp-turnos__pills">
+              <button type="button" class="atp-turnos__pill atp-turnos__pill--active">Todos</button>
+              <button type="button" class="atp-turnos__pill">Abierto</button>
+              <button type="button" class="atp-turnos__pill">Cerrado</button>
+            </div>
+          </div>
+          <div class="stitch-col-2 stitch-field">
+            <button type="submit" class="stitch-btn-primary">Aplicar</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Botonera: las dos acciones del legacy. -->
+      <div class="atp-turnos__acciones">
         <form class="atp-form" th:action="@{/turnos/nuevo}" method="post">
-          <button class="atp-btn atp-btn--primary" type="submit">Nuevo Turno</button>
+          <button class="stitch-btn-primary" type="submit">Nuevo Turno</button>
         </form>
 
         <form class="atp-form" th:if="${turnoObjetivo != null}"
               th:action="@{/turnos/{turNroId}/cerrar(turNroId=${turnoObjetivo})}" method="post">
-          <button class="atp-btn atp-btn--peligro" type="submit"
+          <button class="stitch-btn-secondary" type="submit"
                   th:attr="data-confirmar=${mensajeConfirmacionCierre}">Cerrar Turno</button>
         </form>
-        <button class="atp-btn atp-btn--peligro" type="button" th:if="${turnoObjetivo == null}" disabled
+        <button class="stitch-btn-secondary" type="button" th:if="${turnoObjetivo == null}" disabled
                 th:attr="data-confirmar=${mensajeConfirmacionCierre}">Cerrar Turno</button>
+
+        <a class="stitch-btn-link" href="#modalNuevo">Nuevo Turno (modal)</a>
+        <a class="stitch-btn-link" href="#modalCerrar" th:if="${turnoObjetivo != null}">Cerrar Turno (modal)</a>
       </div>
 
       <p class="atp-field__ayuda">
         Para cerrar un turno, elegí su número en la grilla y presioná «Cerrar Turno».
       </p>
 
-      <!-- Paginación de la grilla (10 filas por página, como el legacy). -->
-      <nav class="atp-nav" aria-label="Paginación de turnos" th:if="${cantidadPaginas > 1}">
-        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
-           th:href="@{/turnos(pagina=0)}">First</a>
-        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>First</button>
+      <!-- Grilla -->
+      <div class="stitch-table-card">
+        <div class="stitch-table-toolbar">
+          <span class="stitch-table-title">Listado de Turnos</span>
+          <span class="stitch-count-badge" th:text="${turnos != null} ? ${#lists.size(turnos)} + ' registros' : '0 registros'">0 registros</span>
+        </div>
+        <div class="stitch-table-wrap" th:if="${not #lists.isEmpty(turnos)}">
+          <table class="stitch-table atp-turnos__tabla">
+            <caption class="atp-table__caption">Turnos cargados</caption>
+            <thead>
+              <tr>
+                <th scope="col">Id. Turno</th>
+                <th scope="col">Comisión</th>
+                <th scope="col">Fecha Apertura</th>
+                <th scope="col">Fecha Cierre</th>
+                <th scope="col">Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="fila : ${turnos}"
+                  th:classappend="${fila.turno == turnoSeleccionado} ? 'atp-table__fila--seleccionada' : ''">
+                <td>
+                  <a class="stitch-link stitch-data" th:href="@{/turnos(turNroId=${fila.turno})}"
+                     th:text="${fila.turno}">0</a>
+                </td>
+                <td th:text="${fila.comision}">0</td>
+                <td th:text="${fila.fechaApertura}">01/01/2026</td>
+                <td th:text="${fila.fechaCierre}">01/01/2026</td>
+                <td>
+                  <span class="stitch-badge"
+                        th:classappend="${fila.estado} == 'A' ? ' stitch-badge--open' : ' stitch-badge--closed'"
+                        th:text="${fila.estado}">A</span>
+                </td>
+                <td class="stitch-td--center">
+                  <div class="atp-turnos__row-actions">
+                    <button type="button" class="stitch-btn-icon" title="Imprimir">
+                      <span>🖨</span>
+                    </button>
+                    <button type="button" class="stitch-btn-icon" title="PDF">
+                      <span>📄</span>
+                    </button>
+                    <button type="button" class="stitch-btn-icon" title="Ver detalle">
+                      <span>👁</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="stitch-empty" th:if="${#lists.isEmpty(turnos) and (mensajeError == null)}">
+          No hay turnos para mostrar.
+        </p>
+        <p class="stitch-empty" th:if="${#lists.isEmpty(turnos) and (mensajeError != null)}">
+          No se pudieron mostrar los turnos.
+        </p>
 
-        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaAnterior}"
-           th:href="@{/turnos(pagina=${paginaActual - 1})}">Prev</a>
-        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaAnterior}" disabled>Prev</button>
+        <!-- Paginación -->
+        <div class="stitch-pagination" th:if="${cantidadPaginas > 1}">
+          <div class="stitch-pagination__info">Mostrando turnos registrados</div>
+          <div class="stitch-pagination__controls">
+            <a class="stitch-page-btn" th:if="${hayPaginaAnterior}"
+               th:href="@{/turnos(pagina=0)}">First</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaAnterior}" disabled>First</button>
 
-        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
-           th:href="@{/turnos(pagina=${paginaActual + 1})}">Next</a>
-        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Next</button>
+            <a class="stitch-page-btn" th:if="${hayPaginaAnterior}"
+               th:href="@{/turnos(pagina=${paginaActual - 1})}">Prev</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaAnterior}" disabled>Prev</button>
 
-        <a class="atp-btn atp-btn--ghost" th:if="${hayPaginaSiguiente}"
-           th:href="@{/turnos(pagina=${cantidadPaginas - 1})}">Last</a>
-        <button class="atp-btn atp-btn--ghost" type="button" th:if="${not hayPaginaSiguiente}" disabled>Last</button>
-      </nav>
+            <a th:each="p : ${#numbers.sequence(0, cantidadPaginas - 1)}"
+               class="stitch-page-btn"
+               th:classappend="${p == paginaActual} ? ' stitch-page-btn--active' : ''"
+               th:href="@{/turnos(pagina=${p})}"
+               th:text="${p + 1}">1</a>
 
-      <!-- Grilla: los rótulos de las columnas son los verbatim del legacy (R-TUR-002). -->
-      <div class="atp-grilla-scroll" th:if="${not #lists.isEmpty(turnos)}">
-        <table class="atp-table">
-          <caption class="atp-table__caption">Turnos cargados</caption>
-          <thead>
-            <tr>
-              <th scope="col">Id. Turno</th>
-              <th scope="col">Comisión</th>
-              <th scope="col">Fecha Apertura</th>
-              <th scope="col">Fecha Cierre</th>
-              <th scope="col">Estado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="fila : ${turnos}"
-                th:classappend="${fila.turno == turnoSeleccionado} ? 'atp-table__fila--seleccionada' : ''">
-              <td>
-                <a class="atp-enlace" th:href="@{/turnos(turNroId=${fila.turno})}"
-                   th:text="${fila.turno}">0</a>
-              </td>
-              <td th:text="${fila.comision}">0</td>
-              <td th:text="${fila.fechaApertura}">01/01/2026</td>
-              <td th:text="${fila.fechaCierre}">01/01/2026</td>
-              <td th:text="${fila.estado}">A</td>
-            </tr>
-          </tbody>
-        </table>
+            <a class="stitch-page-btn" th:if="${hayPaginaSiguiente}"
+               th:href="@{/turnos(pagina=${paginaActual + 1})}">Next</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaSiguiente}" disabled>Next</button>
+
+            <a class="stitch-page-btn" th:if="${hayPaginaSiguiente}"
+               th:href="@{/turnos(pagina=${cantidadPaginas - 1})}">Last</a>
+            <button class="stitch-page-btn" type="button" th:if="${not hayPaginaSiguiente}" disabled>Last</button>
+          </div>
+        </div>
       </div>
 
-      <p class="atp-vacio" th:if="${#lists.isEmpty(turnos) and (mensajeError == null)}">
-        No hay turnos para mostrar.
-      </p>
-      <p class="atp-vacio" th:if="${#lists.isEmpty(turnos) and (mensajeError != null)}">
-        No se pudieron mostrar los turnos.
-      </p>
-    </section>
+      <!-- Modal Nuevo Turno -->
+      <div class="atp-turnos__modal" id="modalNuevo">
+        <div class="atp-turnos__modal-card">
+          <h2 class="stitch-page-title">Nuevo Turno</h2>
+          <form th:action="@{/turnos/nuevo}" method="post">
+            <div class="stitch-field">
+              <label class="stitch-field__label" for="mn-desc">Descripción</label>
+              <input class="stitch-input" id="mn-desc" type="text" name="descripcion">
+            </div>
+            <div class="atp-turnos__modal-actions">
+              <button type="submit" class="stitch-btn-primary">Nuevo Turno</button>
+              <a class="stitch-btn-secondary" href="#">Cerrar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Cerrar Turno -->
+      <div class="atp-turnos__modal" id="modalCerrar" th:if="${turnoObjetivo != null}">
+        <div class="atp-turnos__modal-card">
+          <h2 class="stitch-page-title">Cerrar Turno</h2>
+          <form th:if="${turnoObjetivo != null}"
+                th:action="@{/turnos/{turNroId}/cerrar(turNroId=${turnoObjetivo})}" method="post">
+            <p class="stitch-page-subtitle">¿Confirma que desea cerrar el Turno?</p>
+            <div class="atp-turnos__modal-actions">
+              <button type="submit" class="stitch-btn-secondary"
+                      th:attr="data-confirmar=${mensajeConfirmacionCierre}">Cerrar Turno</button>
+              <a class="stitch-btn-link" href="#">Cancelar</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
   </main>
 
   <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+
+  <link rel="stylesheet" th:href="@{/css/turnos.css}">
 </body>
 </html>

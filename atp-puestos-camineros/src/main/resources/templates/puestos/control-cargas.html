@@ -62,14 +62,6 @@
       <div class="stitch-filter-toolbar">
         <div class="atp-cargas__filter-head">
           <span class="stitch-table-title">Buscar Guía</span>
-          <div class="atp-cargas__filter-actions">
-            <button type="button" class="stitch-btn-icon" title="Actualizar">
-              <span class="material-symbols-outlined">refresh</span>
-            </button>
-            <button type="button" class="stitch-btn-icon" title="Descargar">
-              <span class="material-symbols-outlined">download</span>
-            </button>
-          </div>
         </div>
         <form class="stitch-form-grid" th:action="@{/cargas/buscar}" method="post" th:object="${cargaForm}">
           <div class="stitch-col-4 stitch-field">
@@ -99,7 +91,7 @@
           <span class="stitch-count-badge" th:text="${cargaForm != null and cargaForm.formularios != null} ? ${#lists.size(cargaForm.formularios)} + ' registros' : '0 registros'">0 registros</span>
         </div>
         <div class="stitch-table-wrap" th:if="${cargaForm != null and not #lists.isEmpty(cargaForm.formularios)}">
-          <table class="stitch-table atp-cargas__tabla">
+          <table class="stitch-table">
             <!-- Compatibilidad de pruebas legacy: Nro Guia Acopiador Cuit Fecha Emision Nro. Comprobante Total General Marcar -->
             <thead>
               <tr>
@@ -109,13 +101,13 @@
                 <th scope="col">Nro. Comprobante</th>
                 <th scope="col">Total General</th>
                 <th scope="col" class="stitch-th--center">Estado</th>
-                <th scope="col" class="stitch-th--center">Resumen / Acciones</th>
+                <th scope="col" class="stitch-th--center">Marcar</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="f : ${cargaForm.formularios}">
                 <td>
-                  <a class="stitch-link stitch-data" th:href="@{/cargas/detalle(dppNroForm=${f.dppNroForm},dpptipoGui=${cargaForm.dpptipoGui},duplicado=${cargaForm.duplicado},conCuit=${f.conCuit})}" th:text="${f.dppNroForm}">0000000000</a>
+                  <a class="stitch-link stitch-data" th:href="@{/cargas/detalle(dppNroForm=${f.dppNroForm},dpptipoGui=${cargaForm.dpptipoGui},duplicado=${cargaForm.duplicado},conCuit=${f.conCuit},nroGuia=${cargaForm.nroGuia},barCode=${cargaForm.barCode})}" th:text="${f.dppNroForm}">0000000000</a>
                 </td>
                 <td>
                   <div class="stitch-name" th:text="${f.conRazSoc}">Razón social</div>
@@ -128,21 +120,16 @@
                   <span class="stitch-badge atp-cargas__badge-validado">Validado</span>
                 </td>
                 <td class="stitch-td--center">
-                  <div class="atp-cargas__acciones">
-                    <form class="atp-form atp-form--inline" th:action="@{/cargas/marcar}" method="post">
-                      <input type="hidden" name="conCuit" th:value="${f.conCuit}" />
-                      <input type="hidden" name="dppSucu" th:value="${f.dppSucu}" />
-                      <input type="hidden" name="calPerFisc" th:value="${f.calPerFisc}" />
-                      <input type="hidden" name="dppSecu" th:value="${f.dppSecu}" />
-                      <input type="hidden" name="dppNroForm" th:value="${f.dppNroForm}" />
-                      <button type="submit" class="stitch-btn-icon" data-icon="selectRow" th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}" onclick="return confirm('Esta seguro que desea Marcar el formulario?')">
-                        <img th:src="@{/img/selectRow.png}" alt="selectRow" width="21" height="21">
-                      </button>
-                    </form>
-                    <button type="button" class="stitch-btn-icon" title="Imprimir"><span class="material-symbols-outlined">print</span></button>
-                    <button type="button" class="stitch-btn-icon" title="Recibo"><span class="material-symbols-outlined">receipt</span></button>
-                    <button type="button" class="stitch-btn-icon" title="Ver detalle"><span class="material-symbols-outlined">visibility</span></button>
-                  </div>
+                  <form class="atp-form atp-form--inline" th:action="@{/cargas/marcar}" method="post">
+                    <input type="hidden" name="conCuit" th:value="${f.conCuit}" />
+                    <input type="hidden" name="dppSucu" th:value="${f.dppSucu}" />
+                    <input type="hidden" name="calPerFisc" th:value="${f.calPerFisc}" />
+                    <input type="hidden" name="dppSecu" th:value="${f.dppSecu}" />
+                    <input type="hidden" name="dppNroForm" th:value="${f.dppNroForm}" />
+                    <button type="submit" class="stitch-btn-icon" data-icon="selectRow" th:disabled="${cargaForm != null and cargaForm.context != null and cargaForm.context.sucursal == 0}" onclick="return confirm('Esta seguro que desea Marcar el formulario?')">
+                      <img th:src="@{/img/selectRow.png}" alt="selectRow" width="21" height="21"> Marcar
+                    </button>
+                  </form>
                 </td>
               </tr>
             </tbody>
@@ -176,7 +163,7 @@
       </div>
 
       <div th:if="${cargaForm != null and cargaForm.mostrarModal != null and cargaForm.mostrarModal}">
-        <div th:replace="~{puestos/fragments/form506-detalle :: modal}"></div>
+        <div th:replace="~{puestos/fragments/modal-detalle-guia :: modalDetalleGuia}"></div>
       </div>
     </div>
   </main>
@@ -184,6 +171,8 @@
   <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
 
   <link rel="stylesheet" th:href="@{/css/control-cargas.css}">
+  <link rel="stylesheet" th:href="@{/css/modal-detalle-guia.css}">
   <script th:src="@{/js/control-cargas.js}" defer></script>
+  <script th:src="@{/js/modal-detalle-guia.js}" defer></script>
 </body>
 </html>

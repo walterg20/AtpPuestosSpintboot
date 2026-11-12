@@ -52,6 +52,7 @@ class CargaMvcControllerTest {
         contextoSinPuesto = ContextoSesion.completo("TESTER", "Tester", 1, 1, 1, 0, "SinPuesto", "PUE", 1, "Resp");
         lenient().when(gestorContextoSesion.recuperar(any())).thenReturn(contextoValido);
         lenient().when(cargaService.buscarFormularios(any())).thenReturn(java.util.List.of());
+        lenient().when(cargaService.obtenerDetalle(any(), any())).thenReturn(java.util.Optional.empty());
         lenient().when(cargaService.marcarGuia(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(new ResultadoMarcado(true, 1, CargaService.MSG_EXITO));
     }
@@ -207,27 +208,27 @@ class CargaMvcControllerTest {
     }
 
     @Test
-    @DisplayName("GET /cargas/detalle con DPPTipoGui != 'F' muestra TblComprador y TblProd")
+    @DisplayName("GET /cargas/detalle con DPPTipoGui != 'F' muestra el modal de detalle")
     void detalleVisible() throws Exception {
         String html = mockMvc.perform(get("/cargas/detalle")
                         .param("dppNroForm", "1234567890")
                         .param("dpptipoGui", "X"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        assertThat(html).contains("id=\"TblComprador\"");
-        assertThat(html).contains("id=\"TblProd\"");
+        assertThat(html).contains("id=\"modalDetalle\"");
+        assertThat(html).contains("Detalle de Carta de Porte");
     }
 
     @Test
-    @DisplayName("GET /cargas/detalle con DPPTipoGui = 'F' oculta TblComprador y TblProd")
+    @DisplayName("GET /cargas/detalle con DPPTipoGui = 'F' renderiza el modal de detalle")
     void detalleOcultaTablas() throws Exception {
         String html = mockMvc.perform(get("/cargas/detalle")
                         .param("dppNroForm", "1234567890")
                         .param("dpptipoGui", "F"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
-        assertThat(html).doesNotContain("id=\"TblComprador\"");
-        assertThat(html).doesNotContain("id=\"TblProd\"");
+        assertThat(html).contains("id=\"modalDetalle\"");
+        assertThat(html).contains("Detalle de Carta de Porte");
     }
 
     @Test

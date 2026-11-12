@@ -259,7 +259,7 @@ class ActaAltaTest extends ActaServicioTestBase {
                 "1", "AB123CD", "EF456GH", new BigDecimal("1"),
                 List.of(new ActaAltaProducto(10, BigDecimal.ONE, BigDecimal.ONE)));
         assertThat(service.guardar(alta, contexto()).mensaje())
-                .isEqualTo("Debe seleccionar un tipo de comprobante");
+                .isEqualTo("Ingrese todos los datos del Transporte");
     }
 
     @Test
@@ -270,7 +270,7 @@ class ActaAltaTest extends ActaServicioTestBase {
                 null, "AB123CD", "EF456GH", new BigDecimal("1"),
                 List.of(new ActaAltaProducto(10, BigDecimal.ONE, BigDecimal.ONE)));
         assertThat(service.guardar(alta, contexto()).mensaje())
-                .isEqualTo("Debe ingresar un nro. de comprobante");
+                .isEqualTo("Ingrese todos los datos del Transporte");
     }
 
     @Test

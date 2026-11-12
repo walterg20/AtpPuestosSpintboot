@@ -1,0 +1,253 @@
+/*
+ * Carga Manual de Actas — SCREEN_21 (Stitch).
+ * Todos los colores y tipografías salen de var(--stitch-*). Las transparencias usan
+ * color-mix(in srgb, var(--stitch-*) <pct>, transparent). Sin literales hex/rgb/rgba.
+ */
+.actas-forms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-lg);
+}
+
+.actas-forms__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--stitch-space-sm);
+}
+
+.actas-forms__card {
+  background: var(--stitch-surface-container-lowest);
+  border: 1px solid var(--stitch-card-border);
+  border-radius: var(--stitch-radius-lg);
+  padding: var(--stitch-space-md);
+  box-shadow: var(--stitch-shadow-1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-md);
+}
+
+.actas-forms__card-title {
+  margin: 0;
+  font-size: var(--stitch-headline-sm-size);
+  font-weight: var(--stitch-headline-sm-weight);
+  line-height: var(--stitch-headline-sm-line);
+  color: var(--stitch-primary);
+}
+
+.actas-forms__fieldset {
+  border: 1px solid var(--stitch-outline-variant);
+  border-radius: var(--stitch-radius);
+  padding: var(--stitch-space-md);
+  margin: 0;
+}
+
+.actas-forms__legend {
+  padding: 0 var(--stitch-space-xs);
+  font-size: var(--stitch-label-md-size);
+  font-weight: var(--stitch-label-md-weight);
+  color: var(--stitch-secondary);
+}
+
+.actas-forms__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--stitch-space-md);
+}
+
+@media (min-width: 768px) {
+  .actas-forms__grid--acta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .actas-forms__grid--partes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .actas-forms__grid--transporte {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  }
+}
+
+.actas-forms__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-xs);
+  min-width: 0;
+}
+
+.actas-forms__label {
+  font-size: var(--stitch-label-sm-size);
+  font-weight: var(--stitch-label-sm-weight);
+  letter-spacing: var(--stitch-label-sm-tracking);
+  text-transform: uppercase;
+  color: var(--stitch-on-surface-variant);
+}
+
+.actas-forms__input,
+.actas-forms__select,
+.actas-forms__textarea {
+  width: 100%;
+  padding: var(--stitch-space-xs) var(--stitch-space-sm);
+  background: var(--stitch-surface-container-low);
+  color: var(--stitch-on-surface);
+  font-size: var(--stitch-body-md-size);
+  line-height: var(--stitch-body-md-line);
+  border: 1px solid var(--stitch-outline-variant);
+  border-radius: var(--stitch-radius);
+  box-sizing: border-box;
+}
+
+.actas-forms__input:focus,
+.actas-forms__select:focus,
+.actas-forms__textarea:focus {
+  outline: none;
+  border-color: var(--stitch-secondary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--stitch-secondary) 25%, transparent);
+}
+
+.actas-forms__control--error {
+  border-color: var(--stitch-error);
+  color: var(--stitch-on-error-container);
+}
+
+.actas-forms__error {
+  margin: 0;
+  font-size: var(--stitch-body-sm-size);
+  line-height: var(--stitch-body-sm-line);
+  color: var(--stitch-error);
+  font-weight: 600;
+}
+
+.actas-forms__cuit-row {
+  display: flex;
+  gap: var(--stitch-space-xs);
+  align-items: stretch;
+}
+
+.actas-forms__cuit-row .actas-forms__input {
+  flex: 1 1 auto;
+}
+
+.actas-forms__btn {
+  padding: var(--stitch-space-xs) var(--stitch-space-md);
+  border: 1px solid var(--stitch-outline-variant);
+  border-radius: var(--stitch-radius);
+  background: var(--stitch-surface-container);
+  color: var(--stitch-on-surface);
+  font-size: var(--stitch-label-md-size);
+  font-weight: var(--stitch-label-md-weight);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.actas-forms__btn:hover {
+  background: var(--stitch-surface-container-high);
+}
+
+.actas-forms__btn--search {
+  white-space: nowrap;
+  background: var(--stitch-secondary);
+  color: var(--stitch-on-secondary);
+  border-color: var(--stitch-secondary);
+}
+
+.actas-forms__btn--search:hover {
+  background: var(--stitch-on-secondary-container);
+}
+
+.actas-forms__btn--confirmar {
+  background: var(--stitch-primary);
+  color: var(--stitch-on-primary);
+  border-color: var(--stitch-primary);
+}
+
+.actas-forms__btn--confirmar:hover {
+  background: var(--stitch-primary-container);
+}
+
+.actas-forms__btn--cancelar {
+  background: var(--stitch-surface-container-lowest);
+  color: var(--stitch-on-surface-variant);
+}
+
+.actas-forms__btn--secundario {
+  background: var(--stitch-surface-container-high);
+  color: var(--stitch-on-surface);
+}
+
+.actas-forms__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.actas-forms__table thead tr {
+  background: var(--stitch-primary);
+  color: var(--stitch-on-primary);
+}
+
+.actas-forms__table th,
+.actas-forms__table td {
+  padding: var(--stitch-space-sm) var(--stitch-space-md);
+  font-size: var(--stitch-body-md-size);
+}
+
+.actas-forms__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--stitch-space-sm) 0;
+  border-top: 1px solid var(--stitch-outline-variant);
+  font-weight: var(--stitch-label-lg-weight);
+  color: var(--stitch-primary);
+}
+
+.actas-forms__total-value {
+  font-family: var(--stitch-font-family);
+  font-size: var(--stitch-headline-sm-size);
+}
+
+.actas-forms__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--stitch-space-md);
+}
+
+.actas-forms__firma {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-xs);
+  padding: var(--stitch-space-sm);
+  border: 1px dashed var(--stitch-outline-variant);
+  border-radius: var(--stitch-radius);
+  background: color-mix(in srgb, var(--stitch-surface-container) 60%, transparent);
+}
+
+.actas-forms__firma-label {
+  font-size: var(--stitch-label-sm-size);
+  text-transform: uppercase;
+  color: var(--stitch-on-surface-variant);
+}
+
+.actas-forms__firma-estado {
+  font-size: var(--stitch-body-md-size);
+  color: var(--stitch-warning);
+}
+
+.actas-forms__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--stitch-space-sm);
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .actas-forms__grid--partes,
+  .actas-forms__grid--acta {
+    grid-template-columns: 1fr;
+  }
+  .actas-forms__acciones .actas-forms__btn {
+    width: 100%;
+  }
+}

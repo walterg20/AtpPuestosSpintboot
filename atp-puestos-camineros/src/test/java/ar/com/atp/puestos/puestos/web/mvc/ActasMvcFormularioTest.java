@@ -88,11 +88,11 @@ class ActasMvcFormularioTest {
     // --------------------------------------------------------- /actas/nueva
 
     @Test
-    @DisplayName("GET /actas/nueva devuelve 200 y la vista puestos/acta-formulario")
+    @DisplayName("GET /actas/nueva devuelve 200 y la vista puestos/carga-manual-actas")
     void getNuevaDevuelveLaVista() throws Exception {
         mockMvc.perform(get("/actas/nueva"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("puestos/acta-formulario"))
+                .andExpect(view().name("puestos/carga-manual-actas"))
                 .andExpect(model().attributeExists("actaForm"))
                 .andExpect(model().attributeExists("productosDisponibles"));
     }

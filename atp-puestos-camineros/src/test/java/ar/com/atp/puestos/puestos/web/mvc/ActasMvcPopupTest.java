@@ -78,7 +78,7 @@ class ActasMvcPopupTest {
     void getNuevaExponeFlags() throws Exception {
         mockMvc.perform(get("/actas/nueva"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("puestos/acta-formulario"))
+                .andExpect(view().name("puestos/carga-manual-actas"))
                 .andExpect(model().attributeExists("locCodVenDerivado"))
                 .andExpect(model().attributeExists("locCodDesDerivado"))
                 .andExpect(model().attributeExists("locCodTranDerivado"));

@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <div th:fragment="modalDetalleGuia" id="modalDetalle" class="modal-backdrop-caminera" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+    <div class="modal-card-caminera">
+      <header class="modal-header-institucional">
+        <div class="modal-header-info">
+          <div class="modal-icon-badge">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          </div>
+          <div>
+            <div class="modal-title-row">
+              <h2 id="modalTitulo" class="modal-title">Detalle de Carta de Porte / Guia de Transito</h2>
+              <span class="badge-atp-valido">VALIDADO ATP</span>
+            </div>
+            <div class="modal-submeta">
+              <span>Comprobante N° <strong th:text="${cargaForm != null and cargaForm.dppNroForm != null} ? ${cargaForm.dppNroForm} : ''">0000000000</strong></span>
+              <span>â€¢</span>
+              <span>Fecha: <span th:text="${cargaForm != null and cargaForm.fechaControl != null} ? ${#temporals.format(cargaForm.fechaControl, 'dd/MM/yyyy HH:mm')} : ''">fecha</span></span>
+              <span>â€¢</span>
+              <span>Puesto: <strong th:text="${cargaForm != null and cargaForm.puestoIngreso != null} ? ${cargaForm.puestoIngreso} : ''">puesto</strong></span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="cerrarModalDetalleGuia()" aria-label="Cerrar modal">&times;</button>
+      </header>
+      <div class="modal-body-content">
+        <div class="mdg-alert mdg-alert--success" role="status" aria-live="polite" th:if="${cargaForm != null and cargaForm.mensaje != null and cargaForm.mensaje == 'La guia ha sido marcada con exito'}">
+          <p th:text="${cargaForm.mensaje}">La guia ha sido marcada con exito</p>
+        </div>
+        <div class="mdg-alert mdg-alert--warn" role="status" aria-live="polite" th:if="${cargaForm != null and cargaForm.duplicado != null and cargaForm.duplicado > 1}">
+          <p>Guia Duplicada , ya paso por algun puesto</p>
+        </div>
+        <section class="section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <span>Datos Guia</span>
+            </div>
+            <span class="badge-expediente" th:text="${cargaForm != null and cargaForm.expedienteDigital != null} ? ${'Expediente Digital #' + cargaForm.expedienteDigital} : 'Expediente Digital'">Expediente Digital</span>
+          </div>
+          <div class="grid-form-4">
+            <div class="data-group">
+              <span class="data-label">Comprobante</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.tipoComprobante != null and !#strings.isEmpty(cargaForm.tipoComprobante)} ? ${cargaForm.tipoComprobante} : 'F'">F</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">N° Comprobante</span>
+              <span class="pill-number" th:text="${cargaForm != null and cargaForm.dppNroForm != null} ? ${cargaForm.dppNroForm} : ''">0000000000</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Fecha Control</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.fechaControl != null} ? ${#temporals.format(cargaForm.fechaControl, 'dd/MM/yyyy HH:mm')} : ''">fecha</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Puesto de Ingreso</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.puestoIngreso != null} ? ${cargaForm.puestoIngreso} : ''">puesto</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Tipo de Guia</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.dpptipoGui != null} ? ${cargaForm.dpptipoGui} : ''">G</span>
+            </div>
+          </div>
+        </section>
+        <section class="section-card">
+          <div class="section-header">
+            <div class="section-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              <span>Datos Transportista y Vehiculo</span>
+            </div>
+            <span class="badge-padron">Padron Activo ATP</span>
+          </div>
+          <div class="grid-form-2">
+            <div class="data-group">
+              <span class="data-label">Transportista / Razon Social</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.conRazSoc != null} ? ${cargaForm.conRazSoc} : ''">Razon social</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">C.U.I.T.</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.conCuit != null} ? ${cargaForm.conCuit} : ''">0</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Patente Chasis</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.chasis != null} ? ${cargaForm.chasis} : ''">chasis</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Patente Acoplado</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.acoplado != null} ? ${cargaForm.acoplado} : ''">acoplado</span>
+            </div>
+          </div>
+        </section>
+        <section class="section-card">
+          <div class="section-header">
+            <div class="section-title"><span>Fiscalizacion</span></div>
+          </div>
+          <div class="grid-form-2">
+            <div class="data-group">
+              <span class="data-label">Fiscalizador</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.fiscalizador != null} ? ${cargaForm.fiscalizador} : ''">fiscalizador</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Hash Control</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.hashControl != null} ? ${cargaForm.hashControl} : ''">hash</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Expediente Digital</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.expedienteDigital != null} ? ${cargaForm.expedienteDigital} : ''">0</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Domicilio Fiscal</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.domicilioFiscal != null} ? ${cargaForm.domicilioFiscal} : ''">domicilio</span>
+            </div>
+          </div>
+        </section>
+        <div class="grid-comparison-2">
+          <div class="calc-panel">
+            <h3 class="calc-panel-header">Total Flete-Pago</h3>
+            <div class="calc-table">
+              <div class="calc-row"><span class="calc-term">KM Flete</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.kmFlete != null} ? ${#numbers.formatDecimal(cargaForm.kmFlete, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Tarifa x KM</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.tarifaKm != null} ? ${#numbers.formatDecimal(cargaForm.tarifaKm, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Monto Flete</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.montoFlete != null} ? ${#numbers.formatDecimal(cargaForm.montoFlete, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Alicuota</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.alicuota != null} ? ${#numbers.formatDecimal(cargaForm.alicuota, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Impuesto Flete</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.impuestoFlete != null} ? ${#numbers.formatDecimal(cargaForm.impuestoFlete, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Adicional 10% Flete</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.adicional10 != null} ? ${#numbers.formatDecimal(cargaForm.adicional10, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row calc-row--total"><span class="calc-term">Subtotal Flete</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.subtotalFlete != null} ? ${#numbers.formatDecimal(cargaForm.subtotalFlete, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+            </div>
+          </div>
+          <div class="calc-panel">
+            <h3 class="calc-panel-header">Total Traslado Prod. Primaria</h3>
+            <div class="calc-table">
+              <div class="calc-row"><span class="calc-term">Ingreso Bruto</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.ingresoBruto != null} ? ${#numbers.formatDecimal(cargaForm.ingresoBruto, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Adicional 10% - IB</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.adicionalIB != null} ? ${#numbers.formatDecimal(cargaForm.adicionalIB, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Cosecha Mecanica</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.cosechaMecanica != null} ? ${#numbers.formatDecimal(cargaForm.cosechaMecanica, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row"><span class="calc-term">Adicional 10% - CM</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.adicionalCM != null} ? ${#numbers.formatDecimal(cargaForm.adicionalCM, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+              <div class="calc-row calc-row--total"><span class="calc-term">Subtotal Traslado</span><span class="calc-val" th:text="${cargaForm != null and cargaForm.subtotalTraslado != null} ? ${#numbers.formatDecimal(cargaForm.subtotalTraslado, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</span></div>
+            </div>
+          </div>
+        </div>
+        <table id="TblComprador" class="stitch-table" th:if="${cargaForm != null and cargaForm.dpptipoGui != 'F'}">
+          <caption>Comprador</caption>
+          <tbody>
+            <tr><td th:text="${cargaForm != null and cargaForm.conRazSoc != null} ? ${cargaForm.conRazSoc} : ''">Razon social</td></tr>
+          </tbody>
+        </table>
+        <table id="TblProd" class="stitch-table" th:if="${cargaForm != null and cargaForm.dpptipoGui != 'F'}">
+          <caption>Productos</caption>
+          <tbody>
+            <tr><td>Producto</td></tr>
+          </tbody>
+        </table>
+        <div class="total-general-banner">
+          <div class="total-general-left">
+            <div class="total-general-icon">$</div>
+            <div>
+              <div class="total-general-label">Total General</div>
+              <div class="total-general-sub">Gravamen de transporte + Adicionales de Ley</div>
+            </div>
+          </div>
+          <div class="total-amount-display" th:text="${cargaForm != null and cargaForm.totalGeneral != null} ? ${#numbers.formatDecimal(cargaForm.totalGeneral, 1, 'POINT', 2, 'COMMA')} : '0,00'">0,00</div>
+        </div>
+      </div>
+      <footer class="modal-footer-actions">
+        <button type="button" class="btn-caminera-secondary" onclick="cerrarModalDetalleGuia()">Cerrar</button>
+        <div class="modal-footer-right">
+          <button type="button" class="btn-caminera-outline" onclick="window.print()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Imprimir Comprobante
+          </button>
+          <button type="button" class="btn-caminera-primary" onclick="descargarModalDetalleGuia()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Descargar Certificado PDF
+          </button>
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

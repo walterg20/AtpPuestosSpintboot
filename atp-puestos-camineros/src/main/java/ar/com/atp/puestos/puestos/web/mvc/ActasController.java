@@ -35,7 +35,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * <p>Rutas (plan §3.2):
  * <ul>
  *   <li>{@code GET /actas} → vista {@code puestos/actas-lista} (grilla paginada + filtros);</li>
- *   <li>{@code GET /actas/nueva} → vista {@code puestos/acta-formulario} (alta);</li>
+ *   <li>{@code GET /actas/nueva} → vista {@code puestos/carga-manual-actas} (alta);</li>
  *   <li>{@code POST /actas/guardar} → re-render del formulario (200) o {@code redirect:/actas} (302).</li>
  * </ul>
  *
@@ -56,7 +56,7 @@ public class ActasController {
     private static final String VISTA_LISTA = "puestos/actas-lista";
 
     /** Vista del formulario de alta. */
-    private static final String VISTA_FORMULARIO = "puestos/acta-formulario";
+    private static final String VISTA_FORMULARIO = "puestos/carga-manual-actas";
 
     /** Mensaje de éxito verbatim del legacy (spec §3.9, mensaje 26). */
     static final String MENSAJE_EXITO = "El acta se ha creado correctamente";

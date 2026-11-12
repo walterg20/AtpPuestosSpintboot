@@ -72,6 +72,7 @@ public class ActaValidador {
             return MensajesActa.MSG_RAZON_SOCIAL_TRANSPORTISTA;
         }
         if (esVacio(alta.f276Chasis()) || esVacio(alta.f276Acopla())
+                || alta.f276TCpbte() == null || esVacio(alta.f276NCpbte())
                 || alta.f276KmFle() == null) {
             return MensajesActa.MSG_DATOS_TRANSPORTE;
         }
@@ -101,7 +102,8 @@ public class ActaValidador {
     /**
      * Reglas de la transacción {@code F2276} que dependen de la sesión y de la fecha.
      *
-     * <p>Orden: tipo de comprobante → nº de comprobante → fecha futura → turno cerrado. El
+     * <p>Orden: fecha futura → turno cerrado. El tipo y número de comprobante se validan junto
+     * con los demás datos del transporte en {@link #validar(ActaAlta)} (R-ACTA-040). El
      * precio inferior al registrado se valida por renglón de detalle (ver
      * {@code ActaService#guardar}), porque depende del precio fijo del producto.
      *
@@ -110,12 +112,6 @@ public class ActaValidador {
      * @return el primer mensaje verbatim, o {@code null} si todo está bien
      */
     public String validarReglas(ActaAlta alta, ContextoSesion ctx) {
-        if (alta.f276TCpbte() == null) {
-            return MensajesActa.MSG_TIPO_COMPROBANTE;
-        }
-        if (esVacio(alta.f276NCpbte())) {
-            return MensajesActa.MSG_NRO_COMPROBANTE;
-        }
         if (fechaMovimiento(alta).isAfter(LocalDate.now())) {
             return MensajesActa.MSG_FECHA_FUTURA;
         }

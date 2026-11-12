@@ -54,6 +54,7 @@ class CargaCorreccionMvcTest {
         contextoValido = ContextoSesion.completo("TESTER", "Tester", 1, 1, 1, 5, "Puesto5", "PUE", 1, "Resp");
         lenient().when(gestorContextoSesion.recuperar(any())).thenReturn(contextoValido);
         lenient().when(cargaService.buscarFormularios(any())).thenReturn(List.of());
+        lenient().when(cargaService.obtenerDetalle(any(), any())).thenReturn(java.util.Optional.empty());
         lenient().when(cargaService.marcarGuia(any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(new ResultadoMarcado(true, 1, CargaService.MSG_EXITO));
     }

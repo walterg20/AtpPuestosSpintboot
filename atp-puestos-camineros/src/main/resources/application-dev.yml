@@ -1,0 +1,10 @@
+# Perfil dev: hot reload de vistas/recursos estaticos para desarrollo.
+spring:
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        period: 0
+      chain:
+        cache: false

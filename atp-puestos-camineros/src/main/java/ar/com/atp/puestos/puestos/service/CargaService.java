@@ -10,6 +10,7 @@ import ar.com.atp.puestos.puestos.repository.PaseGuiaRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,10 +74,10 @@ public class CargaService {
                         "Formulario " + dppNroForm + " no encontrado."));
 
         if (cabecera.getDppMarcAnu() != null && cabecera.getDppMarcAnu() == 1) {
-            return new ResultadoMarcado(false, 0, MSG_ANULADA);
+            return new ResultadoMarcado(false, 0, MSG_ANULADA, cabecera);
         }
         if ("I".equals(cabecera.getDppClasif())) {
-            return new ResultadoMarcado(false, 0, MSG_INTERNA);
+            return new ResultadoMarcado(false, 0, MSG_INTERNA, cabecera);
         }
 
         // Actualizar cabecera
@@ -118,6 +119,26 @@ public class CargaService {
 
         paseRepository.save(pase);
 
-        return new ResultadoMarcado(true, duplicado, MSG_EXITO);
+        return new ResultadoMarcado(true, duplicado, MSG_EXITO, cabecera);
     }
+
+    public Optional<DetalleProductoPrimario> obtenerDetalle(String dppNroForm, Long conCuit) {
+        if (dppNroForm == null || dppNroForm.isBlank()) {
+            return Optional.empty();
+        }
+        List<DetalleProductoPrimario> lista = detalleRepository.findByDppNroForm(dppNroForm.trim());
+        if (lista == null || lista.isEmpty()) {
+            return Optional.empty();
+        }
+        if (conCuit != null) {
+            for (DetalleProductoPrimario d : lista) {
+                BigDecimal cc = d.getConCuit();
+                if (cc != null && cc.longValue() == conCuit) {
+                    return Optional.of(d);
+                }
+            }
+        }
+        return Optional.of(lista.get(0));
+    }
+
 }

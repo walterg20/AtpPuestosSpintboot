@@ -22,7 +22,7 @@ class ActasRecursosTest {
             "/static/css/actas.css",
             "/static/js/actas.js",
             "/templates/puestos/actas-lista.html",
-            "/templates/puestos/acta-formulario.html",
+            "/templates/puestos/carga-manual-actas.html",
             "/templates/puestos/fragments/acta-productos.html");
 
     private static final List<String> PROHIBIDOS = List.of(
@@ -46,7 +46,7 @@ class ActasRecursosTest {
     void lasPlantillasNoCarganRecursosRemotos() throws IOException {
         List<String> plantillas = List.of(
                 "/templates/puestos/actas-lista.html",
-                "/templates/puestos/acta-formulario.html",
+                "/templates/puestos/carga-manual-actas.html",
                 "/templates/puestos/fragments/acta-productos.html");
         for (String plantilla : plantillas) {
             String contenido = leer(plantilla).toLowerCase(Locale.ROOT);

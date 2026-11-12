@@ -105,7 +105,7 @@ class ActasMvcManualTest {
     void getNuevaManualRenderizaNumeroDeActa() throws Exception {
         mockMvc.perform(get("/actas/nueva").param("manual", "true").param("turNroId", "42"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("puestos/acta-formulario"))
+                .andExpect(view().name("puestos/carga-manual-actas"))
                 .andExpect(model().attribute("manual", true))
                 .andExpect(model().attribute("turNroId", 42));
 

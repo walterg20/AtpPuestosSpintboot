@@ -41,3 +41,8 @@ Desktop.ini
 *.tmp
 *.bak
 ~$*
+
+# === Artefactos de ejecucion local ===
+*.pid
+*.log
+*.err.log

@@ -19,9 +19,10 @@ import org.junit.jupiter.api.Test;
 class ActasRecursosTest {
 
     private static final List<String> RECURSOS = List.of(
-            "/static/css/actas.css",
-            "/static/js/actas.js",
+            "/static/css/actas-forms.css",
+            "/static/js/actas-forms.js",
             "/templates/puestos/actas-lista.html",
+            "/templates/puestos/actas-listado.html",
             "/templates/puestos/carga-manual-actas.html",
             "/templates/puestos/fragments/acta-productos.html");
 
@@ -46,6 +47,7 @@ class ActasRecursosTest {
     void lasPlantillasNoCarganRecursosRemotos() throws IOException {
         List<String> plantillas = List.of(
                 "/templates/puestos/actas-lista.html",
+                "/templates/puestos/actas-listado.html",
                 "/templates/puestos/carga-manual-actas.html",
                 "/templates/puestos/fragments/acta-productos.html");
         for (String plantilla : plantillas) {
@@ -58,25 +60,25 @@ class ActasRecursosTest {
     }
 
     @Test
-    @DisplayName("actas.css no contiene literales hexadecimales: todos los colores son tokens")
-    void actasCssNoTieneLiteralesHexadecimales() throws IOException {
-        String css = leer("/static/css/actas.css");
+    @DisplayName("actas-forms.css no contiene literales hexadecimales: todos los colores son tokens")
+    void actasFormsCssNoTieneLiteralesHexadecimales() throws IOException {
+        String css = leer("/static/css/actas-forms.css");
         assertThat(css).doesNotContain("#");
     }
 
     @Test
-    @DisplayName("actas.css sólo usa var(--atp-*) para los colores")
-    void actasCssUsaLosTokensDelSistema() throws IOException {
-        String css = leer("/static/css/actas.css");
-        assertThat(css).contains("var(--atp-");
+    @DisplayName("actas-forms.css sólo usa var(--stitch-*) para los colores")
+    void actasFormsCssUsaLosTokensDelSistema() throws IOException {
+        String css = leer("/static/css/actas-forms.css");
+        assertThat(css).contains("var(--stitch-");
         assertThat(css).doesNotContain("rgb(");
         assertThat(css).doesNotContain("hsl(");
     }
 
     @Test
-    @DisplayName("actas.js no hace fetch, no usa XMLHttpRequest ni eval")
-    void actasJsNoTieneLlamadasHttpNiEval() throws IOException {
-        String js = leer("/static/js/actas.js");
+    @DisplayName("actas-forms.js no hace fetch, no usa XMLHttpRequest ni eval")
+    void actasFormsJsNoTieneLlamadasHttpNiEval() throws IOException {
+        String js = leer("/static/js/actas-forms.js");
         assertThat(js).doesNotContain("fetch(");
         assertThat(js).doesNotContain("XMLHttpRequest");
         assertThat(js).doesNotContain("eval(");
@@ -84,9 +86,9 @@ class ActasRecursosTest {
     }
 
     @Test
-    @DisplayName("actas.js incluye la confirmación verbatim del legacy")
-    void actasJsTieneLaConfirmacionVerbatim() throws IOException {
-        String js = leer("/static/js/actas.js");
+    @DisplayName("actas-forms.js incluye la confirmación verbatim del legacy")
+    void actasFormsJsTieneLaConfirmacionVerbatim() throws IOException {
+        String js = leer("/static/js/actas-forms.js");
         assertThat(js).contains("¿Confirma que desea enviar el Formulario de Acta?");
     }
 

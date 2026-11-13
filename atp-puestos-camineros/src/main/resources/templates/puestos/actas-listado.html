@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--
+  Listado de Actas (Formulario 2276) — rediseño SCREEN_21 de Stitch.
+  Variables del modelo: ${actasPage}, ${resumenMetricas}, ${filtros}.
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head('Actas Listado')}">
+  <title>Actas Listado</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+    <div class="stitch-page al-page">
+      <div class="al-cabecera">
+        <h1 class="stitch-page-title">Actas</h1>
+        <a class="atp-btn atp-btn--primary atp-actas__crear"
+           th:classappend="${turnoActivo} ? '' : 'atp-actas__crear--inactivo'"
+           th:href="${turnoActivo} ? @{/actas/nueva} : null"
+           th:attr="aria-disabled=${turnoActivo} ? null : 'true'">Crear Acta</a>
+      </div>
+
+      <!-- Mensaje de éxito tras el alta -->
+      <div class="atp-alert atp-alert--success" role="status" aria-live="polite"
+           th:if="${mensaje != null and !#strings.isEmpty(mensaje)}">
+        <p class="atp-alert__texto" th:text="${mensaje}">El acta se ha creado correctamente</p>
+      </div>
+
+      <!-- Sin turno -->
+      <div class="atp-alert atp-alert--warn" role="status" aria-live="polite"
+           th:if="${!turnoActivo}">
+        <p class="atp-alert__texto">Debe iniciar un turno...</p>
+      </div>
+
+      <!-- KPIs -->
+      <section class="al-kpis" aria-label="Indicadores de actas">
+        <article class="al-kpi">
+          <span class="al-kpi__label">Actas en Turno</span>
+          <strong class="al-kpi__value"
+                  th:text="${resumenMetricas != null ? resumenMetricas.actasEnTurno : 0}">0</strong>
+        </article>
+        <article class="al-kpi">
+          <span class="al-kpi__label">Carga Manual</span>
+          <strong class="al-kpi__value"
+                  th:text="${resumenMetricas != null ? resumenMetricas.cargaManual : 0}">0</strong>
+        </article>
+        <article class="al-kpi">
+          <span class="al-kpi__label">Confirmadas</span>
+          <strong class="al-kpi__value"
+                  th:text="${resumenMetricas != null ? resumenMetricas.confirmadas : 0}">0</strong>
+        </article>
+        <article class="al-kpi">
+          <span class="al-kpi__label">En Revisión</span>
+          <strong class="al-kpi__value"
+                  th:text="${resumenMetricas != null ? resumenMetricas.enRevision : 0}">0</strong>
+        </article>
+      </section>
+
+      <!-- Filtros -->
+      <form class="al-filtros atp-form atp-actas__filtros" method="get" th:action="@{/actas}"
+            th:object="${filtroActas}">
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="f276Id">Acto Nro.</label>
+          <input class="atp-field__control" id="f276Id" type="number" min="0" step="1" th:field="*{f276Id}">
+        </div>
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="cuit">CUIT</label>
+          <input class="atp-field__control" id="cuit" type="number" min="0" step="1" th:field="*{cuit}">
+        </div>
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="razonSocial">Razón Social</label>
+          <input class="atp-field__control" id="razonSocial" type="text" maxlength="35" th:field="*{razonSocial}">
+        </div>
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="desde">Desde</label>
+          <input class="atp-field__control" id="desde" type="date" th:field="*{desde}">
+        </div>
+        <div class="atp-field">
+          <label class="atp-field__etiqueta" for="hasta">Hasta</label>
+          <input class="atp-field__control" id="hasta" type="date" th:field="*{hasta}">
+        </div>
+        <div class="stitch-field">
+          <label class="stitch-field__label" for="busquedaRapida">Búsqueda rápida</label>
+          <input class="stitch-input" id="busquedaRapida" type="text" name="busquedaRapida" placeholder="Buscar...">
+        </div>
+        <div class="stitch-field">
+          <label class="stitch-field__label" for="tipoOrigen">Tipo/Origen</label>
+          <select class="stitch-select" id="tipoOrigen" name="tipoOrigen">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="stitch-field">
+          <label class="stitch-field__label" for="fechaTurno">Fecha de Turno</label>
+          <input class="stitch-input" id="fechaTurno" type="date" name="fechaTurno">
+        </div>
+        <div class="stitch-field al-filtros__acciones">
+          <button type="submit" class="stitch-btn-primary" id="btnFiltrar">Filtrar</button>
+          <button type="button" class="stitch-btn-secondary" id="btnReset">Limpiar</button>
+          <button type="button" class="stitch-btn-secondary" id="btnExportar">Exportar</button>
+        </div>
+      </form>
+
+      <!-- Grilla -->
+      <div class="stitch-table-card">
+        <div class="stitch-table-toolbar">
+          <span class="stitch-table-title">Listado de Actas</span>
+          <span class="stitch-count-badge"
+                th:text="${actasPage != null ? actasPage.totalElements : 0}">0</span>
+        </div>
+        <div class="stitch-table-wrap" th:if="${actasPage != null and not #lists.isEmpty(actasPage.content)}">
+          <table class="stitch-table al-tabla">
+            <thead>
+              <tr>
+                <th scope="col">ACTA NRO.</th>
+                <th scope="col">CUIT</th>
+                <th scope="col">RAZÓN SOCIAL</th>
+                <th scope="col">GEN. MANUAL?</th>
+                <th scope="col">USUARIO GEN.</th>
+                <th scope="col">FECHA/HORA</th>
+                <th scope="col">ESTADO</th>
+                <th scope="col">ACCIONES/IMPRIMIR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="a : ${actasPage.content}">
+                <td class="stitch-data" th:text="${a.f276Id}">0</td>
+                <td class="stitch-data" th:text="${a.conCuit}">0</td>
+                <td class="stitch-name" th:text="${a.conRazSoc}">Razón social</td>
+                <td class="stitch-td--center" th:text="${a.genManual}">No</td>
+                <td th:text="${a.f276Operad}">USUARIO</td>
+                <td class="stitch-data">-</td>
+                <td><span class="stitch-badge stitch-badge--open">-</span></td>
+                <td class="stitch-td--center">
+                  <span th:if="${a.imprimible}" title="Imprimir" aria-label="Imprimir">&#128424;</span>
+                  <span th:unless="${a.imprimible}" class="atp-actas__no-imprime"
+                        title="No Imprime" aria-label="No Imprime">&#128424;</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="stitch-empty" th:if="${actasPage == null or #lists.isEmpty(actasPage.content)}">
+          Sin actas para mostrar.
+        </p>
+      </div>
+
+      <!-- Paginador -->
+      <nav class="stitch-pagination" aria-label="Paginación de actas"
+           th:if="${actasPage != null and actasPage.totalPages > 1}">
+        <span class="stitch-pagination__info"
+              th:text="${actasPage.number + 1} + ' de ' + ${actasPage.totalPages}">1 de 1</span>
+        <div class="stitch-pagination__controls">
+          <a class="stitch-page-btn" th:if="${actasPage.hasPrevious()}"
+             th:href="@{/actas(page=${actasPage.number - 1},size=${actasPage.size},f276Id=${filtros.f276Id},cuit=${filtros.cuit},razonSocial=${filtros.razonSocial},desde=${filtros.desde},hasta=${filtros.hasta})}">Prev</a>
+          <button class="stitch-page-btn" type="button" th:if="${!actasPage.hasPrevious()}" disabled>Prev</button>
+          <a th:each="p : ${#numbers.sequence(0, actasPage.totalPages - 1)}"
+             class="stitch-page-btn"
+             th:classappend="${p == actasPage.number} ? ' stitch-page-btn--active' : ''"
+             th:href="@{/actas(page=${p},size=${actasPage.size},f276Id=${filtros.f276Id},cuit=${filtros.cuit},razonSocial=${filtros.razonSocial},desde=${filtros.desde},hasta=${filtros.hasta})}"
+             th:text="${p + 1}">1</a>
+          <a class="stitch-page-btn" th:if="${actasPage.hasNext()}"
+             th:href="@{/actas(page=${actasPage.number + 1},size=${actasPage.size},f276Id=${filtros.f276Id},cuit=${filtros.cuit},razonSocial=${filtros.razonSocial},desde=${filtros.desde},hasta=${filtros.hasta})}">Next</a>
+          <button class="stitch-page-btn" type="button" th:if="${!actasPage.hasNext()}" disabled>Next</button>
+        </div>
+      </nav>
+
+      <!-- Banner legal inferior -->
+      <div class="al-legal" role="note">
+        Sistema Integral de Puestos Camineros · ATP Chaco © 2018 - 2026
+      </div>
+    </div>
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+
+  <link rel="stylesheet" th:href="@{/css/actas-listado.css}">
+  <script th:src="@{/js/actas-listado.js}" defer></script>
+</body>
+</html>

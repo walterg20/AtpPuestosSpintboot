@@ -6,6 +6,7 @@ import ar.com.atp.puestos.nucleo.web.mvc.ProveedorNavegacion;
 import ar.com.atp.puestos.puestos.service.ActaService;
 import ar.com.atp.puestos.puestos.service.model.ActaFila;
 import ar.com.atp.puestos.puestos.service.model.ActaPreparada;
+import ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas;
 import ar.com.atp.puestos.puestos.service.model.ResultadoAltaActa;
 import ar.com.atp.puestos.puestos.web.mvc.form.ActaForm;
 import ar.com.atp.puestos.puestos.web.mvc.form.FiltroActasForm;
@@ -52,8 +53,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/actas")
 public class ActasController {
 
-    /** Vista del listado de Actas. */
-    private static final String VISTA_LISTA = "puestos/actas-lista";
+    /** Vista del listado de Actas (rediseño SCREEN_21). */
+    private static final String VISTA_LISTA = "puestos/actas-listado";
 
     /** Vista del formulario de alta. */
     private static final String VISTA_FORMULARIO = "puestos/carga-manual-actas";
@@ -122,11 +123,15 @@ public class ActasController {
         }
 
         model.addAttribute("actas", actas);
+        model.addAttribute("actasPage", actas);
         model.addAttribute("filtroActas", filtro);
+        model.addAttribute("filtros", filtro);
         model.addAttribute("turnoActivo", turnoActivo(contexto));
         model.addAttribute("sortActas", sortParam(pageable));
         Object exito = model.getAttribute("mensajeExito");
         model.addAttribute("mensaje", exito == null ? "" : exito.toString());
+
+        model.addAttribute("resumenMetricas", actaService.resumenMetricas(contexto));
         return VISTA_LISTA;
     }
 

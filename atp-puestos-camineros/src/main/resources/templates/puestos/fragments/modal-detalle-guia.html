@@ -91,6 +91,27 @@
         </section>
         <section class="section-card">
           <div class="section-header">
+            <div class="section-title">
+              <span>Datos Comprador</span>
+            </div>
+          </div>
+          <div class="grid-form-2">
+            <div class="data-group">
+              <span class="data-label">Razon Social</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.conRazSoc != null} ? ${cargaForm.conRazSoc} : ''">Razon social</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">C.U.I.T.</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.conCuit != null} ? ${cargaForm.conCuit} : ''">0</span>
+            </div>
+            <div class="data-group">
+              <span class="data-label">Domicilio</span>
+              <span class="data-value" th:text="${cargaForm != null and cargaForm.conDomicilio != null} ? ${cargaForm.conDomicilio} : ''">domicilio</span>
+            </div>
+          </div>
+        </section>
+        <section class="section-card">
+          <div class="section-header">
             <div class="section-title"><span>Fiscalizacion</span></div>
           </div>
           <div class="grid-form-2">

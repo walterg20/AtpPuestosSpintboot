@@ -12,6 +12,7 @@ public class CargaForm {
     private String dppNroForm;
     private Long conCuit;
     private String conRazSoc;
+    private String conDomicilio;
     private ContextoSesion context;
     private String mensaje;
     private Integer duplicado;
@@ -55,6 +56,8 @@ public class CargaForm {
     public void setConCuit(Long conCuit) { this.conCuit = conCuit; }
     public String getConRazSoc() { return conRazSoc; }
     public void setConRazSoc(String conRazSoc) { this.conRazSoc = conRazSoc; }
+    public String getConDomicilio() { return conDomicilio; }
+    public void setConDomicilio(String conDomicilio) { this.conDomicilio = conDomicilio; }
     public ContextoSesion getContext() { return context; }
     public void setContext(ContextoSesion context) { this.context = context; }
     public String getMensaje() { return mensaje; }

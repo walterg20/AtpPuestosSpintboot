@@ -86,7 +86,7 @@ class ActasMvcControllerTest {
     void getActasDevuelveLaVista() throws Exception {
         mockMvc.perform(get("/actas"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("puestos/actas-lista"));
+                .andExpect(view().name("puestos/actas-listado"));
     }
 
     @Test
@@ -135,12 +135,12 @@ class ActasMvcControllerTest {
         assertThat(fin).isGreaterThan(inicio);
         String encabezado = html.substring(inicio, fin);
 
-        int acto = encabezado.indexOf("Acto Nro.");
-        int cuit = encabezado.indexOf(">CUIT<");
-        int razon = encabezado.indexOf(">Razón Social<");
-        int manual = encabezado.indexOf("Gen. Manual?");
-        int operad = encabezado.indexOf("Usuario Gen.");
-        int imprimir = encabezado.indexOf(">Imprimir<");
+        int acto = encabezado.indexOf("ACTA NRO.");
+        int cuit = encabezado.indexOf("CUIT");
+        int razon = encabezado.indexOf("RAZÓN SOCIAL");
+        int manual = encabezado.indexOf("GEN. MANUAL?");
+        int operad = encabezado.indexOf("USUARIO GEN.");
+        int imprimir = encabezado.indexOf("ACCIONES/IMPRIMIR");
 
         assertThat(acto).isGreaterThan(0);
         assertThat(cuit).isGreaterThan(acto);

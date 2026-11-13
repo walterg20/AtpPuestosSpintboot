@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="turno-resumen"
+              language="java"
+              pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+  <parameter name="P_TITULO" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA["Resumen de Turnos"]]></defaultValueExpression>
+  </parameter>
+  <parameter name="P_FECHA_GENERACION" class="java.time.LocalDateTime" isForPrompting="false">
+    <defaultValueExpression><![CDATA[java.time.LocalDateTime.now()]]></defaultValueExpression>
+  </parameter>
+  <parameter name="P_VERSION" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA["0.1.0"]]></defaultValueExpression>
+  </parameter>
+  <parameter name="P_SUC_NRO_ID" class="java.lang.Integer" isForPrompting="false"/>
+  <parameter name="P_SUC_TIPO" class="java.lang.String" isForPrompting="false"/>
+  <parameter name="P_TUR_NRO_ID" class="java.lang.Integer" isForPrompting="false"/>
+  <parameter name="P_SUC_DESCR" class="java.lang.String" isForPrompting="false"/>
+  <parameter name="P_TUR_USUARIO" class="java.lang.String" isForPrompting="false"/>
+  <parameter name="P_TUR_USUARIO_NOMBRE" class="java.lang.String" isForPrompting="false"/>
+  <parameter name="P_TUR_FCH_APE" class="java.time.LocalDateTime" isForPrompting="false"/>
+  <parameter name="P_TUR_FCH_CIE" class="java.time.LocalDateTime" isForPrompting="false"/>
+  <parameter name="P_TUR_ESTADO" class="java.lang.String" isForPrompting="false"/>
+  <parameter name="P_TUR_CPC_ID" class="java.lang.Integer" isForPrompting="false"/>
+  <parameter name="P_MENSAJE_VACIO" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA["Sin formularios para el turno seleccionado"]]></defaultValueExpression>
+  </parameter>
+  <field name="f276Id" class="java.lang.Integer"/>
+  <field name="f276NCpbte" class="java.lang.String"/>
+  <field name="f276VenRS" class="java.lang.String"/>
+  <field name="f276CuitVe" class="java.math.BigDecimal"/>
+  <field name="f276TranRS" class="java.lang.String"/>
+  <field name="f276CuitTr" class="java.math.BigDecimal"/>
+  <field name="f276ActaTi" class="java.lang.String"/>
+  <field name="f276FchMov" class="java.time.LocalDateTime"/>
+  <field name="ib" class="java.math.BigDecimal"/>
+  <field name="cm" class="java.math.BigDecimal"/>
+  <field name="adicIB" class="java.math.BigDecimal"/>
+  <field name="adicCM" class="java.math.BigDecimal"/>
+  <field name="adicFletes" class="java.math.BigDecimal"/>
+  <field name="impuFletes" class="java.math.BigDecimal"/>
+  <variable name="SUM_IB" class="java.math.BigDecimal" calculation="Sum">
+    <variableExpression><![CDATA[$F{ib}]]></variableExpression>
+    <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+  </variable>
+  <variable name="SUM_CM" class="java.math.BigDecimal" calculation="Sum">
+    <variableExpression><![CDATA[$F{cm}]]></variableExpression>
+    <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+  </variable>
+  <variable name="SUM_ADIC_IB" class="java.math.BigDecimal" calculation="Sum">
+    <variableExpression><![CDATA[$F{adicIB}]]></variableExpression>
+    <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+  </variable>
+  <title>
+    <band height="30">
+      <textField>
+        <reportElement x="0" y="0" width="802" height="30"/>
+        <textElement textAlignment="Center"><font size="18" isBold="true"/></textElement>
+        <textFieldExpression><![CDATA[$P{P_TITULO}]]></textFieldExpression>
+      </textField>
+    </band>
+  </title>
+  <pageHeader>
+    <band height="20">
+      <textField>
+        <reportElement x="0" y="0" width="802" height="20"/>
+        <textFieldExpression><![CDATA["Sucursal: " + $P{P_SUC_NRO_ID} + " - " + $P{P_SUC_DESCR}]]></textFieldExpression>
+      </textField>
+    </band>
+  </pageHeader>
+  <columnHeader>
+    <band height="20">
+      <staticText><reportElement x="0" y="0" width="40" height="20"/><text><![CDATA[Acta]]></text></staticText>
+      <staticText><reportElement x="40" y="0" width="100" height="20"/><text><![CDATA[Comprobante]]></text></staticText>
+    </band>
+  </columnHeader>
+  <detail>
+    <band height="20">
+      <textField><reportElement x="0" y="0" width="40" height="20"/><textFieldExpression><![CDATA[$F{f276Id}]]></textFieldExpression></textField>
+      <textField><reportElement x="40" y="0" width="100" height="20"/><textFieldExpression><![CDATA[$F{f276NCpbte}]]></textFieldExpression></textField>
+    </band>
+  </detail>
+
+  <pageFooter>
+    <band height="20">
+      <textField>
+        <reportElement x="0" y="0" width="400" height="20"/>
+        <textFieldExpression><![CDATA["Pag. " + $V{PAGE_NUMBER} + " de " + $V{PAGE_NUMBER}]]></textFieldExpression>
+      </textField>
+    </band>
+  </pageFooter>
+
+  <summary>
+    <band height="40">
+      <staticText><reportElement x="0" y="0" width="100" height="20"/><text><![CDATA[Totales]]></text></staticText>
+      <textField><reportElement x="100" y="0" width="100" height="20"/><textFieldExpression><![CDATA[$V{SUM_IB}]]></textFieldExpression></textField>
+      <staticText><reportElement x="0" y="20" width="200" height="20"/><text><![CDATA[Firma del Operador]]></text></staticText>
+      <line><reportElement x="0" y="18" width="200" height="1"/></line>
+    </band>
+  </summary>
+</jasperReport>

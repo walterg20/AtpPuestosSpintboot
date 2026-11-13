@@ -1,0 +1,85 @@
+/*
+ * Actas Listado (SCREEN_21) — CSS nativo con tokens del Design System.
+ * Sin literales hexadecimales: todos los colores vía var(--stitch-*).
+ */
+:root {
+  --al-primary: var(--stitch-primary);
+  --al-surface: var(--stitch-surface-container-lowest);
+  --al-text: var(--stitch-on-surface);
+}
+
+.al-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-lg);
+}
+
+.al-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--stitch-space-md);
+}
+
+.al-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--stitch-space-md);
+}
+
+@media (max-width: 960px) {
+  .al-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.al-kpi {
+  background: var(--stitch-surface-container-lowest);
+  border: 1px solid var(--stitch-card-border);
+  border-radius: var(--stitch-radius);
+  padding: var(--stitch-space-md);
+  box-shadow: var(--stitch-shadow-1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--stitch-space-xs);
+}
+
+.al-kpi__label {
+  font-size: var(--stitch-label-sm-size);
+  font-weight: var(--stitch-label-sm-weight);
+  text-transform: uppercase;
+  color: var(--stitch-on-surface-variant);
+}
+
+.al-kpi__value {
+  font-size: var(--stitch-headline-lg-size);
+  font-weight: 700;
+  color: var(--stitch-primary);
+}
+
+.al-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--stitch-space-md);
+  background: var(--stitch-surface-container-lowest);
+  padding: var(--stitch-space-md);
+  border-radius: var(--stitch-radius);
+  box-shadow: var(--stitch-shadow-1);
+}
+
+.al-filtros__acciones {
+  display: flex;
+  gap: var(--stitch-space-sm);
+  align-items: end;
+}
+
+.al-tabla thead tr {
+  background: var(--stitch-primary);
+  color: var(--stitch-on-primary);
+}
+
+.al-legal {
+  text-align: center;
+  font-size: var(--stitch-body-sm-size);
+  color: var(--stitch-on-surface-variant);
+  padding: var(--stitch-space-md);
+}

@@ -194,6 +194,7 @@ public class CargaMvcController {
             if (tipo.isEmpty()) {
                 tipo = d.getDppTipoPr() != null ? String.valueOf(d.getDppTipoPr()) : "F";
             }
+            cargaForm.setDpptipoGui(tipo);
             cargaForm.setTipoComprobante(tipo);
             cargaForm.setIngresoBruto(ZERO);
             cargaForm.setAdicionalIB(ZERO);

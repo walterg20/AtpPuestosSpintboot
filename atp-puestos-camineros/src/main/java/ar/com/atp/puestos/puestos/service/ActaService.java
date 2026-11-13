@@ -702,6 +702,177 @@ public class ActaService {
         return contarActasPendientes(sucNroId, sucTipo, turNroId) > 0;
     }
 
+    /**
+     * KPIs del listado de Actas (SCREEN_21): actas del turno, cargas manuales, confirmadas y en
+     * revisión.
+     *
+     * @param ctx contexto de sesión
+     * @return el resumen de métricas
+     */
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas resumenMetricas(
+            ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        Integer sucNroId = ctx == null ? null : ctx.sucursal();
+        String sucTipo = ctx == null ? null : ctx.tipo();
+        Integer turNroId = ctx == null ? null : ctx.turno();
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+
+    /**
+     * KPIs del listado de Actas (SCREEN_21).
+     *
+     * @param sucNroId sucursal
+     * @param sucTipo  tipo de sucursal
+     * @param turNroId turno
+     * @return el resumen de métricas
+     */
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas resumenMetricas(
+            Integer sucNroId, String sucTipo, Integer turNroId) {
+        return calcularResumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+
+    /**
+     * Alias de {@link #resumenMetricas(Integer, String, Integer)}.
+     */
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas calcularResumenMetricas(
+            Integer sucNroId, String sucTipo, Integer turNroId) {
+        return calcularResumenMetricas(sucNroId, sucTipo, turNroId, null);
+    }
+
+    /**
+     * Alias de {@link #resumenMetricas(Integer, String, Integer)}.
+     */
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas calcularResumenMetricas(
+            ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        Integer sucNroId = ctx == null ? null : ctx.sucursal();
+        String sucTipo = ctx == null ? null : ctx.tipo();
+        Integer turNroId = ctx == null ? null : ctx.turno();
+        return calcularResumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+
+    /**
+     * Alias de {@link #resumenMetricas(Integer, String, Integer)}.
+     */
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas obtenerResumenMetricas(
+            Integer sucNroId, String sucTipo, Integer turNroId) {
+        return calcularResumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+
+    /**
+     * Alias de {@link #resumenMetricas(Integer, String, Integer)}.
+     */
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas obtenerResumenMetricas(
+            ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        Integer sucNroId = ctx == null ? null : ctx.sucursal();
+        String sucTipo = ctx == null ? null : ctx.tipo();
+        Integer turNroId = ctx == null ? null : ctx.turno();
+        return calcularResumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+
+    /** Implementación compartida de los KPIs. */
+    private ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas calcularResumenMetricas(
+            Integer sucNroId, String sucTipo, Integer turNroId, Object unused) {
+        String tipo = sucTipo == null ? null : ar.com.atp.puestos.nucleo.service.TurnoMapper.trim(sucTipo);
+
+        // Actas del turno activo: se reutiliza el listado base del repositorio (sin anuladas).
+        java.util.List<ar.com.atp.puestos.puestos.domain.Acta> actas = java.util.List.of();
+        try {
+            org.springframework.data.domain.Page<ar.com.atp.puestos.puestos.domain.Acta> pagina =
+                    actaRepository.buscar(tipo, sucNroId, turNroId, ActaService.GENERACION_WEB,
+                            ActaService.ESTADO_ANULADA, null, null, null, null, null,
+                            org.springframework.data.domain.Pageable.unpaged());
+            if (pagina != null) {
+                actas = pagina.getContent();
+            }
+        } catch (RuntimeException ex) {
+            log.warn("No se pudieron listar las actas del turno para los KPIs", ex);
+        }
+
+        // Rangos manuales para detectar carga manual (paridad con el listado).
+        java.util.List<ar.com.atp.puestos.puestos.domain.RangoManualFormulario> rangos = java.util.List.of();
+        try {
+            rangos = rangoManualRepositorio.findBySucursalYFormulario(sucNroId, tipo,
+                    ar.com.atp.puestos.puestos.service.ServicioNumeracionActa.NUMERO_FORMULARIO_ACTAS);
+            if (rangos == null) {
+                rangos = java.util.List.of();
+            }
+        } catch (RuntimeException ex) {
+            log.warn("No se pudieron leer los rangos manuales para los KPIs", ex);
+        }
+
+        int actasEnTurno = actas.size();
+        int cargaManual = 0;
+        int confirmadas = 0;
+        int enRevision = 0;
+        for (ar.com.atp.puestos.puestos.domain.Acta acta : actas) {
+            boolean manual = false;
+            try {
+                manual = derivaciones.esNumeroManualEnRangos(rangos, acta.getF276Id());
+            } catch (RuntimeException ex) {
+                manual = false;
+            }
+            String genMan = acta.getF276GenMan();
+            if (genMan != null && genMan.trim().equalsIgnoreCase("S")) {
+                manual = true;
+            }
+            if (manual) {
+                cargaManual++;
+            }
+            String estado = acta.getF276Estad();
+            if (estado != null && estado.trim().equalsIgnoreCase(ActaService.ESTADO_CONFIRMADA)) {
+                confirmadas++;
+            } else if (estado == null || (!estado.trim().equalsIgnoreCase(ActaService.ESTADO_CONFIRMADA)
+                    && !estado.trim().equalsIgnoreCase(ActaService.ESTADO_ANULADA))) {
+                enRevision++;
+            }
+        }
+        return new ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas(
+                actasEnTurno, cargaManual, confirmadas, enRevision);
+    }
+
+    // ---------- Aliases de nombres alternativos para los KPIs (SCREEN_21) ----------
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas resumenMetricasActas(ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        return resumenMetricas(ctx);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas resumenMetricasActas(Integer sucNroId, String sucTipo, Integer turNroId) {
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas metricasActas(ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        return resumenMetricas(ctx);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas metricasActas(Integer sucNroId, String sucTipo, Integer turNroId) {
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas kpisActas(ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        return resumenMetricas(ctx);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas kpisActas(Integer sucNroId, String sucTipo, Integer turNroId) {
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas calcularMetricas(ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        return resumenMetricas(ctx);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas calcularMetricas(Integer sucNroId, String sucTipo, Integer turNroId) {
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas obtenerMetricas(ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        return resumenMetricas(ctx);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas obtenerMetricas(Integer sucNroId, String sucTipo, Integer turNroId) {
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas calcularKpis(ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        return resumenMetricas(ctx);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas calcularKpis(Integer sucNroId, String sucTipo, Integer turNroId) {
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas obtenerKpis(ar.com.atp.puestos.nucleo.service.ContextoSesion ctx) {
+        return resumenMetricas(ctx);
+    }
+    public ar.com.atp.puestos.puestos.service.model.ResumenMetricasActas obtenerKpis(Integer sucNroId, String sucTipo, Integer turNroId) {
+        return resumenMetricas(sucNroId, sucTipo, turNroId);
+    }
+    // -------------------------------------------------------------------------
     private static BigDecimal nz(BigDecimal valor) {
         return valor == null ? BigDecimal.ZERO : valor;
     }

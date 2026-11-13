@@ -4,7 +4,7 @@
 
   - Fragmento reutilizable (`:: grilla`): lo inserta `puestos/acta-formulario`.
   - Columnas del legacy `Grid1`: `Código`, `Descripción`, `Tn.` y la acción `Eliminar` (R-ACTA-020).
-  - Alta/baja de filas con JS puntual (`static/js/actas.js`): el botón `+` clona la fila-plantilla
+  - Alta/baja de filas con JS puntual (`static/js/actas-forms.js`): el botón `+` clona la fila-plantilla
     y el botón `−` quita la fila; ambos renumeran los índices para que el binding siga siendo
     `productos[i].*` (D-ACTA-11).
   - Accesibilidad (R-ACTA-055): cada control tiene su `<label for>` (oculto visualmente) con el
@@ -15,7 +15,7 @@
 <div th:fragment="grilla" th:object="${actaForm}">
 
   <div class="atp-grilla-scroll">
-    <table class="atp-table atp-actas__tabla" id="acta-productos">
+    <table class="actas-forms__table" id="acta-productos">
       <caption class="atp-table__caption">Detalle de productos</caption>
       <thead>
         <tr>
@@ -29,7 +29,7 @@
         <tr data-acta-producto="true" th:each="p, it : ${actaForm.productos}">
           <td>
             <label class="atp-oculto" th:attr="for=|productos_${it.index}_prodCod|,data-rotulo='Código'">Código fila 1</label>
-            <select class="atp-field__control" data-producto="true"
+            <select class="actas-forms__select" data-producto="true"
                     th:field="*{productos[__${it.index}__].prodCod}"
                     th:attr="id=|productos_${it.index}_prodCod|">
               <option value="">Seleccionar...</option>
@@ -45,7 +45,7 @@
           </td>
           <td>
             <label class="atp-oculto" th:attr="for=|productos_${it.index}_f276RCant|,data-rotulo='Tn.'">Tn. fila 1</label>
-            <input class="atp-field__control" type="number" step="0.0001" min="0"
+            <input class="actas-forms__input" type="number" step="0.0001" min="0"
                    data-cantidad="true"
                    th:field="*{productos[__${it.index}__].f276RCant}"
                    th:attr="id=|productos_${it.index}_f276RCant|">
@@ -73,7 +73,7 @@
     <tr data-acta-producto="true">
       <td>
         <label class="atp-oculto" for="productos___INDEX___prodCod" data-rotulo="Código">Código fila __FILA__</label>
-        <select class="atp-field__control" data-producto="true"
+        <select class="actas-forms__select" data-producto="true"
                 name="productos[__INDEX__].prodCod" id="productos___INDEX___prodCod">
           <option value="">Seleccionar...</option>
           <option th:each="d : ${productosDisponibles}"
@@ -87,7 +87,7 @@
       </td>
       <td>
         <label class="atp-oculto" for="productos___INDEX___f276RCant" data-rotulo="Tn.">Tn. fila __FILA__</label>
-        <input class="atp-field__control" type="number" step="0.0001" min="0"
+        <input class="actas-forms__input" type="number" step="0.0001" min="0"
                data-cantidad="true"
                name="productos[__INDEX__].f276RCant" id="productos___INDEX___f276RCant">
       </td>

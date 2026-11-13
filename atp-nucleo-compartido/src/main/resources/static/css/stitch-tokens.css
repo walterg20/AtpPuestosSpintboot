@@ -483,9 +483,9 @@ body.stitch-body {
 .stitch-login-field{display:flex;flex-direction:column;gap:4px}
 .stitch-login-input{width:100%;padding:10px 12px;background:var(--stitch-surface-container-low);color:var(--stitch-on-surface);font-size:var(--stitch-body-md-size);line-height:var(--stitch-body-md-line);border:1px solid var(--stitch-outline-variant);border-radius:var(--stitch-radius-lg);transition:box-shadow .15s ease,border-color .15s ease,background-color .15s ease}
 .stitch-login-input:focus{outline:none;border-color:var(--stitch-primary);box-shadow:0 0 0 2px rgba(2,132,199,.2);background:var(--stitch-surface-container-lowest)}
-.stitch-login-input--password{padding-right:2.5rem;letter-spacing:.15em}
-.stitch-login-input-wrap{position:relative}
-.stitch-login-toggle{position:absolute;inset-y:0;right:0;display:flex;align-items:center;padding-right:10px;color:var(--stitch-on-surface-variant);background:transparent;border:none;cursor:pointer}
+.stitch-login-input--password{padding-right:2.75rem;letter-spacing:.15em}
+.stitch-login-input-wrap{position:relative;display:block}
+.stitch-login-toggle{position:absolute;top:50%;transform:translateY(-50%);right:8px;z-index:2;display:flex;align-items:center;color:var(--stitch-on-surface-variant);background:transparent;border:none;cursor:pointer}
 .stitch-login-toggle:hover{color:var(--stitch-on-surface)}
 .stitch-login-btn{width:100%;padding:12px 16px;background:linear-gradient(to right,var(--stitch-primary-container),var(--stitch-primary));color:var(--stitch-on-primary);border:none;border-radius:var(--stitch-radius-lg);font-size:var(--stitch-label-md-size);font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 4px 14px 0 rgba(15,42,74,.35);transition:transform .15s ease,box-shadow .15s ease,background-color .15s ease}
 .stitch-login-btn:hover{background:linear-gradient(to right,var(--stitch-primary),var(--stitch-primary));box-shadow:0 6px 18px 0 rgba(15,42,74,.4)}

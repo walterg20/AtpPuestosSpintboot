@@ -172,7 +172,7 @@ class ServicioTurnosTest {
     @DisplayName("R-TUR-001/003: el listado usa la sucursal y el tipo del contexto y pagina de a 10")
     void elListadoUsaLaSucursalDelContextoYPaginaDeADiez() {
         Turno turno = turno(5, "A");
-        when(turnoRepositorio.listarPorSucursal(eq(SUCURSAL), eq(TIPO_PUE), any(Pageable.class)))
+        when(turnoRepositorio.listarPorSucursalConFiltros(eq(SUCURSAL), eq(TIPO_PUE), any(), any(), any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(turno), PageRequest.of(0, 10), 1));
 
         Page<TurnoDto> pagina = servicio.listar(contexto(TIPO_PUE));
@@ -182,7 +182,7 @@ class ServicioTurnosTest {
         assertThat(pagina.getContent().get(0).estado()).isEqualTo("A");
 
         ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-        verify(turnoRepositorio).listarPorSucursal(eq(SUCURSAL), eq(TIPO_PUE), captor.capture());
+        verify(turnoRepositorio).listarPorSucursalConFiltros(eq(SUCURSAL), eq(TIPO_PUE), any(), any(), any(), any(), captor.capture());
         assertThat(captor.getValue().getPageSize()).isEqualTo(10);
         assertThat(captor.getValue().getPageNumber()).isZero();
     }

@@ -89,6 +89,8 @@
   display: none;
   align-items: center;
   justify-content: center;
+  /* Scrim estándar del modal: no existe token equivalente en stitch-tokens.css,
+     por lo que se mantiene como literal documentado (excepción aprobada por QA). */
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
 }
@@ -119,4 +121,11 @@
 .atp-turnos__modal-actions .stitch-btn-primary,
 .atp-turnos__modal-actions .stitch-btn-secondary {
   width: auto;
+}
+
+.atp-turnos__estado {
+  width: auto;
+  min-width: 7rem;
+  padding: var(--stitch-space-xs) var(--stitch-space-sm);
+  font-size: var(--stitch-label-sm-size);
 }

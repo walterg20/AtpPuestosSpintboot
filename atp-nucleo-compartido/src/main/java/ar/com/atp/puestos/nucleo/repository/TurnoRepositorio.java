@@ -2,6 +2,7 @@ package ar.com.atp.puestos.nucleo.repository;
 
 import ar.com.atp.puestos.nucleo.domain.Turno;
 import ar.com.atp.puestos.nucleo.domain.TurnoId;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,8 +45,8 @@ public interface TurnoRepositorio extends JpaRepository<Turno, TurnoId> {
      * Listado de los turnos de la sucursal, ordenado por la clave primaria y paginado
      * (R-TUR-001, R-TUR-003).
      *
-     * <p>El orden es {@code SucNroId, SucTipo, TurNroId}: dentro del filtro por sucursal y tipo
-     * queda el orden por {@code TurNroId}, que es el índice físico de la tabla.
+     * <p>El orden es {@code SucNroId, SucTipo, TurNroId descendente}: dentro del filtro por sucursal
+     * y tipo queda el orden por {@code TurNroId} en orden descendente.
      *
      * @param sucNroId sucursal del usuario ({@code Context.Sucursal})
      * @param sucTipo tipo de sucursal del usuario ({@code Context.Tipo})
@@ -53,7 +54,7 @@ public interface TurnoRepositorio extends JpaRepository<Turno, TurnoId> {
      * @return la página de turnos
      */
     @Query("select t from Turno t where t.id.sucNroId = :sucNroId and t.id.sucTipo = :sucTipo "
-            + "order by t.id.sucNroId asc, t.id.sucTipo asc, t.id.turNroId asc")
+            + "order by t.id.sucNroId asc, t.id.sucTipo asc, t.id.turNroId desc")
     Page<Turno> listarPorSucursal(@Param("sucNroId") Integer sucNroId,
             @Param("sucTipo") String sucTipo, Pageable pageable);
 
@@ -88,4 +89,31 @@ public interface TurnoRepositorio extends JpaRepository<Turno, TurnoId> {
             + "order by t.id.sucNroId asc, t.id.sucTipo asc, t.id.turNroId asc")
     Page<Turno> listarAbiertosPorSucursal(@Param("sucNroId") Integer sucNroId,
             @Param("sucTipo") String sucTipo, Pageable pageable);
+
+    /**
+     * Listado de los turnos de la sucursal con filtros opcionales (Fase 1, módulo {@code 06-turnos}).
+     *
+     * <p>Los filtros son opcionales: {@code null} (o, para {@code estado}, en blanco) los desactiva.
+     * El orden es {@code SucNroId, SucTipo, TurNroId desc}.
+     *
+     * @param sucNroId sucursal del usuario
+     * @param sucTipo   tipo de sucursal del usuario
+     * @param busqueda  filtra por {@code TurNroId} o {@code TurCPCId}; {@code null} = sin filtro
+     * @param desde     filtra {@code TurFchApe >= desde}; {@code null} = sin filtro
+     * @param hasta     filtra {@code TurFchApe <= hasta}; {@code null} = sin filtro
+     * @param estado    filtra {@code TurEstado = estado}; {@code null}/en blanco = sin filtro
+     * @param pageable  paginación
+     * @return la página de turnos filtrada
+     */
+    @Query("select t from Turno t where t.id.sucNroId = :sucNroId "
+            + "and t.id.sucTipo = :sucTipo "
+            + "and (:busqueda is null or t.id.turNroId = :busqueda or t.turCpcId = :busqueda) "
+            + "and (:desde is null or t.turFchApe >= :desde) "
+            + "and (:hasta is null or t.turFchApe <= :hasta) "
+            + "and (:estado is null or trim(:estado) = '' or t.turEstado = trim(:estado)) "
+            + "order by t.id.sucNroId asc, t.id.sucTipo asc, t.id.turNroId desc")
+    Page<Turno> listarPorSucursalConFiltros(@Param("sucNroId") Integer sucNroId,
+            @Param("sucTipo") String sucTipo, @Param("busqueda") Integer busqueda,
+            @Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta,
+            @Param("estado") String estado, Pageable pageable);
 }

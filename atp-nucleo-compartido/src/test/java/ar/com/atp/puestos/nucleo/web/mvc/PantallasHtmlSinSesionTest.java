@@ -10,6 +10,7 @@ import ar.com.atp.puestos.nucleo.config.RegistradorAutenticacion;
 import ar.com.atp.puestos.nucleo.service.ProductoService;
 import ar.com.atp.puestos.nucleo.service.ServicioAcceso;
 import ar.com.atp.puestos.nucleo.service.ServicioAutorizacion;
+import ar.com.atp.puestos.nucleo.service.FiltrosTurno;
 import ar.com.atp.puestos.nucleo.service.ServicioTurnos;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -139,7 +140,7 @@ class PantallasHtmlSinSesionTest {
     @DisplayName("R-LOG-043: GET /turnos sin cookie de sesión previa devuelve 200 con su _csrf")
     @WithMockUser(username = "tester", roles = "USER")
     void getTurnosSinSesionPrevia() throws Exception {
-        lenient().when(servicioTurnos.listar(any(), any(Pageable.class)))
+        lenient().when(servicioTurnos.listar(any(), any(), any()))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10), 0));
 
         var resultado = mockMvc.perform(get("/turnos"))

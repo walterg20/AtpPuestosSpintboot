@@ -2,6 +2,7 @@ package ar.com.atp.puestos.nucleo.web.mvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import ar.com.atp.puestos.nucleo.service.ContextoSesion;
+import ar.com.atp.puestos.nucleo.service.FiltrosTurno;
 import ar.com.atp.puestos.nucleo.service.ServicioTurnos;
 import ar.com.atp.puestos.nucleo.web.dto.TurnoDto;
 import java.time.LocalDateTime;
@@ -48,7 +50,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class TurnoMvcControllerTest {
 
     /** Cabeceras de la grilla: se extraen del HTML renderizado. */
-    private static final Pattern CABECERAS = Pattern.compile("<th scope=\"col\">([^<]*)</th>");
+    private static final Pattern CABECERAS = Pattern.compile("<th[^>]*scope=\"col\"[^>]*>([^<]*)</th>");
 
     /** Rótulos verbatim del legacy, en el orden de la grilla (R-TUR-002). */
     private static final List<String> ROTULOS_VERBATIM = List.of(
@@ -56,7 +58,8 @@ class TurnoMvcControllerTest {
             "Comisión",
             "Fecha Apertura",
             "Fecha Cierre",
-            "Estado");
+            "Estado",
+            "Resumen");
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,7 +73,7 @@ class TurnoMvcControllerTest {
 
     @BeforeEach
     void listadoVacioPorDefecto() {
-        lenient().when(servicioTurnos.listar(any(), any(Pageable.class)))
+        lenient().when(servicioTurnos.listar(any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10), 0));
     }
 
@@ -91,7 +94,8 @@ class TurnoMvcControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("nucleo/turnos"))
                 .andExpect(model().attributeExists("turnos", "mensajeConfirmacionCierre",
-                        "paginaActual", "cantidadPaginas", "hayPaginaAnterior", "hayPaginaSiguiente"))
+                        "mensajeConfirmacionNuevo", "paginaActual", "cantidadPaginas", "hayPaginaAnterior",
+                        "hayPaginaSiguiente"))
                 .andExpect(result -> {
                     Map<String, Object> modelo = result.getModelAndView().getModel();
                     assertThat(modelo.get("mensajeError")).isNull();
@@ -101,8 +105,8 @@ class TurnoMvcControllerTest {
     }
 
     @Test
-    @DisplayName("R-TUR-002: los 5 rótulos de la grilla se renderizan verbatim y en orden")
-    void losCincoRotulosSeRenderizanVerbatimYEnOrden() throws Exception {
+    @DisplayName("R-TUR-002: los 6 rótulos de la grilla se renderizan verbatim y en orden")
+    void losSeisRotulosSeRenderizanVerbatimYEnOrden() throws Exception {
         whenListar(turno(5, "A"), turno(6, "C"));
 
         String html = mockMvc.perform(get("/turnos"))
@@ -140,11 +144,27 @@ class TurnoMvcControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        assertThat(html).contains("href=\"/turnos?turNroId=5\"");
+        assertThat(html).contains("href=\"/turnos/5\"");
         assertThat(html).contains("345");
         assertThat(html).contains("01/10/2026");
         // La fecha de cierre es la sentinela de "vacío": la celda queda vacía.
         assertThat(html).doesNotContain("01/01/1753");
+    }
+
+    @Test
+    @DisplayName("R-TUR-C5: la columna Estado es un combobox y Resumen tiene el ícono de imprimir")
+    void laColumnaEstadoEsComboboxYResumenTieneIcono() throws Exception {
+        whenListar(turno(5, "A"));
+
+        String html = mockMvc.perform(get("/turnos"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(html).contains("<select");
+        assertThat(html).contains("disabled");
+        assertThat(html).contains("Cerrado");
+        assertThat(html).contains("Abierto");
+        assertThat(html).contains("🖨");
     }
 
     @Test
@@ -173,6 +193,18 @@ class TurnoMvcControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
         assertThat(html).contains("data-confirmar=\"¿Confirma que desea cerrar el Turno?\"");
+    }
+
+    @Test
+    @DisplayName("R-TUR-005: la confirmación del nuevo turno es la verbatim del legacy")
+    void laConfirmacionDelNuevoEsLaVerbatim() throws Exception {
+        whenListar(turno(5, "A"));
+
+        String html = mockMvc.perform(get("/turnos"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(html).contains("data-confirmar=\"¿Confirma que desea abrir un nuevo Turno?\"");
     }
 
     @Test
@@ -210,7 +242,7 @@ class TurnoMvcControllerTest {
         for (int i = 1; i <= 10; i++) {
             filas.add(turno(i, "A"));
         }
-        when(servicioTurnos.listar(any(), any(Pageable.class)))
+        when(servicioTurnos.listar(any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(filas, PageRequest.of(0, 10), 25));
 
         mockMvc.perform(get("/turnos"))
@@ -220,7 +252,7 @@ class TurnoMvcControllerTest {
                 .andExpect(model().attribute("hayPaginaAnterior", false));
 
         var captor = ArgumentCaptor.forClass(Pageable.class);
-        verify(servicioTurnos).listar(any(), captor.capture());
+        verify(servicioTurnos).listar(any(), any(), captor.capture());
         assertThat(captor.getValue().getPageSize()).isEqualTo(10);
         assertThat(captor.getValue().getPageNumber()).isZero();
     }
@@ -228,7 +260,7 @@ class TurnoMvcControllerTest {
     @Test
     @DisplayName("La paginación ofrece la página siguiente y la última")
     void laPaginacionOfreceLaPaginaSiguienteYLaUltima() throws Exception {
-        when(servicioTurnos.listar(any(), any(Pageable.class)))
+        when(servicioTurnos.listar(any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(turno(1, "A")), PageRequest.of(0, 10), 25));
 
         String html = mockMvc.perform(get("/turnos"))
@@ -253,7 +285,7 @@ class TurnoMvcControllerTest {
     @Test
     @DisplayName("Si el listado no se puede cargar se muestra el estado de error")
     void siElListadoNoSeCargaSeMuestraElEstadoDeError() throws Exception {
-        when(servicioTurnos.listar(any(), any(Pageable.class)))
+        when(servicioTurnos.listar(any(), any(), any(Pageable.class)))
                 .thenThrow(new IllegalStateException("no se pudo leer la base"));
 
         String html = mockMvc.perform(get("/turnos"))
@@ -265,10 +297,42 @@ class TurnoMvcControllerTest {
         assertThat(html).contains("No se pudieron mostrar los turnos.");
     }
 
+    @Test
+    @DisplayName("GET /turnos/{turNroId} devuelve la vista nucleo/detalle-turno")
+    void detalleDevuelveLaVista() throws Exception {
+        mockMvc.perform(get("/turnos/5"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("nucleo/detalle-turno"));
+    }
+
+    @Test
+    @DisplayName("GET /turnos/{turNroId}?tab=actas devuelve la vista nucleo/detalle-turno-actas")
+    void detalleActasDevuelveLaVista() throws Exception {
+        mockMvc.perform(get("/turnos/5").param("tab", "actas"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("nucleo/detalle-turno-actas"));
+    }
+
+    @Test
+    @DisplayName("GET /turnos acepta los filtros de búsqueda (busqueda, estado)")
+    void listarAceptaFiltrosDeBusqueda() throws Exception {
+        mockMvc.perform(get("/turnos").param("busqueda", "5").param("estado", "A"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("busqueda", "5"))
+                .andExpect(model().attribute("estado", "A"));
+    }
+
+    @Test
+    @DisplayName("GET /turnos acepta filtro por fecha (desde, hasta)")
+    void listarAceptaFiltroPorFecha() throws Exception {
+        mockMvc.perform(get("/turnos").param("desde", "2026-10-01").param("hasta", "2026-10-31"))
+                .andExpect(status().isOk());
+    }
+
     // ------------------------------------------------------------------ helpers
 
     private void whenListar(TurnoDto... filas) {
-        when(servicioTurnos.listar(any(), any(Pageable.class)))
+        when(servicioTurnos.listar(any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(filas), PageRequest.of(0, 10), filas.length));
     }
 

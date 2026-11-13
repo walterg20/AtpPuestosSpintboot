@@ -26,7 +26,7 @@ import java.time.format.DateTimeFormatter;
  * @param abierto {@code true} si el turno está abierto
  */
 public record TurnoFilaView(Integer turno, Integer comision, String fechaApertura, String fechaCierre,
-        String estado, boolean abierto) {
+        String estado, boolean abierto, Integer sucursal, String tipo) {
 
     /** Formato de fecha del legacy (atributo {@code date} con picture {@code 99/99/99}). */
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -43,7 +43,8 @@ public record TurnoFilaView(Integer turno, Integer comision, String fechaApertur
         }
         String estado = dto.estado() == null ? "" : dto.estado().trim();
         return new TurnoFilaView(dto.turno(), dto.comision(), fecha(dto.fechaApertura()),
-                fecha(dto.fechaCierre()), estado, ServicioTurnos.ESTADO_ABIERTO.equals(estado));
+                fecha(dto.fechaCierre()), estado, ServicioTurnos.ESTADO_ABIERTO.equals(estado),
+                dto.sucursal(), dto.tipo());
     }
 
     /**

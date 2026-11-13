@@ -4,10 +4,20 @@ import ar.com.atp.puestos.nucleo.domain.Turno;
 import ar.com.atp.puestos.nucleo.domain.TurnoId;
 import ar.com.atp.puestos.nucleo.repository.ComisionRepository;
 import ar.com.atp.puestos.nucleo.repository.TurnoRepositorio;
-import ar.com.atp.puestos.nucleo.web.dto.TurnoDto;
+import ar.com.atp.puestos.nucleo.repository.Formulario2276Repositorio;
+import ar.com.atp.puestos.nucleo.domain.Formulario2276;
+import ar.com.atp.puestos.nucleo.domain.TotalesFormulario2276;import ar.com.atp.puestos.nucleo.web.dto.TurnoDto;
+import ar.com.atp.puestos.nucleo.web.mvc.turno.ActaView;
+import ar.com.atp.puestos.nucleo.web.mvc.turno.BitacoraEvento;
+import ar.com.atp.puestos.nucleo.web.mvc.turno.TurnoDetalleView;
+import ar.com.atp.puestos.nucleo.web.mvc.turno.TurnoFilaView;
 import ar.com.atp.puestos.shared.time.FechaVacia;
+import ar.com.atp.puestos.shared.error.NotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServicioTurnos {
 
     private static final Logger log = LoggerFactory.getLogger(ServicioTurnos.class);
-
     /** Filas por página de la grilla (paridad con el {@code MaxRows="10"} del legacy, R-TUR-003). */
     public static final int TAMANIO_PAGINA = 10;
 
@@ -62,13 +71,22 @@ public class ServicioTurnos {
     private final ComisionRepository comisionRepository;
     private final ServicioEstadoDeForm servicioEstadoDeForm;
     private final ServicioCierreTurno servicioCierreTurno;
+    private final Formulario2276Repositorio formularioRepositorio;
 
     public ServicioTurnos(TurnoRepositorio turnoRepositorio, ComisionRepository comisionRepository,
             ServicioEstadoDeForm servicioEstadoDeForm, ServicioCierreTurno servicioCierreTurno) {
+        this(turnoRepositorio, comisionRepository, servicioEstadoDeForm, servicioCierreTurno, null);
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public ServicioTurnos(TurnoRepositorio turnoRepositorio, ComisionRepository comisionRepository,
+            ServicioEstadoDeForm servicioEstadoDeForm, ServicioCierreTurno servicioCierreTurno,
+            Formulario2276Repositorio formularioRepositorio) {
         this.turnoRepositorio = turnoRepositorio;
         this.comisionRepository = comisionRepository;
         this.servicioEstadoDeForm = servicioEstadoDeForm;
         this.servicioCierreTurno = servicioCierreTurno;
+        this.formularioRepositorio = formularioRepositorio;
     }
 
     // ------------------------------------------------------------------ listado (R-TUR-001..003)
@@ -96,9 +114,26 @@ public class ServicioTurnos {
      */
     @Transactional(readOnly = true)
     public Page<TurnoDto> listar(ContextoSesion contexto, Pageable pageable) {
+        return listar(contexto, FiltrosTurno.vacio(), pageable);
+    }
+
+    /**
+     * Listado de los turnos de la sucursal del usuario con filtros opcionales (Fase 1).
+     *
+     * @param contexto contexto de sesion
+     * @param filtros  filtros opcionales (puede ser {@code null})
+     * @param pageable paginacion pedida por la vista
+     * @return la pagina de turnos
+     */
+    @Transactional(readOnly = true)
+    public Page<TurnoDto> listar(ContextoSesion contexto, FiltrosTurno filtros, Pageable pageable) {
         Integer sucursal = contexto.sucursal();
         String tipo = TurnoMapper.trim(contexto.tipo());
-        return turnoRepositorio.listarPorSucursal(sucursal, tipo, pageable).map(TurnoMapper::toDto);
+        FiltrosTurno f = (filtros == null) ? FiltrosTurno.vacio() : filtros;
+        String estado = TurnoMapper.trim(f.estado());
+        return turnoRepositorio.listarPorSucursalConFiltros(
+                sucursal, tipo, f.busqueda(), f.desde(), f.hasta(), estado, pageable)
+                .map(TurnoMapper::toDto);
     }
 
     // ------------------------------------------------------------------ alta (R-TUR-006..011)
@@ -219,5 +254,105 @@ public class ServicioTurnos {
         }
         return servicioEstadoDeForm.hayFormularioAbierto(turno.getSucNroId(), turno.getSucTipo(),
                 turno.getTurNroId());
+    }
+
+    // ------------------------------------------------------------------ detalle (Fase 2)
+
+    /**
+     * Detalle de un turno: fila del turno, actas, total, percepción estimada y bitácora.
+     *
+     * @param contexto contexto de sesión
+     * @param turNroId número de turno
+     * @return el detalle del turno
+     * @throws NotFoundException si el turno no existe
+     */
+    @Transactional(readOnly = true)
+    public TurnoDetalleView detalleTurno(ContextoSesion contexto, Integer turNroId) {
+        Integer sucursal = contexto.sucursal();
+        String tipo = TurnoMapper.trim(contexto.tipo());
+        Turno turno = turnoRepositorio.findById(new TurnoId(sucursal, tipo, turNroId))
+                .orElseThrow(() -> new NotFoundException("NO_ENCONTRADO",
+                        "El turno no existe"));
+        TurnoFilaView turnoView = TurnoFilaView.de(TurnoMapper.toDto(turno));
+
+        List<Formulario2276> formularios = (formularioRepositorio == null)
+                ? List.of()
+                : formularioRepositorio.findBySucNroIdAndSucTipoAndTurNroIdOrderByF276IdAsc(
+                        sucursal, tipo, turNroId);
+
+        List<ActaView> actas = new ArrayList<>();
+        List<BitacoraEvento> bitacora = new ArrayList<>();
+        for (Formulario2276 f : formularios) {
+            BigDecimal importe = nz(f.getF276ImpuFl()).add(nz(f.getF276AdicFl()))
+                    .add(nz(f.getF276AdIBTo())).add(nz(f.getF276AdCMTo()));
+            String estado = f.getF276Estad() == null ? "" : f.getF276Estad().trim();
+            actas.add(new ActaView(f.getF276Id(), f.getF276FchMov(), importe, estado));
+            bitacora.add(new BitacoraEvento(f.getF276FchMov(),
+                    "Acta N° " + f.getF276Id() + " emitida"));
+        }
+
+        int totalActas = actas.size();
+
+        BigDecimal percepcionEstimada;
+        if (formularioRepositorio == null) {
+            percepcionEstimada = sumarImportes(actas);
+        } else {
+            List<Object[]> filas = formularioRepositorio.totalizarTurno(sucursal, tipo, turNroId);
+            if (filas == null || filas.isEmpty()) {
+                percepcionEstimada = sumarImportes(actas);
+            } else {
+                TotalesFormulario2276 totales = TotalesFormulario2276.deFila(filas.get(0));
+                percepcionEstimada = totales.totFletes().add(totales.totalAd());
+            }
+        }
+
+        return new TurnoDetalleView(turnoView, actas, totalActas, percepcionEstimada, bitacora);
+    }
+
+    // ------------------------------------------------------------------ listado actas (Fase 3)
+
+    /**
+     * Listado paginado de las actas (formularios 2276) de un turno.
+     *
+     * <p>Incluye <strong>todas</strong> las actas del turno (incluso las anuladas, cuyo estado se
+     * muestra en la columna {@code estado}); el importe de cada acta es la suma de
+     * {@code F276ImpuFl + F276AdicFl + F276AdIBTo + F276AdCMTo} (nulos → 0). El orden es por
+     * {@code F276Id} ascendente (paridad con el {@code For Each} del legacy).
+     *
+     * @param contexto contexto de sesión
+     * @param turNroId número de turno
+     * @param pageable paginación pedida por la vista
+     * @return la página de actas
+     */
+    @Transactional(readOnly = true)
+    public Page<ActaView> listarActas(ContextoSesion contexto, Integer turNroId, Pageable pageable) {
+        Integer sucursal = contexto.sucursal();
+        String tipo = TurnoMapper.trim(contexto.tipo());
+        Pageable p = (pageable == null) ? PageRequest.of(0, TAMANIO_PAGINA) : pageable;
+        if (formularioRepositorio == null) {
+            return Page.empty(p);
+        }
+        return formularioRepositorio
+                .findBySucNroIdAndSucTipoAndTurNroIdOrderByF276IdAsc(sucursal, tipo, turNroId, p)
+                .map(f -> {
+                    BigDecimal importe = nz(f.getF276ImpuFl()).add(nz(f.getF276AdicFl()))
+                            .add(nz(f.getF276AdIBTo())).add(nz(f.getF276AdCMTo()));
+                    String estado = f.getF276Estad() == null ? "" : f.getF276Estad().trim();
+                    return new ActaView(f.getF276Id(), f.getF276FchMov(), importe, estado);
+                });
+    }
+
+    private static BigDecimal sumarImportes(List<ActaView> actas) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (ActaView a : actas) {
+            if (a.importe() != null) {
+                total = total.add(a.importe());
+            }
+        }
+        return total;
+    }
+
+    private static BigDecimal nz(BigDecimal valor) {
+        return valor == null ? BigDecimal.ZERO : valor;
     }
 }

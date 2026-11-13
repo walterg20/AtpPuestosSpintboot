@@ -1,0 +1,336 @@
+/* Estilos nativos de la solapa LISTADO ACTAS del Detalle de Turno (Stitch SCREEN_2).
+   Sin Tailwind/Bootstrap/CDN. Tokens en :root. */
+:root {
+  --dta-primary: #0f2a4a;
+  --dta-accent: #1a73e8;
+  --dta-success: #10b981;
+  --dta-danger: #b91c1c;
+  --dta-bg: #f8f9ff;
+  --dta-surface: #ffffff;
+  --dta-surface-alt: #eff4ff;
+  --dta-text: #1f2937;
+  --dta-muted: #6b7280;
+  --dta-border: #d1d5db;
+  --dta-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --dta-radius: 10px;
+  --dta-space-xs: 4px;
+  --dta-space-sm: 8px;
+  --dta-space-md: 16px;
+  --dta-space-lg: 24px;
+}
+
+body.stitch-body {
+  font-family: var(--dta-font);
+  background: var(--dta-bg);
+  color: var(--dta-text);
+}
+
+.dta-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dta-space-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--dta-space-lg);
+}
+
+.dta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dta-space-md);
+  flex-wrap: wrap;
+}
+
+.dta-title {
+  margin: 0;
+  color: var(--dta-primary);
+  font-size: 1.5rem;
+}
+
+.dta-subtitle {
+  margin: 4px 0 0;
+  color: var(--dta-muted);
+}
+
+.dta-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--dta-surface-alt);
+  color: var(--dta-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dta-badge--open {
+  background: var(--dta-success);
+  color: #fff;
+}
+
+.dta-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dta-space-md);
+}
+
+.dta-kpi {
+  background: var(--dta-surface);
+  border: 1px solid var(--dta-border);
+  border-radius: var(--dta-radius);
+  padding: var(--dta-space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dta-space-xs);
+  box-shadow: 0 1px 3px rgba(15, 42, 74, 0.08);
+}
+
+.dta-kpi__label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dta-muted);
+}
+
+.dta-kpi__value {
+  font-size: 1.6rem;
+  color: var(--dta-primary);
+}
+
+.dta-kpi__foot {
+  font-size: 0.75rem;
+  color: var(--dta-muted);
+}
+
+.dta-tabs {
+  display: flex;
+  gap: var(--dta-space-sm);
+  border-bottom: 2px solid var(--dta-border);
+}
+
+.dta-tab {
+  padding: 8px 16px;
+  text-decoration: none;
+  color: var(--dta-muted);
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dta-tab--active {
+  color: var(--dta-accent);
+  border-bottom-color: var(--dta-accent);
+}
+
+.dta-tab__badge {
+  background: var(--dta-accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+}
+
+.dta-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--dta-space-md);
+  flex-wrap: wrap;
+  background: var(--dta-surface);
+  border: 1px solid var(--dta-border);
+  border-radius: var(--dta-radius);
+  padding: var(--dta-space-md);
+}
+
+.dta-toolbar__search {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 260px;
+}
+
+.dta-toolbar__label {
+  font-size: 0.8rem;
+  color: var(--dta-muted);
+}
+
+.dta-input {
+  padding: 8px 10px;
+  border: 1px solid var(--dta-border);
+  border-radius: var(--dta-radius);
+  font: inherit;
+  color: var(--dta-text);
+}
+
+.dta-toolbar__actions {
+  display: flex;
+  gap: var(--dta-space-sm);
+  flex-wrap: wrap;
+}
+
+.dta-btn {
+  padding: 8px 14px;
+  border-radius: var(--dta-radius);
+  border: 1px solid var(--dta-border);
+  background: var(--dta-surface);
+  color: var(--dta-text);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+
+.dta-btn--primary {
+  background: var(--dta-accent);
+  color: #fff;
+  border-color: var(--dta-accent);
+}
+
+.dta-btn--secondary {
+  background: var(--dta-surface-alt);
+  color: var(--dta-primary);
+}
+
+.dta-btn--link {
+  background: transparent;
+  border: none;
+  color: var(--dta-accent);
+}
+
+.dta-table-card {
+  background: var(--dta-surface);
+  border: 1px solid var(--dta-border);
+  border-radius: var(--dta-radius);
+  padding: var(--dta-space-md);
+}
+
+.dta-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--dta-space-sm);
+}
+
+.dta-table-title {
+  color: var(--dta-primary);
+  font-weight: 600;
+}
+
+.dta-count-badge {
+  background: var(--dta-surface-alt);
+  color: var(--dta-muted);
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.dta-table-wrap {
+  overflow-x: auto;
+}
+
+.dta-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dta-table th,
+.dta-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--dta-border);
+  text-align: left;
+}
+
+.dta-table th {
+  background: var(--dta-surface-alt);
+  color: var(--dta-primary);
+}
+
+.dta-th--center,
+.dta-td--center {
+  text-align: center;
+}
+
+.dta-data {
+  font-weight: 600;
+  color: var(--dta-primary);
+}
+
+.dta-btn-icon {
+  border: 1px solid var(--dta-border);
+  background: var(--dta-surface);
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.dta-empty {
+  color: var(--dta-muted);
+  font-style: italic;
+}
+
+.dta-alert {
+  padding: 10px 14px;
+  border-radius: var(--dta-radius);
+  border: 1px solid var(--dta-border);
+}
+
+.dta-alert--success {
+  background: #ecfdf5;
+  border-color: var(--dta-success);
+  color: #065f46;
+}
+
+.dta-alert--error {
+  background: #fef2f2;
+  border-color: var(--dta-danger);
+  color: #7f1d1d;
+}
+
+.dta-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dta-space-md);
+  margin-top: var(--dta-space-md);
+  flex-wrap: wrap;
+}
+
+.dta-pagination__info {
+  color: var(--dta-muted);
+  font-size: 0.85rem;
+}
+
+.dta-pagination__controls {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.dta-page-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--dta-border);
+  border-radius: 6px;
+  background: var(--dta-surface);
+  color: var(--dta-text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dta-page-btn--active {
+  background: var(--dta-accent);
+  color: #fff;
+  border-color: var(--dta-accent);
+}
+
+.dta-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .dta-kpis {
+    grid-template-columns: 1fr;
+  }
+}

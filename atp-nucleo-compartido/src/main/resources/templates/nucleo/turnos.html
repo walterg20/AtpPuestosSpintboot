@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
   Pantalla de Turnos (módulo 06-turnos) — rediseño Stitch "Gestión de Turnos".
   Conserva los contratos verificados por TurnoMvcControllerTest.
@@ -85,22 +85,23 @@
         <form class="stitch-form-grid" method="get" th:action="@{/turnos}">
           <div class="stitch-col-4 stitch-field">
             <label class="stitch-field__label" for="tur-busqueda">Buscar Turno</label>
-            <input class="stitch-input" id="tur-busqueda" type="text" name="busqueda" placeholder="Id. Turno, Comisión...">
+            <input class="stitch-input" id="tur-busqueda" type="text" name="busqueda" placeholder="Id. Turno, Comisión..." th:value="${busqueda}">
           </div>
           <div class="stitch-col-2 stitch-field">
             <label class="stitch-field__label" for="tur-desde">Desde</label>
-            <input class="stitch-input" id="tur-desde" type="date" name="desde">
+            <input class="stitch-input" id="tur-desde" type="date" name="desde" th:value="${desde}">
           </div>
           <div class="stitch-col-2 stitch-field">
             <label class="stitch-field__label" for="tur-hasta">Hasta</label>
-            <input class="stitch-input" id="tur-hasta" type="date" name="hasta">
+            <input class="stitch-input" id="tur-hasta" type="date" name="hasta" th:value="${hasta}">
           </div>
           <div class="stitch-col-2 stitch-field">
-            <div class="atp-turnos__pills">
-              <button type="button" class="atp-turnos__pill atp-turnos__pill--active">Todos</button>
-              <button type="button" class="atp-turnos__pill">Abierto</button>
-              <button type="button" class="atp-turnos__pill">Cerrado</button>
-            </div>
+            <label class="stitch-field__label" for="tur-estado">Estado</label>
+            <select class="stitch-input" id="tur-estado" name="estado">
+              <option value="" th:selected="${estado == null or #strings.isEmpty(estado)}">Todos</option>
+              <option value="A" th:selected="${estado == 'A'}">Abierto</option>
+              <option value="C" th:selected="${estado == 'C'}">Cerrado</option>
+            </select>
           </div>
           <div class="stitch-col-2 stitch-field">
             <button type="submit" class="stitch-btn-primary">Aplicar</button>
@@ -111,7 +112,8 @@
       <!-- Botonera: las dos acciones del legacy. -->
       <div class="atp-turnos__acciones">
         <form class="atp-form" th:action="@{/turnos/nuevo}" method="post">
-          <button class="stitch-btn-primary" type="submit">Nuevo Turno</button>
+          <button class="stitch-btn-primary" type="submit"
+                  th:attr="data-confirmar=${mensajeConfirmacionNuevo}">Nuevo Turno</button>
         </form>
 
         <form class="atp-form" th:if="${turnoObjetivo != null}"
@@ -146,36 +148,27 @@
                 <th scope="col">Fecha Apertura</th>
                 <th scope="col">Fecha Cierre</th>
                 <th scope="col">Estado</th>
-                <th>Acciones</th>
+                <th class="stitch-th--center" scope="col">Resumen</th>
               </tr>
             </thead>
             <tbody>
               <tr th:each="fila : ${turnos}"
                   th:classappend="${fila.turno == turnoSeleccionado} ? 'atp-table__fila--seleccionada' : ''">
                 <td>
-                  <a class="stitch-link stitch-data" th:href="@{/turnos(turNroId=${fila.turno})}"
+                  <a class="stitch-link stitch-data" th:href="@{/turnos/{id}(id=${fila.turno})}"
                      th:text="${fila.turno}">0</a>
                 </td>
                 <td th:text="${fila.comision}">0</td>
                 <td th:text="${fila.fechaApertura}">01/01/2026</td>
                 <td th:text="${fila.fechaCierre}">01/01/2026</td>
                 <td>
-                  <span class="stitch-badge"
-                        th:classappend="${fila.estado} == 'A' ? ' stitch-badge--open' : ' stitch-badge--closed'"
-                        th:text="${fila.estado}">A</span>
+                  <select class="stitch-input atp-turnos__estado" disabled>
+                    <option value="C" th:selected="${fila.estado == 'C'}">Cerrado</option>
+                    <option value="A" th:selected="${fila.estado == 'A'}">Abierto</option>
+                  </select>
                 </td>
                 <td class="stitch-td--center">
-                  <div class="atp-turnos__row-actions">
-                    <button type="button" class="stitch-btn-icon" title="Imprimir">
-                      <span>🖨</span>
-                    </button>
-                    <button type="button" class="stitch-btn-icon" title="PDF">
-                      <span>📄</span>
-                    </button>
-                    <button type="button" class="stitch-btn-icon" title="Ver detalle">
-                      <span>👁</span>
-                    </button>
-                  </div>
+                   <a class="stitch-btn-icon" target="_blank" rel="noopener" th:href="@{/reportes/turnos/{sucNroId}/{sucTipo}/{turNroId}/resumen.pdf(sucNroId=${fila.sucursal}, sucTipo=${fila.tipo}, turNroId=${fila.turno})}" title="Imprimir Resumen">🖨</a>
                 </td>
               </tr>
             </tbody>
@@ -227,7 +220,8 @@
               <input class="stitch-input" id="mn-desc" type="text" name="descripcion">
             </div>
             <div class="atp-turnos__modal-actions">
-              <button type="submit" class="stitch-btn-primary">Nuevo Turno</button>
+              <button type="submit" class="stitch-btn-primary"
+                      th:attr="data-confirmar=${mensajeConfirmacionNuevo}">Nuevo Turno</button>
               <a class="stitch-btn-secondary" href="#">Cerrar</a>
             </div>
           </form>

@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import ar.com.atp.puestos.nucleo.service.ContextoSesion;
 import ar.com.atp.puestos.nucleo.service.MensajesTurno;
 import ar.com.atp.puestos.nucleo.service.ResultadoTurno;
+import ar.com.atp.puestos.nucleo.service.FiltrosTurno;
 import ar.com.atp.puestos.nucleo.service.ServicioTurnos;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +56,7 @@ class TurnoMvcEscrituraTest {
 
     @BeforeEach
     void listadoVacioPorDefecto() {
-        when(servicioTurnos.listar(any(), any(Pageable.class)))
+        when(servicioTurnos.listar(any(), any(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10), 0));
     }
 

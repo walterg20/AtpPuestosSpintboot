@@ -1,0 +1,336 @@
+/* Estilos nativos de la pantalla Detalle de Turno (Stitch SCREEN_5). Sin Tailwind/Bootstrap/CDN. */
+:root {
+  --dt-primary: #0f2a4a;
+  --dt-accent: #1a73e8;
+  --dt-success: #10b981;
+  --dt-danger: #b91c1c;
+  --dt-bg: #f8f9ff;
+  --dt-surface: #ffffff;
+  --dt-surface-alt: #eff4ff;
+  --dt-text: #1f2937;
+  --dt-muted: #6b7280;
+  --dt-border: #d1d5db;
+  --dt-font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --dt-radius: 10px;
+  --dt-space-xs: 4px;
+  --dt-space-sm: 8px;
+  --dt-space-md: 16px;
+  --dt-space-lg: 24px;
+}
+
+body.stitch-body {
+  font-family: var(--dt-font);
+  background: var(--dt-bg);
+  color: var(--dt-text);
+}
+
+.dt-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dt-space-lg);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--dt-space-lg);
+}
+
+.dt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dt-space-md);
+  flex-wrap: wrap;
+}
+
+.dt-title {
+  margin: 0;
+  color: var(--dt-primary);
+  font-size: 1.5rem;
+}
+
+.dt-subtitle {
+  margin: 4px 0 0;
+  color: var(--dt-muted);
+}
+
+.dt-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--dt-surface-alt);
+  color: var(--dt-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dt-badge--open {
+  background: var(--dt-success);
+  color: #fff;
+}
+
+.dt-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dt-space-md);
+}
+
+.dt-kpi {
+  background: var(--dt-surface);
+  border: 1px solid var(--dt-border);
+  border-radius: var(--dt-radius);
+  padding: var(--dt-space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dt-space-xs);
+  box-shadow: 0 1px 3px rgba(15, 42, 74, 0.08);
+}
+
+.dt-kpi__label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dt-muted);
+}
+
+.dt-kpi__value {
+  font-size: 1.6rem;
+  color: var(--dt-primary);
+}
+
+.dt-kpi__foot {
+  font-size: 0.75rem;
+  color: var(--dt-muted);
+}
+
+.dt-tabs {
+  display: flex;
+  gap: var(--dt-space-sm);
+  border-bottom: 2px solid var(--dt-border);
+}
+
+.dt-tab {
+  padding: 8px 16px;
+  text-decoration: none;
+  color: var(--dt-muted);
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.dt-tab--active {
+  color: var(--dt-accent);
+  border-bottom-color: var(--dt-accent);
+}
+
+.dt-tab__badge {
+  background: var(--dt-accent);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+
+.dt-grid {
+  display: grid;
+  grid-template-columns: 65% 35%;
+  gap: var(--dt-space-lg);
+}
+
+.dt-card {
+  background: var(--dt-surface);
+  border: 1px solid var(--dt-border);
+  border-radius: var(--dt-radius);
+  padding: var(--dt-space-md);
+}
+
+.dt-card__head {
+  margin-bottom: var(--dt-space-md);
+  border-bottom: 1px solid var(--dt-surface-alt);
+  padding-bottom: var(--dt-space-sm);
+}
+
+.dt-card__head--sub {
+  margin-top: var(--dt-space-lg);
+}
+
+.dt-card__title {
+  margin: 0;
+  color: var(--dt-primary);
+  font-size: 1.1rem;
+}
+
+.dt-datos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dt-space-sm);
+  margin: 0;
+}
+
+.dt-datos__fila {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--dt-space-md);
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--dt-border);
+}
+
+.dt-datos__fila dt {
+  font-weight: 600;
+  color: var(--dt-muted);
+}
+
+.dt-datos__fila dd {
+  margin: 0;
+  color: var(--dt-text);
+}
+
+.dt-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dt-space-sm);
+}
+
+.dt-btn {
+  padding: 10px 14px;
+  border-radius: var(--dt-radius);
+  border: 1px solid var(--dt-border);
+  background: var(--dt-surface);
+  color: var(--dt-text);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+
+.dt-btn--secondary {
+  background: var(--dt-surface-alt);
+  color: var(--dt-primary);
+}
+
+.dt-btn--danger {
+  background: var(--dt-danger);
+  color: #fff;
+  border-color: var(--dt-danger);
+}
+
+.dt-btn--link {
+  background: transparent;
+  border: none;
+  color: var(--dt-accent);
+}
+
+.dt-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dt-space-sm);
+}
+
+.dt-timeline li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  background: var(--dt-surface-alt);
+  border-radius: var(--dt-radius);
+}
+
+.dt-timeline__fecha {
+  font-size: 0.8rem;
+  color: var(--dt-muted);
+}
+
+.dt-timeline__desc {
+  color: var(--dt-text);
+}
+
+.dt-table-wrap {
+  overflow-x: auto;
+}
+
+.dt-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dt-table th,
+.dt-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--dt-border);
+  text-align: left;
+}
+
+.dt-table th {
+  background: var(--dt-surface-alt);
+  color: var(--dt-primary);
+}
+
+.dt-empty {
+  color: var(--dt-muted);
+  font-style: italic;
+}
+
+.dt-alert {
+  padding: 10px 14px;
+  border-radius: var(--dt-radius);
+  border: 1px solid var(--dt-border);
+}
+
+.dt-alert--success {
+  background: #ecfdf5;
+  border-color: var(--dt-success);
+  color: #065f46;
+}
+
+.dt-alert--error {
+  background: #fef2f2;
+  border-color: var(--dt-danger);
+  color: #7f1d1d;
+}
+
+/* Modal */
+.dt-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dt-modal[hidden] {
+  display: none;
+}
+
+.dt-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 42, 74, 0.5);
+}
+
+.dt-modal__dialog {
+  position: relative;
+  background: var(--dt-surface);
+  border-radius: var(--dt-radius);
+  padding: var(--dt-space-lg);
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dt-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--dt-space-sm);
+  margin-top: var(--dt-space-md);
+}
+
+@media (max-width: 768px) {
+  .dt-grid {
+    grid-template-columns: 1fr;
+  }
+  .dt-kpis {
+    grid-template-columns: 1fr;
+  }
+}

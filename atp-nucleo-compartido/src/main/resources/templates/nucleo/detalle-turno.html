@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head('Detalle de Turno')}">
+  <title>Detalle de Turno</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+    <div class="dt-page">
+
+      <!-- Mensajes -->
+      <div class="dt-alert dt-alert--success" role="status" aria-live="polite" th:if="${mensajeExito}">
+        <p th:text="${mensajeExito}">Ok</p>
+      </div>
+      <div class="dt-alert dt-alert--error" role="alert" aria-live="assertive" th:if="${mensajeError}">
+        <p th:text="${mensajeError}">Error</p>
+      </div>
+
+      <!-- Header -->
+      <header class="dt-header">
+        <div>
+          <h1 class="dt-title">Detalle de Turno Operativo</h1>
+          <p class="dt-subtitle">Información completa del turno seleccionado.</p>
+        </div>
+        <span class="dt-badge dt-badge--open" th:if="${turno != null and turno.abierto}">Abierto</span>
+        <span class="dt-badge" th:if="${turno == null or not turno.abierto}">Cerrado</span>
+      </header>
+
+      <!-- KPIs -->
+      <section class="dt-kpis" aria-label="Indicadores del turno">
+        <article class="dt-kpi">
+          <span class="dt-kpi__label">ID Turno</span>
+          <strong class="dt-kpi__value" th:text="${turno != null ? ('#' + turno.turno) : '#'}">-</strong>
+          <span class="dt-kpi__foot">Identificador</span>
+        </article>
+        <article class="dt-kpi">
+          <span class="dt-kpi__label">Actas Labradas</span>
+          <strong class="dt-kpi__value" th:text="${actas != null ? #lists.size(actas) : 0}">0</strong>
+          <span class="dt-kpi__foot">Total de actas</span>
+        </article>
+        <article class="dt-kpi">
+          <span class="dt-kpi__label">Percepción Estimada</span>
+          <strong class="dt-kpi__value"
+                  th:text="${detalle != null and detalle.percepcionEstimada != null ? #numbers.formatDecimal(detalle.percepcionEstimada, 1, 2) : '0,00'}">0,00</strong>
+          <span class="dt-kpi__foot">Importe estimado</span>
+        </article>
+      </section>
+
+      <!-- Pestañas -->
+      <nav class="dt-tabs" aria-label="Secciones del turno">
+        <a class="dt-tab" th:classappend="${tab == 'general' or tab == null} ? ' dt-tab--active' : ''"
+           th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='general')}">GENERAL</a>
+        <a class="dt-tab" th:classappend="${tab == 'actas'} ? ' dt-tab--active' : ''"
+           th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='actas')}">
+          LISTADO ACTAS
+          <span class="dt-tab__badge" th:text="${actas != null ? #lists.size(actas) : 0}">0</span>
+        </a>
+      </nav>
+
+      <!-- Layout 2 columnas -->
+      <div class="dt-grid">
+        <!-- Columna izquierda: datos del turno -->
+        <section class="dt-card dt-card--left" aria-labelledby="titulo-datos">
+          <header class="dt-card__head">
+            <h2 id="titulo-datos" class="dt-card__title">Datos del Turno</h2>
+          </header>
+          <dl class="dt-datos" th:if="${turno != null}">
+            <div class="dt-datos__fila">
+              <dt>Id</dt>
+              <dd th:text="${turno.turno}">0</dd>
+            </div>
+            <div class="dt-datos__fila">
+              <dt>Fiscalizador</dt>
+              <dd th:text="${fiscalizador}">Fiscalizador</dd>
+            </div>
+            <div class="dt-datos__fila">
+              <dt>Fecha Apertura</dt>
+              <dd th:text="${turno.fechaApertura}">01/01/2026</dd>
+            </div>
+            <div class="dt-datos__fila">
+              <dt>Fecha Cierre</dt>
+              <dd th:text="${turno.fechaCierre}">—</dd>
+            </div>
+            <div class="dt-datos__fila">
+              <dt>Estado</dt>
+              <dd th:text="${turno.estado == 'A' ? 'Abierto' : 'Cerrado'}">Abierto</dd>
+            </div>
+            <div class="dt-datos__fila">
+              <dt>Comisión</dt>
+              <dd th:text="${turno.comision}">0</dd>
+            </div>
+          </dl>
+          <p class="dt-empty" th:if="${turno == null}">No hay datos del turno.</p>
+        </section>
+
+        <!-- Columna derecha: acciones + bitácora -->
+        <aside class="dt-card dt-card--right" aria-labelledby="titulo-acciones">
+          <header class="dt-card__head">
+            <h2 id="titulo-acciones" class="dt-card__title">Acciones</h2>
+          </header>
+          <div class="dt-acciones">
+            <button type="button" class="dt-btn dt-btn--secondary" onclick="window.print()">Imprimir Planilla</button>
+            <form th:if="${turno != null and turno.abierto}" id="form-cerrar-turno" class="dt-form"
+                  th:action="@{/turnos/{turNroId}/cerrar(turNroId=${turno.turno})}" method="post">
+              <button class="dt-btn dt-btn--danger" type="button" data-abrir-modal="modal-cierre"
+                      th:attr="data-confirmar='¿Confirma que desea cerrar el Turno?'">Cerrar Turno</button>
+            </form>
+            <a class="dt-btn dt-btn--link" th:href="@{/turnos}">Volver a Turnos</a>
+          </div>
+
+          <header class="dt-card__head dt-card__head--sub">
+            <h2 class="dt-card__title">Bitácora</h2>
+          </header>
+          <ul class="dt-timeline" th:if="${eventosBitacora != null and not #lists.isEmpty(eventosBitacora)}">
+            <li th:each="ev : ${eventosBitacora}">
+              <span class="dt-timeline__fecha" th:text="${ev.fechaHora}">01/01/2026</span>
+              <span class="dt-timeline__desc" th:text="${ev.descripcion}">Evento</span>
+            </li>
+          </ul>
+          <p class="dt-empty" th:if="${eventosBitacora == null or #lists.isEmpty(eventosBitacora)}">Sin eventos.</p>
+        </aside>
+      </div>
+
+      <!-- Listado de Actas -->
+      <section class="dt-card dt-card--full" aria-labelledby="titulo-actas" th:if="${actas != null and not #lists.isEmpty(actas)}">
+        <header class="dt-card__head">
+          <h2 id="titulo-actas" class="dt-card__title">Listado de Actas</h2>
+        </header>
+        <div class="dt-table-wrap">
+          <table class="dt-table">
+            <thead>
+              <tr>
+                <th scope="col">Nº Acta</th>
+                <th scope="col">Fecha/Hora</th>
+                <th scope="col">Importe</th>
+                <th scope="col">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="acta : ${actas}">
+                <td th:text="${acta.nroActa}">0</td>
+                <td th:text="${acta.fechaHora}">01/01/2026</td>
+                <td th:text="${acta.importe}">0,00</td>
+                <td th:text="${acta.estado}">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <p class="dt-empty" th:if="${actas == null or #lists.isEmpty(actas)}">No hay actas para mostrar.</p>
+
+    </div>
+  </main>
+
+  <!-- Modal de cierre -->
+  <div class="dt-modal" id="modal-cierre" hidden>
+    <div class="dt-modal__backdrop" data-cerrar-modal></div>
+    <div class="dt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="titulo-cierre">
+      <h2 id="titulo-cierre">Cerrar Turno</h2>
+      <p>¿Confirma que desea cerrar el Turno?</p>
+      <div class="dt-modal__actions">
+        <button type="button" class="dt-btn dt-btn--link" data-cerrar-modal>Cancelar</button>
+        <button type="button" class="dt-btn dt-btn--danger" data-confirmar-cierre>Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+
+  <link rel="stylesheet" th:href="@{/css/detalle-turno.css}">
+  <script th:src="@{/js/detalle-turno.js}" defer></script>
+</body>
+</html>

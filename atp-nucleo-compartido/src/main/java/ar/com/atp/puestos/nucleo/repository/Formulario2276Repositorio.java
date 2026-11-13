@@ -4,6 +4,8 @@ import ar.com.atp.puestos.nucleo.domain.Formulario2276;
 import ar.com.atp.puestos.nucleo.domain.Lote227;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -84,4 +86,17 @@ public interface Formulario2276Repositorio extends JpaRepository<Formulario2276,
             nativeQuery = true)
     List<Object[]> totalizarTurno(@Param("sucNroId") Integer sucNroId,
             @Param("sucTipo") String sucTipo, @Param("turNroId") Integer turNroId);
+    List<Formulario2276> findBySucNroIdAndSucTipoAndTurNroIdOrderByF276IdAsc(Integer sucNroId, String sucTipo, Integer turNroId);
+
+    /**
+     * Igual que {@link #findBySucNroIdAndSucTipoAndTurNroIdOrderByF276IdAsc(Integer, String, Integer)}
+     * pero con paginación (Fase 3 — solapa LISTADO ACTAS).
+     *
+     * @param sucNroId sucursal del turno
+     * @param sucTipo   tipo de sucursal del turno
+     * @param turNroId  número de turno
+     * @param pageable  paginación pedida por la vista
+     * @return página de formularios ordenados por {@code F276Id} asc
+     */
+    Page<Formulario2276> findBySucNroIdAndSucTipoAndTurNroIdOrderByF276IdAsc(Integer sucNroId, String sucTipo, Integer turNroId, Pageable pageable);
 }

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head('Detalle de Turno - Actas')}">
+  <title>Detalle de Turno - Listado de Actas</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+    <div class="dta-page">
+
+      <!-- Mensajes -->
+      <div class="dta-alert dta-alert--success" role="status" aria-live="polite" th:if="${mensajeExito}">
+        <p th:text="${mensajeExito}">Ok</p>
+      </div>
+      <div class="dta-alert dta-alert--error" role="alert" aria-live="assertive" th:if="${mensajeError}">
+        <p th:text="${mensajeError}">Error</p>
+      </div>
+
+      <!-- Header -->
+      <header class="dta-header">
+        <div>
+          <h1 class="dta-title">Detalle de Turno Operativo</h1>
+          <p class="dta-subtitle">Listado de Actas labradas en el turno.</p>
+        </div>
+        <span class="dta-badge dta-badge--open"
+              th:if="${turno != null and turno.abierto}">Abierto</span>
+        <span class="dta-badge" th:if="${turno == null or not turno.abierto}">Cerrado</span>
+      </header>
+
+      <!-- KPIs: ID Turno, Actas Labradas, Percepción Estimada -->
+      <section class="dta-kpis" aria-label="Indicadores del turno">
+        <article class="dta-kpi">
+          <span class="dta-kpi__label">ID Turno</span>
+          <strong class="dta-kpi__value" th:text="${turno != null ? ('#' + turno.turno) : '#'}">-</strong>
+          <span class="dta-kpi__foot">Identificador</span>
+        </article>
+        <article class="dta-kpi">
+          <span class="dta-kpi__label">Actas Labradas</span>
+          <strong class="dta-kpi__value"
+                  th:text="${actasPage != null ? actasPage.totalElements : (actas != null ? #lists.size(actas) : 0)}">0</strong>
+          <span class="dta-kpi__foot">Total de actas</span>
+        </article>
+        <article class="dta-kpi">
+          <span class="dta-kpi__label">Percepción Estimada</span>
+          <strong class="dta-kpi__value"
+                  th:text="${detalle != null and detalle.percepcionEstimada != null ? #numbers.formatDecimal(detalle.percepcionEstimada, 1, 2) : '0,00'}">0,00</strong>
+          <span class="dta-kpi__foot">Importe estimado</span>
+        </article>
+      </section>
+
+      <!-- Pestañas -->
+      <nav class="dta-tabs" aria-label="Secciones del turno">
+        <a class="dta-tab"
+           th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='general')}">GENERAL</a>
+        <a class="dta-tab dta-tab--active"
+           th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='actas')}">
+          LISTADO ACTAS
+          <span class="dta-tab__badge"
+                th:text="${actasPage != null ? actasPage.totalElements : (actas != null ? #lists.size(actas) : 0)}">0</span>
+        </a>
+      </nav>
+
+      <!-- Barra de acciones -->
+      <div class="dta-toolbar" role="toolbar" aria-label="Acciones del listado de actas">
+        <div class="dta-toolbar__search">
+          <label class="dta-toolbar__label" for="dta-busqueda">Búsqueda rápida</label>
+          <input class="dta-input" id="dta-busqueda" type="search" placeholder="Buscar por N° Acta, fecha, importe o estado..."
+                 aria-label="Búsqueda rápida">
+        </div>
+        <div class="dta-toolbar__actions">
+          <button type="button" class="dta-btn dta-btn--secondary">Filtros Avanzados</button>
+          <button type="button" class="dta-btn dta-btn--secondary">Exportar</button>
+          <button type="button" class="dta-btn dta-btn--primary">+ Nueva Carga Manual de Acta</button>
+        </div>
+      </div>
+
+      <!-- Grilla -->
+      <div class="dta-table-card">
+        <div class="dta-table-toolbar">
+          <span class="dta-table-title">Listado de Actas</span>
+          <span class="dta-count-badge"
+                th:text="${actasPage != null ? actasPage.totalElements + ' registros' : '0 registros'}">0 registros</span>
+        </div>
+        <div class="dta-table-wrap" th:if="${actasPage != null and not #lists.isEmpty(actasPage.content)}">
+          <table class="dta-table" id="dta-tabla">
+            <caption class="dta-table__caption">Actas del turno</caption>
+            <thead>
+              <tr>
+                <th scope="col" title="N° Acta">Nº Acta</th>
+                <th scope="col">Fecha/Hora</th>
+                <th scope="col">Importe</th>
+                <th scope="col">Estado</th>
+                <th class="dta-th--center" scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="acta : ${actasPage.content}">
+                <td class="dta-data" th:text="${acta.nroActa}">0</td>
+                <td th:text="${acta.fechaHora}">01/01/2026</td>
+                <td th:text="${acta.importe}">0,00</td>
+                <td th:text="${acta.estado}">—</td>
+                <td class="dta-td--center">
+                  <button type="button" class="dta-btn-icon" title="Ver">👁</button>
+                  <button type="button" class="dta-btn-icon" title="Imprimir">🖨</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="dta-empty" th:if="${actasPage == null or #lists.isEmpty(actasPage.content)}">
+          No hay actas para mostrar.
+        </p>
+
+        <!-- Paginador reusado (de turnos.html) -->
+        <div class="dta-pagination" th:if="${actasPage != null and actasPage.totalPages > 1}">
+          <div class="dta-pagination__info">Mostrando actas del turno</div>
+          <div class="dta-pagination__controls">
+            <a class="dta-page-btn" th:if="${actasPage.hasPrevious()}"
+               th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='actas', pagina=0)}">First</a>
+            <button class="dta-page-btn" type="button" th:if="${not actasPage.hasPrevious()}" disabled>First</button>
+
+            <a class="dta-page-btn" th:if="${actasPage.hasPrevious()}"
+               th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='actas', pagina=${actasPage.number - 1})}">Prev</a>
+            <button class="dta-page-btn" type="button" th:if="${not actasPage.hasPrevious()}" disabled>Prev</button>
+
+            <a th:each="p : ${#numbers.sequence(0, actasPage.totalPages - 1)}"
+               class="dta-page-btn"
+               th:classappend="${p == actasPage.number} ? ' dta-page-btn--active' : ''"
+               th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='actas', pagina=${p})}"
+               th:text="${p + 1}">1</a>
+
+            <a class="dta-page-btn" th:if="${actasPage.hasNext()}"
+               th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='actas', pagina=${actasPage.number + 1})}">Next</a>
+            <button class="dta-page-btn" type="button" th:if="${not actasPage.hasNext()}" disabled>Next</button>
+
+            <a class="dta-page-btn" th:if="${actasPage.hasNext()}"
+               th:href="@{/turnos/{id}(id=${turno != null ? turno.turno : 0}, tab='actas', pagina=${actasPage.totalPages - 1})}">Last</a>
+            <button class="dta-page-btn" type="button" th:if="${not actasPage.hasNext()}" disabled>Last</button>
+          </div>
+        </div>
+      </div>
+
+      <a class="dta-btn dta-btn--link" th:href="@{/turnos}">Volver a Turnos</a>
+
+    </div>
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+
+  <link rel="stylesheet" th:href="@{/css/detalle-turno-actas.css}">
+  <script th:src="@{/js/detalle-turno-actas.js}" defer></script>
+</body>
+</html>

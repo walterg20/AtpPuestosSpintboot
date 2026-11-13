@@ -37,7 +37,7 @@ if defined DB_USER echo   BD  : %DB_USER%@%DB_HOST%:%DB_PORT%/%DB_NAME%
 echo   Para detener: Ctrl+C
 echo.
 
-call mvnw.cmd -pl atp-puestos-camineros spring-boot:run -Dspring-boot.run.profiles=dev
+call mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
 set "RC=%ERRORLEVEL%"
 
 endlocal & exit /b %RC%
@@ -52,3 +52,4 @@ for /f "usebackq eol=# tokens=1* delims==" %%A in (%1) do (
     if not "%%A"=="" if not "%%B"=="" set "%%A=%%B"
 )
 exit /b 0
+

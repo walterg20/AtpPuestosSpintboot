@@ -1,0 +1,56 @@
+# Perfil dev: configuracion heredada del nucleo (datasource, jpa, etc.) + overrides de desarrollo.
+# Fusion Etapa 2 de unificacion: propiedades del nucleo (application.yml) integradas aqui,
+# manteniendo ddl-auto=none. Si hay conflicto en BD/JPA, prevalecen las del nucleo.
+spring:
+  # 03-login / D-LOG-16: exclusion de UserDetailsServiceAutoConfiguration (ver nucleo).
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+  application:
+    name: atp-puestos
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:Rentas};encrypt=true;trustServerCertificate=true}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USER:}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
+    driver-class-name: ${DB_DRIVER:com.microsoft.sqlserver.jdbc.SQLServerDriver}
+    hikari:
+      pool-name: atp-puestos-pool
+      maximum-pool-size: 10
+      connection-timeout: 10000
+  jpa:
+    database-platform: org.hibernate.dialect.SQLServer2012Dialect
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+    show-sql: false
+  jackson:
+    default-property-inclusion: non_null
+  # Overrides de desarrollo (hot reload de vistas/recursos estaticos).
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        period: 0
+      chain:
+        cache: false
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+  servlet:
+    session:
+      cookie:
+        same-site: lax
+        http-only: true
+
+# Auditoria de escritura (R-033): usuario por defecto cuando NO hay sesion autenticada.
+app:
+  auditoria:
+    usuario: ${APP_AUDITORIA_USUARIO:SISTEMA}

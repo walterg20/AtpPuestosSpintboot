@@ -23,13 +23,13 @@ jobs:
           cache: maven
 
       - name: Build artifact
-        run: ./mvnw -B -pl atp-puestos-camineros -am package -DskipTests
+        run: ./mvnw -B package -DskipTests
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: atp-puestos-camineros
-          path: atp-puestos-camineros/target/*.jar
+          name: atp-puestos
+          path: target/*.jar
           retention-days: 30
 
       # Descomentar y adaptar al mecanismo de deploy real (SSH, scp, docker push, etc.).
@@ -43,3 +43,4 @@ jobs:
       #       systemctl stop atp-puestos
       #       scp ... /opt/atp-puestos/app.jar
       #       systemctl start atp-puestos
+

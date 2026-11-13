@@ -5,10 +5,10 @@ REM  Monorepo Maven: el artefacto desplegable es atp-puestos-camineros.
 REM  Usa JDK 17 (el java del PATH suele ser 1.8).
 REM
 REM  Uso:
-REM     run-mvn-jdk17.cmd                  -> -pl atp-puestos-camineros -am clean package -DskipTests
+REM     run-mvn-jdk17.cmd                  -> clean package -DskipTests
 REM     run-mvn-jdk17.cmd test             -> corre los tests (H2, sin BD)
 REM     run-mvn-jdk17.cmd clean verify     -> build completo + tests
-REM  Genera: atp-puestos-camineros\target\atp-puestos-camineros-0.1.0-SNAPSHOT.jar
+REM  Genera: target\atp-puestos-camineros-0.1.0-SNAPSHOT.jar
 REM ============================================================
 setlocal
 
@@ -35,8 +35,8 @@ ping -n 2 127.0.0.1 >nul
 
 :build
 if "%~1"=="" (
-    echo [build] -pl atp-puestos-camineros -am clean package -DskipTests
-    call mvnw.cmd -pl atp-puestos-camineros -am clean package -DskipTests
+    echo [build] clean package -DskipTests
+    call mvnw.cmd clean package -DskipTests
 ) else (
     echo [build] %*
     call mvnw.cmd %*
@@ -44,3 +44,4 @@ if "%~1"=="" (
 set "RC=%ERRORLEVEL%"
 
 endlocal & exit /b %RC%
+

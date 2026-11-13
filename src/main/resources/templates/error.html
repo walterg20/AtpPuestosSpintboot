@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!--
+  Vista de error por defecto de la aplicacion.
+
+  La sirve el GlobalExceptionHandler (ar.gob.chaco.atp.puestoscamineros.shared.error) para las peticiones que NO
+  son del canal REST: las de error llegan con el modelo `codigo`, `mensaje`, `ruta` y `status`.
+
+  La misma plantilla es la que Spring Boot usa como pagina de error por defecto (BasicErrorController
+  -> DefaultErrorViewResolver -> "error"), y en ese caso el modelo trae `status`, `error`,
+  `message` y `path`. Por eso cada dato se resuelve con el operador elvis `?:`: la plantilla
+  sirve para los dos origenes sin duplicarse.
+
+  Diseno visual alineado al layout base-stitch (tokens stitch + tokens legacy).
+-->
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base-stitch :: head(${codigo} ?: 'Error')}">
+  <title th:text="${codigo} ?: 'Error'">Error</title>
+</head>
+<body class="stitch-body">
+  <a class="atp-saltar" href="#contenido">Ir al contenido</a>
+
+  <div th:replace="~{layout/base-stitch :: topbar}"></div>
+
+  <header th:replace="~{layout/base-stitch :: hero}"></header>
+
+  <div th:replace="~{layout/base-stitch :: sesion}"></div>
+
+  <div th:replace="~{layout/base-stitch :: navegacion}"></div>
+
+  <main id="contenido" class="stitch-main stitch-bg-grid">
+    <div class="atp-error__panel">
+      <p class="atp-error__status" th:text="${status} ?: '?'">?</p>
+      <h1 class="atp-error__code" th:text="${codigo} ?: (${error} ?: 'Error')">Error</h1>
+      <p class="atp-error__message" th:text="${mensaje} ?: (${message} ?: 'Ocurrio un error inesperado.')">
+        Ocurrio un error inesperado.
+      </p>
+      <p class="atp-error__path" th:if="${ruta} ?: ${path}" th:text="${ruta} ?: ${path}">/ruta</p>
+      <a class="atp-error__back" th:href="@{/}">Volver al inicio</a>
+    </div>
+  </main>
+
+  <footer th:replace="~{layout/base-stitch :: footer-institucional}"></footer>
+</body>
+</html>

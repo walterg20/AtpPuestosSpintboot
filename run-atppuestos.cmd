@@ -3,7 +3,7 @@ REM ============================================================
 REM  ATPPuestos - RUN (arranca el jar ya compilado)
 REM  Perfil dev -> SQL Server RENTAS.
 REM
-REM  Requiere el jar: atp-puestos-camineros\target\atp-puestos-camineros-0.1.0-SNAPSHOT.jar
+REM  Requiere el jar: target\atp-puestos-camineros-0.1.0-SNAPSHOT.jar
 REM  Si no existe, compilarlo primero con:  run-mvn-jdk17.cmd
 REM  Para detener: Ctrl+C
 REM ============================================================
@@ -37,7 +37,7 @@ if not defined DB_USER if not defined SPRING_DATASOURCE_USERNAME (
 cd /d "%~dp0"
 
 REM --- Verificacion: el jar debe existir ---
-set "JAR=atp-puestos-camineros\target\atp-puestos-camineros-0.1.0-SNAPSHOT.jar"
+set "JAR=target\atp-puestos-camineros-0.1.0-SNAPSHOT.jar"
 if not exist "%JAR%" (
     echo ERROR: no existe %JAR%
     echo Compilalo primero:  run-mvn-jdk17.cmd

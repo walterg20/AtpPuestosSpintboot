@@ -111,7 +111,7 @@ mapeadas** en `DetalleProductoPrimario` (ver `dppLocOr`, `dppLocDe`, `dppIncluid
 |---|---|---|---|
 | GET | `/cargas` | Página principal (modal cerrado) | vista `puestos/control-cargas` |
 | GET | `/cargas/detalle?dppNroForm=…&dpptipoGui=…&duplicado=…&conCuit=…` | Abre el modal (R-MDG-01) | vista `puestos/control-cargas` con `mostrarModal=true` |
-| POST | `/cargas/marcar` | Marcar guía (modal se muestra tras el marcado) | vista `puestos/control-cargas` con `mostrarModal=true` |
+| POST | `/cargas/marcar` | Marcar guía (éxito → modal `modalDetalleGuia` con banner verde; anulada/interna → sólo leyenda en alert superior) | vista `puestos/control-cargas` con `mostrarModal = (mensaje == MSG_EXITO)` |
 
 ### 3.2 G-POSTMAN
 

@@ -57,6 +57,13 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Reportes PDF (JasperReports) — módulo 07-reportes-turnos (D-REP-001). -->
+    <dependency>
+      <groupId>net.sf.jasperreports</groupId>
+      <artifactId>jasperreports</artifactId>
+      <version>6.21.3</version>
+    </dependency>
   </dependencies>
 
   <build>

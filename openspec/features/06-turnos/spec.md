@@ -55,7 +55,7 @@ PK compuesta ⇒ `@EmbeddedId`/`@IdClass`.
 ### 3.1 Listado
 - **R-TUR-001:** El sistema SHALL listar los turnos de la sucursal del usuario autenticado
   (`Context.Sucursal` = `SucNroId`, `Context.Tipo` = `SucTipo`), ordenados por
-  `SucNroId, SucTipo, TurNroId`.
+  `SucNroId, SucTipo, TurNroId descendente`.
 - **R-TUR-002:** La grilla SHALL mostrar, con rótulos **verbatim**, las columnas visibles del
   legacy: `Id. Turno`, `Comisión`, `Fecha Apertura`, `Fecha Cierre`, `Estado`; y SHALL ocultar
   `SucNroId`, `SucTipo` y `SNSinNum`.
@@ -123,6 +123,17 @@ PK compuesta ⇒ `@EmbeddedId`/`@IdClass`.
 - **D-TUR-006:** El WorkWith completo (`WWPPrim_Turnos` con tabs de F2276) queda **fuera de
   alcance**: sus links de Update/Delete están comentados en el legacy.
 - **D-TUR-007:** `CPCResNyA` no se mapea (no existe en la tabla física).
+
+## 4b. Decisiones de diseño (Stitch SCREEN_5, 2026-11-12)
+- **D-TUR-008:** La pantalla de detalle es `detalle-turno.html` (Pestaña GENERAL), con pestaña
+  LISTADO ACTAS navegable por query param `?tab=actas` (no ruta separada).
+- **D-TUR-009:** KPIs del detalle: Actas Labradas (`COUNT(F2276)`) y Percepción Estimada
+  (`SUM(importes)`). **"Cargas Verificadas" se omite** (no hay campo de vehículos en `F2276`).
+- **D-TUR-010:** CSS nativo puro con variables `:root` (Design System "Gestión Caminera Chaco");
+  prohibido Tailwind/Bootstrap/CDN. JS vanilla sin dependencias.
+- **D-TUR-011:** Se reutiliza `layout/base-stitch` (no existen `fragments/header` ni
+  `fragments/footer`).
+- **D-TUR-012:** La bitácora se aproxima a partir de las actas (un evento por acta).
 
 ## 5. Fuera de alcance
 - WorkWith `WWPPrim_Turnos` y sus tabs de F2276/FormDef.

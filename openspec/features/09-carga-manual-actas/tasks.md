@@ -160,6 +160,16 @@
   - Evidencia: nuevo endpoint + test.
   - Nota: fuera de alcance actual (SA-ACTA-01); se registra como backlog.
 
+- [x] **T-ACTA-031** — Rediseño visual de `carga-manual-actas.html` replicando Stitch SCREEN_27.
+  - Deps: T-ACTA-001…T-ACTA-028.
+  - Hecho cuando: vista rediseñada con layout SCREEN_27 (breadcrumb, badge fecha/estado/puesto, secciones 1-4, tríptico, barra inferior), CSS nativo (carga-manual-actas.css) con variables :root, JS vanilla (carga-manual-actas.js). Funcionalidad preservada (th:object, th:field, validaciones). Sin frameworks CSS externos.
+  - Evidencia: `ActasMvcFormularioTest` (6 tests PASS) + `ActasRecursosTest` (6 tests PASS). BUILD SUCCESS 215 tests. Verificación QA PASS.
+
+- [x] **T-ACTA-032** — Rediseño visual de listado de actas replicando Stitch SCREEN_21 (`actas-listado.html`).
+  - Deps: T-ACTA-001…T-ACTA-028.
+  - Hecho cuando: vista rediseñada con KPIs (Actas en Turno, Carga Manual, Confirmadas, En Revisión), barra de filtros, grilla con Fecha/Hora y Estado, paginador reusado, banner legal, CSS nativo (actas-listado.css), JS vanilla (actas-listado.js). KPIs en backend (ResumenMetricasActas). Hallazgos menores cerrados.
+  - Evidencia: `ActasMvcControllerTest` (15 tests PASS) + `ActasRecursosTest` (6 tests PASS). BUILD SUCCESS 215 tests. Verificación QA PASS.
+
 ## Resumen de cobertura
 
 | Grupo | Tareas | Estado |
